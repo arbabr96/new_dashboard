@@ -41,6 +41,7 @@ import Zoom from "@material-ui/core/Zoom";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import "../../assets/css.css";
 import axios from "axios";
+import logo from "../../assets/logo.png";
 import {
   newMessage,
   ticketID,
@@ -1842,7 +1843,13 @@ class ChatInstance extends React.Component {
                 overflowY: "auto"
               }}
             >
-              <div className="heading_1 show_hide">EHR Form</div>
+              <div className="heading_1 show_hide">
+                <img
+                  src={logo}
+                  alt=""
+                  style={{ width: "60px", height: "60px" }}
+                />
+              </div>
               <div className="block-example border-bottom border-primary"></div>
               <Form>
                 {/* ///////////////// Customer Details ///////////////// */}
@@ -1850,7 +1857,7 @@ class ChatInstance extends React.Component {
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
                 <FormGroup
-                  className="form_group"
+                  // className="form_group"
                   style={{
                     marginTop: "10px",
                     paddingLeft: "6px",
@@ -2058,7 +2065,7 @@ class ChatInstance extends React.Component {
                       })}
                 </div>
                 {/* ///////////////// Complaints & Symptoms ///////////////// */}
-                <div style={{ marginTop: "16px" }}></div>
+                {/* <div style={{ marginTop: "16px" }}></div> */}
                 {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
                 {/* <Divider /> */}
                 <div className="row" style={{ backgroundColor: "#ffff" }}>
@@ -2084,8 +2091,8 @@ class ChatInstance extends React.Component {
                 </div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
-                <div style={{ marginTop: "16px" }}></div>
-                <div className="row" style={{ marginBottom: "10px" }}>
+                {/* <div style={{ marginTop: "16px" }}></div> */}
+                <div className="row" style={{ marginBottom: "16px" }}>
                   {this.state.provisional_diagnosis.length == 0
                     ? null
                     : this.state.provisional_diagnosis.map((val, index) => {

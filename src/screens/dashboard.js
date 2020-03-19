@@ -73,7 +73,7 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { MDBCol, MDBContainer, MDBRow, MDBFooter } from "mdbreact";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import DoneIcon from "@material-ui/icons/Done";
-
+import logo from "../assets/logo.png";
 import axios from "axios";
 const signalR = require("@aspnet/signalr");
 const { TextArea } = Input;
@@ -1155,7 +1155,13 @@ class dashboard extends React.Component {
                   overflowY: "auto"
                 }}
               >
-                <div className="heading_1 show_hide">EHR Form</div>
+                <div className="heading_1 show_hide">
+                  <img
+                    src={logo}
+                    alt=""
+                    style={{ width: "60px", height: "60px" }}
+                  />
+                </div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
                 <Form>
@@ -1165,7 +1171,7 @@ class dashboard extends React.Component {
                   </div>
                   <div className="block-example border-bottom border-primary"></div>
                   <FormGroup
-                    className="form_group"
+                    // className="form_group"
                     style={{
                       marginTop: "10px",
                       paddingLeft: "6px",
@@ -1303,51 +1309,53 @@ class dashboard extends React.Component {
                   </div>
                   <div className="block-example border-bottom border-primary"></div>
                   <div style={{ marginTop: "16px" }}></div>
-                  <div className="col-6">
-                    <FormGroup
-                      style={{
-                        paddingLeft: "6px",
-                        paddingRight: "6px"
-                      }}
-                    >
-                      <InputGroup>
-                        <Input
-                          type="text"
-                          name="symptoms"
-                          disabled
-                          className="show_hide"
-                          id="symptoms"
-                          placeholder="Symptoms"
-                          style={{ fontSize: "12px" }}
-                        />
-                        <Input
-                          type="text"
-                          name="duration"
-                          disabled
-                          className="show_hide"
-                          id="duration"
-                          placeholder="Duration"
-                          style={{ fontSize: "12px" }}
-                        />
-                        <InputGroupAddon addonType="append">
-                          <Tooltip title="Remove Complaints & Symptoms">
-                            <IconButton
-                              disabled
-                              size="small"
-                              color="secondary"
-                              aria-label="add an alarm"
-                            >
-                              <RemoveCircleOutlineIcon
-                                style={{ color: "red" }}
-                              />
-                            </IconButton>
-                          </Tooltip>
-                        </InputGroupAddon>
-                      </InputGroup>
-                    </FormGroup>
+                  <div className="row">
+                    <div className="col-6">
+                      <FormGroup
+                        style={{
+                          paddingLeft: "6px",
+                          paddingRight: "6px"
+                        }}
+                      >
+                        <InputGroup>
+                          <Input
+                            type="text"
+                            name="symptoms"
+                            disabled
+                            className="show_hide"
+                            id="symptoms"
+                            placeholder="Symptoms"
+                            style={{ fontSize: "12px" }}
+                          />
+                          <Input
+                            type="text"
+                            name="duration"
+                            disabled
+                            className="show_hide"
+                            id="duration"
+                            placeholder="Duration"
+                            style={{ fontSize: "12px" }}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <Tooltip title="Remove Complaints & Symptoms">
+                              <IconButton
+                                disabled
+                                size="small"
+                                color="secondary"
+                                aria-label="add an alarm"
+                              >
+                                <RemoveCircleOutlineIcon
+                                  style={{ color: "red" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormGroup>
+                    </div>
                   </div>
                   {/* ///////////////// Complaints & Symptoms ///////////////// */}
-                  <div style={{ marginTop: "16px" }}></div>
+                  {/* <div style={{ marginTop: "16px" }}></div> */}
                   {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
                   {/* <Divider /> */}
                   <div className="row" style={{ backgroundColor: "#ffff" }}>
@@ -1375,7 +1383,7 @@ class dashboard extends React.Component {
                   </div>
                   <div className="block-example border-bottom border-primary"></div>
                   <div style={{ marginTop: "16px" }}></div>
-                  <div className="row" style={{ marginBottom: "10px" }}>
+                  <div className="row">
                     <div className="col-6">
                       <FormGroup
                         style={{
@@ -1857,12 +1865,12 @@ class dashboard extends React.Component {
           {/* {this.drawChatTabs()} */}
           <div className="row">
             {" "}
-            <div className="col-3">
+            <div className="col">
               <div
                 id="style-1"
                 className="chatBox"
                 style={{
-                  width: "300px",
+                  // width: "300px",
                   backgroundColor: "#fafafa",
                   paddingTop: "10px",
                   paddingBottom: "10px"
