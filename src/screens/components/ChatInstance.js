@@ -608,7 +608,7 @@ class ChatInstance extends React.Component {
   AudioRequestView = () => {
     return (
       <div className="call_request_view">
-        <div className="heading_text">
+        <div className="heading_text show_hide">
           Patient has requested for an audio call session
         </div>
 
@@ -618,6 +618,7 @@ class ChatInstance extends React.Component {
               variant="contained"
               size="small"
               color="primary"
+              className="show_hide"
               startIcon={<DoneIcon />}
               onClick={() => {
                 this.props.newCallNotification(false);
@@ -650,6 +651,7 @@ class ChatInstance extends React.Component {
               variant="contained"
               size="small"
               color="secondary"
+              className="show_hide"
               startIcon={<ClearIcon />}
               onClick={() => {
                 this.props.newCallNotification(false);
@@ -1006,7 +1008,7 @@ class ChatInstance extends React.Component {
 
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
   add_complaints = event => {
-    this.Form_scrollToBottom();
+    // this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.complaints_symptoms.length);
     this.setState(prevState => ({
       complaints_symptoms: [
@@ -1067,7 +1069,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Provisional Diagnosis /////////////////////////////////////////
 
   addPD = event => {
-    this.Form_scrollToBottom();
+    // this.Form_scrollToBottom();
     console.log("ADD_____", this.state.treatment_arr.length);
     this.setState(prevState => ({
       provisional_diagnosis: [
@@ -1110,7 +1112,7 @@ class ChatInstance extends React.Component {
 
   ////////////////////////// Lab Tests /////////////////////////////////////////
   add_lab_test = event => {
-    this.Form_scrollToBottom();
+    // this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.lab_tests.length);
     this.setState(prevState => ({
       lab_tests: [
@@ -1153,7 +1155,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Lab Tests /////////////////////////////////////////
 
   addPrescriptionRow = () => {
-    this.Form_scrollToBottom();
+    // this.Form_scrollToBottom();
     console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
     this.setState(prevState => ({
       add_Prescription: [
@@ -1447,7 +1449,7 @@ class ChatInstance extends React.Component {
                 <div className="col">
                   <div className="right_bar">
                     <div className="row">
-                      {this.state.videoState ? (
+                      {this.state.videoState && this.state.showRemoteVideo ? (
                         <FormControlLabel
                           className="mt-2"
                           control={
@@ -1459,9 +1461,19 @@ class ChatInstance extends React.Component {
                           }
                           label={
                             this.state.show_video ? (
-                              <div style={{ fontSize: "12px" }}>Hide Video</div>
+                              <div
+                                className="show_hide"
+                                style={{ fontSize: "12px" }}
+                              >
+                                Hide Video
+                              </div>
                             ) : (
-                              <div style={{ fontSize: "12px" }}>Show Video</div>
+                              <div
+                                className="show_hide"
+                                style={{ fontSize: "12px" }}
+                              >
+                                Show Video
+                              </div>
                             )
                           }
                         />
@@ -1561,7 +1573,7 @@ class ChatInstance extends React.Component {
                       {this.props.close_Ticket ? this.removeTicket() : null}
                       {this.props.ticket.messages.length === 0 &&
                       !this.state.showRemoteVideo ? (
-                        <div className="no_message">
+                        <div className="no_message show_hide">
                           <Chip label="No messages" />
                         </div>
                       ) : null}
@@ -1624,7 +1636,7 @@ class ChatInstance extends React.Component {
                           <Row key={index}>
                             <Col>
                               {isSenderPatient ? (
-                                <div className={"message-right"}>
+                                <div className={"message-right show_hide"}>
                                   {message.file == null ? message.text : null}
 
                                   {message.file != null &&
@@ -1662,7 +1674,7 @@ class ChatInstance extends React.Component {
                                   )}
                                 </div>
                               ) : (
-                                <div className={"message-left"}>
+                                <div className={"message-left show_hide"}>
                                   {message.file == null ? message.text : null}
                                   {message.file != null &&
                                   message.file.fileType === 0 ? (
@@ -1747,9 +1759,10 @@ class ChatInstance extends React.Component {
               {/* <div className="container-fluid"> */}
               {/* <div className="row"> */}
               {this.state.disconnect_TicketID === this.props.ticket.id ? (
-                <div className="session_expired">
+                <div className="session_expired show_hide">
                   <Chip
                     // variant="outlined"
+                    className="show_hide"
                     label="Your Chat Session Expired"
                     color="secondary"
                     icon={<SpeakerNotesOffIcon />}
@@ -1772,6 +1785,7 @@ class ChatInstance extends React.Component {
                       style={{
                         fontSize: "10px"
                       }}
+                      className="show_hide"
                       fullWidth={true}
                       value={this.state.textMessage}
                       onChange={text =>
@@ -1828,11 +1842,11 @@ class ChatInstance extends React.Component {
                 overflowY: "auto"
               }}
             >
-              <div className="heading_1">EHR Form</div>
+              <div className="heading_1 show_hide">EHR Form</div>
               <div className="block-example border-bottom border-primary"></div>
               <Form>
                 {/* ///////////////// Customer Details ///////////////// */}
-                <div className="tab_heading">Customer Details :</div>
+                <div className="tab_heading show_hide">Customer Details :</div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
                 <FormGroup
@@ -1850,6 +1864,7 @@ class ChatInstance extends React.Component {
                         type="text"
                         required={true}
                         name="health_id"
+                        className="show_hide"
                         id="health_id"
                         placeholder="Health ID #"
                         style={{ fontSize: "12px" }}
@@ -1861,6 +1876,7 @@ class ChatInstance extends React.Component {
                         type="number"
                         name="registeration_id"
                         id="registeration_id"
+                        className="show_hide"
                         placeholder="Registration #"
                         style={{ fontSize: "12px" }}
                       />
@@ -1880,6 +1896,7 @@ class ChatInstance extends React.Component {
                         type="text"
                         required={true}
                         name="mr/mrs"
+                        className="show_hide"
                         id="mr/mrs"
                         placeholder="Mr/Mrs"
                         style={{ fontSize: "12px" }}
@@ -1901,6 +1918,7 @@ class ChatInstance extends React.Component {
                       <Input
                         type="select"
                         name="gender"
+                        className="show_hide"
                         id="gender"
                         placeholder="Gender"
                         style={{ fontSize: "12px" }}
@@ -1915,6 +1933,7 @@ class ChatInstance extends React.Component {
                         type="text"
                         required={true}
                         name="contact"
+                        className="show_hide"
                         id="contact"
                         placeholder="Contact"
                         style={{ fontSize: "12px" }}
@@ -1925,6 +1944,7 @@ class ChatInstance extends React.Component {
                       <Input
                         type="email"
                         required={true}
+                        className="show_hide"
                         name="email"
                         id="email"
                         placeholder="Email-Address"
@@ -1945,7 +1965,9 @@ class ChatInstance extends React.Component {
                   }}
                 >
                   <div className="col">
-                    <div className="tab_heading">Complaints & Symptoms :</div>
+                    <div className="tab_heading show_hide">
+                      Complaints & Symptoms :
+                    </div>
                   </div>
                   <div className="col">
                     <div className="add_btn">
@@ -1980,6 +2002,7 @@ class ChatInstance extends React.Component {
                                 <Input
                                   type="text"
                                   name="symptoms"
+                                  className="show_hide"
                                   id="symptoms"
                                   value={
                                     this.state.complaints_symptoms[index]
@@ -1998,6 +2021,7 @@ class ChatInstance extends React.Component {
                                   type="text"
                                   name="duration"
                                   id="duration"
+                                  className="show_hide"
                                   value={
                                     this.state.complaints_symptoms[index]
                                       .duration
@@ -2039,7 +2063,9 @@ class ChatInstance extends React.Component {
                 {/* <Divider /> */}
                 <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
-                    <div className="tab_heading">Provisional Diagnosis :</div>
+                    <div className="tab_heading show_hide">
+                      Provisional Diagnosis :
+                    </div>
                   </div>
                   <div className="col">
                     <div className="add_btn">
@@ -2076,6 +2102,7 @@ class ChatInstance extends React.Component {
                                   type="text"
                                   name="add_PD"
                                   id="addPD"
+                                  className="show_hide"
                                   value={
                                     this.state.provisional_diagnosis[index]
                                       .diagnose
@@ -2112,7 +2139,7 @@ class ChatInstance extends React.Component {
                 {/* <Divider /> */}
                 <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
-                    <div className="tab_heading">Prescription :</div>
+                    <div className="tab_heading show_hide">Prescription :</div>
                   </div>
                   <div className="col">
                     <div className="add_btn">
@@ -2142,12 +2169,24 @@ class ChatInstance extends React.Component {
                     <thead>
                       <tr>
                         <th></th>
-                        <th style={{ fontSize: "12px" }}>S.No</th>
-                        <th style={{ fontSize: "12px" }}>Medicine</th>
-                        <th style={{ fontSize: "12px" }}>Dosage</th>
-                        <th style={{ fontSize: "12px" }}>Route</th>
-                        <th style={{ fontSize: "12px" }}>Frequency</th>
-                        <th style={{ fontSize: "12px" }}>Duration</th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          S.No
+                        </th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          Medicine
+                        </th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          Dosage
+                        </th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          Route
+                        </th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          Frequency
+                        </th>
+                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                          Duration
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
@@ -2156,7 +2195,10 @@ class ChatInstance extends React.Component {
                             return (
                               <tr key={index}>
                                 <th scope="select">
-                                  <Tooltip title="Delete Provisional Diagnosis">
+                                  <Tooltip
+                                    className="show_hide"
+                                    title="Delete Provisional Diagnosis"
+                                  >
                                     <IconButton
                                       style={{ width: "10px" }}
                                       size="small"
@@ -2180,6 +2222,7 @@ class ChatInstance extends React.Component {
                                     type="text"
                                     name="description"
                                     id="description"
+                                    className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index]
@@ -2198,6 +2241,7 @@ class ChatInstance extends React.Component {
                                     type="text"
                                     name="dosage"
                                     id="dosage"
+                                    className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index].dosage
@@ -2212,6 +2256,7 @@ class ChatInstance extends React.Component {
                                     type="text"
                                     name="Period"
                                     id="Period"
+                                    className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index].period
@@ -2226,6 +2271,7 @@ class ChatInstance extends React.Component {
                                     type="text"
                                     name="dosageForm"
                                     id="dosageForm"
+                                    className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index]
@@ -2243,6 +2289,7 @@ class ChatInstance extends React.Component {
                                   <Input
                                     type="text"
                                     name="comment"
+                                    className="show_hide"
                                     id="comment"
                                     style={{ fontSize: "10px" }}
                                     value={
@@ -2267,7 +2314,7 @@ class ChatInstance extends React.Component {
                 {/* <Divider /> */}
                 <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
-                    <div className="tab_heading">Lab Tests :</div>
+                    <div className="tab_heading show_hide">Lab Tests :</div>
                   </div>
                   <div className="col">
                     <div className="add_btn">
@@ -2303,6 +2350,7 @@ class ChatInstance extends React.Component {
                                 <Input
                                   type="text"
                                   name="labtest"
+                                  className="show_hide"
                                   id="labtest"
                                   value={this.state.lab_tests[index].test}
                                   placeholder={"Test # " + index}
@@ -2340,7 +2388,7 @@ class ChatInstance extends React.Component {
 
                 {/* //////////////////////////// Follow Up ////////////////// */}
                 {/* <Divider /> */}
-                <div className="tab_heading">Follow up :</div>
+                <div className="tab_heading show_hide">Follow up :</div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
@@ -2354,6 +2402,7 @@ class ChatInstance extends React.Component {
                     <TextField
                       id="outlined-multiline-static"
                       label="Follow up"
+                      className="show_hide"
                       multiline
                       rows="4"
                       variant="outlined"
@@ -2369,6 +2418,7 @@ class ChatInstance extends React.Component {
                   style={{ width: "96%", padding: "10px", margin: "10px" }}
                 >
                   <div
+                    className="show_hide"
                     style={{
                       fontSize: "14px",
                       fontWeight: "bold",
@@ -2378,15 +2428,24 @@ class ChatInstance extends React.Component {
                     Disclaimer
                   </div>
                   <div style={{ padding: "10px" }}>
-                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                    <div
+                      className="show_hide"
+                      style={{ fontSize: "12px", color: "#0d74bc" }}
+                    >
                       1.&nbsp;&nbsp;&nbsp;&nbsp; Prescription is Not Valid For
                       Court{" "}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                    <div
+                      className="show_hide"
+                      style={{ fontSize: "12px", color: "#0d74bc" }}
+                    >
                       2.&nbsp;&nbsp;&nbsp;&nbsp; Treatment/Prescription is only
                       applicable for non-emergency medical cases{" "}
                     </div>
-                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                    <div
+                      className="show_hide"
+                      style={{ fontSize: "12px", color: "#0d74bc" }}
+                    >
                       3.&nbsp;&nbsp;&nbsp;&nbsp; This is Second Opinion service.
                       It does not replace your primary care Doctor.
                     </div>
@@ -2399,6 +2458,7 @@ class ChatInstance extends React.Component {
                   <Button
                     variant="contained"
                     color="primary"
+                    className="show_hide"
                     startIcon={<CloudUploadIcon />}
                   >
                     Upload EHR

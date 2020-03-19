@@ -72,6 +72,8 @@ import Zoom from "@material-ui/core/Zoom";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { MDBCol, MDBContainer, MDBRow, MDBFooter } from "mdbreact";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
+import DoneIcon from "@material-ui/icons/Done";
+
 import axios from "axios";
 const signalR = require("@aspnet/signalr");
 const { TextArea } = Input;
@@ -911,8 +913,10 @@ class dashboard extends React.Component {
 
     const btn = (
       <Button
-        type="primary"
+        variant="contained"
         size="small"
+        color="primary"
+        startIcon={<DoneIcon />}
         // onClick={() => notification.close(key)}
         onClick={() => {
           console.log("ON ACCEPT", key);
@@ -933,7 +937,7 @@ class dashboard extends React.Component {
     );
 
     notification.open({
-      message: "Message Request",
+      message: <div style={{ fontWeight: "bold" }}>Message Request</div>,
       description: `New Message Request From Patient ID - ${key}`,
       btn,
       key,
@@ -1016,9 +1020,19 @@ class dashboard extends React.Component {
                           }
                           label={
                             this.state.show_video ? (
-                              <div style={{ fontSize: "12px" }}>Hide Video</div>
+                              <div
+                                className="show_hide"
+                                style={{ fontSize: "12px" }}
+                              >
+                                Hide Video
+                              </div>
                             ) : (
-                              <div style={{ fontSize: "12px" }}>Show Video</div>
+                              <div
+                                className="show_hide"
+                                style={{ fontSize: "12px" }}
+                              >
+                                Show Video
+                              </div>
                             )
                           }
                         />
@@ -1141,12 +1155,14 @@ class dashboard extends React.Component {
                   overflowY: "auto"
                 }}
               >
-                <div className="heading_1">EHR Form</div>
+                <div className="heading_1 show_hide">EHR Form</div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
                 <Form>
                   {/* ///////////////// Customer Details ///////////////// */}
-                  <div className="tab_heading">Customer Details :</div>
+                  <div className="tab_heading show_hide">
+                    Customer Details :
+                  </div>
                   <div className="block-example border-bottom border-primary"></div>
                   <FormGroup
                     className="form_group"
@@ -1163,6 +1179,7 @@ class dashboard extends React.Component {
                           type="text"
                           required={true}
                           name="health_id"
+                          className="show_hide"
                           id="health_id"
                           placeholder="Health ID #"
                           style={{ fontSize: "12px" }}
@@ -1175,6 +1192,7 @@ class dashboard extends React.Component {
                           type="number"
                           disabled={true}
                           name="registeration_id"
+                          className="show_hide"
                           id="registeration_id"
                           placeholder="Registration #"
                           style={{ fontSize: "12px" }}
@@ -1196,6 +1214,7 @@ class dashboard extends React.Component {
                           required={true}
                           disabled
                           name="mr/mrs"
+                          className="show_hide"
                           id="mr/mrs"
                           placeholder="Mr/Mrs"
                           style={{ fontSize: "12px" }}
@@ -1218,6 +1237,7 @@ class dashboard extends React.Component {
                           type="select"
                           name="gender"
                           disabled
+                          className="show_hide"
                           id="gender"
                           placeholder="Gender"
                           style={{ fontSize: "12px" }}
@@ -1237,6 +1257,7 @@ class dashboard extends React.Component {
                           placeholder="Contact"
                           style={{ fontSize: "12px" }}
                           disabled
+                          className="show_hide"
                         />
                       </div>
                       <div className="col">
@@ -1245,6 +1266,7 @@ class dashboard extends React.Component {
                           type="text"
                           required={true}
                           name="email"
+                          className="show_hide"
                           id="email"
                           placeholder="Email-Address"
                           style={{ fontSize: "12px" }}
@@ -1258,7 +1280,9 @@ class dashboard extends React.Component {
                   {/* <Divider /> */}
                   <div className="row" style={{ backgroundColor: "#ffff" }}>
                     <div className="col">
-                      <div className="tab_heading">Complaints & Symptoms :</div>
+                      <div className="tab_heading show_hide">
+                        Complaints & Symptoms :
+                      </div>
                     </div>
                     <div className="col">
                       <div className="add_btn">
@@ -1291,6 +1315,7 @@ class dashboard extends React.Component {
                           type="text"
                           name="symptoms"
                           disabled
+                          className="show_hide"
                           id="symptoms"
                           placeholder="Symptoms"
                           style={{ fontSize: "12px" }}
@@ -1299,6 +1324,7 @@ class dashboard extends React.Component {
                           type="text"
                           name="duration"
                           disabled
+                          className="show_hide"
                           id="duration"
                           placeholder="Duration"
                           style={{ fontSize: "12px" }}
@@ -1326,7 +1352,9 @@ class dashboard extends React.Component {
                   {/* <Divider /> */}
                   <div className="row" style={{ backgroundColor: "#ffff" }}>
                     <div className="col">
-                      <div className="tab_heading">Provisional Diagnosis :</div>
+                      <div className="tab_heading show_hide">
+                        Provisional Diagnosis :
+                      </div>
                     </div>
                     <div className="col">
                       <div className="add_btn">
@@ -1361,6 +1389,7 @@ class dashboard extends React.Component {
                             name="add_PD"
                             disabled
                             id="addPD"
+                            className="show_hide"
                             placeholder="Diagnosis"
                             style={{ fontSize: "12px" }}
                           />
@@ -1388,7 +1417,9 @@ class dashboard extends React.Component {
                   {/* <Divider /> */}
                   <div className="row" style={{ backgroundColor: "#ffff" }}>
                     <div className="col">
-                      <div className="tab_heading">Prescription :</div>
+                      <div className="tab_heading show_hide">
+                        Prescription :
+                      </div>
                     </div>
                     <div className="col">
                       <div className="add_btn">
@@ -1419,12 +1450,42 @@ class dashboard extends React.Component {
                       <thead>
                         <tr>
                           <th></th>
-                          <th style={{ fontSize: "12px" }}>S.No</th>
-                          <th style={{ fontSize: "12px" }}>Medicine</th>
-                          <th style={{ fontSize: "12px" }}>Dosage</th>
-                          <th style={{ fontSize: "12px" }}>Route</th>
-                          <th style={{ fontSize: "12px" }}>Frequency</th>
-                          <th style={{ fontSize: "12px" }}>Duration</th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            S.No
+                          </th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Medicine
+                          </th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Dosage
+                          </th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Route
+                          </th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Frequency
+                          </th>
+                          <th
+                            className="show_hide"
+                            style={{ fontSize: "12px" }}
+                          >
+                            Duration
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1444,7 +1505,11 @@ class dashboard extends React.Component {
                               </IconButton>
                             </Tooltip>
                           </th>
-                          <th scope="row" style={{ fontSize: "10px" }}>
+                          <th
+                            className="show_hide"
+                            scope="row"
+                            style={{ fontSize: "10px" }}
+                          >
                             0
                           </th>
                           <td>
@@ -1453,6 +1518,7 @@ class dashboard extends React.Component {
                               disabled
                               name="description"
                               id="description"
+                              className="show_hide"
                               placeholder="Medicine"
                               style={{ fontSize: "10px" }}
                             />
@@ -1462,6 +1528,7 @@ class dashboard extends React.Component {
                               type="text"
                               name="dosage"
                               disabled
+                              className="show_hide"
                               id="dosage"
                               placeholder="Dosage"
                               style={{ fontSize: "10px" }}
@@ -1472,6 +1539,7 @@ class dashboard extends React.Component {
                               type="text"
                               name="Route"
                               disabled
+                              className="show_hide"
                               id="Route"
                               style={{ fontSize: "10px" }}
                               placeholder="Route"
@@ -1482,6 +1550,7 @@ class dashboard extends React.Component {
                               type="text"
                               name="Frequency"
                               disabled
+                              className="show_hide"
                               id="Frequency"
                               style={{ fontSize: "10px" }}
                               placeholder="Frequency"
@@ -1492,6 +1561,7 @@ class dashboard extends React.Component {
                               type="text"
                               name="Duration"
                               disabled
+                              className="show_hide"
                               id="Duration"
                               style={{ fontSize: "10px" }}
                               placeholder="Duration"
@@ -1508,7 +1578,7 @@ class dashboard extends React.Component {
                   {/* <Divider /> */}
                   <div className="row" style={{ backgroundColor: "#ffff" }}>
                     <div className="col">
-                      <div className="tab_heading">Lab Tests :</div>
+                      <div className="tab_heading show_hide">Lab Tests :</div>
                     </div>
                     <div className="col">
                       <div className="add_btn">
@@ -1541,6 +1611,7 @@ class dashboard extends React.Component {
                           <Input
                             disabled
                             type="text"
+                            className="show_hide"
                             name="labtest"
                             id="labtest"
                             placeholder={"Test # 1"}
@@ -1567,7 +1638,7 @@ class dashboard extends React.Component {
                   {/* //////////////////// LAB TESTS ///////////////// */}
                   {/* //////////////////////////// Follow Up ////////////////// */}
                   {/* <Divider /> */}
-                  <div className="tab_heading">Follow up :</div>
+                  <div className="tab_heading show_hide">Follow up :</div>
                   <div className="block-example border-bottom border-primary"></div>
                   <div style={{ marginTop: "16px" }}></div>
                   <FormGroup
@@ -1581,6 +1652,7 @@ class dashboard extends React.Component {
                         disabled
                         id="outlined-multiline-static"
                         label="Follow up"
+                        className="show_hide"
                         multiline
                         rows="4"
                         variant="outlined"
@@ -1596,6 +1668,7 @@ class dashboard extends React.Component {
                     style={{ width: "96%", padding: "10px", margin: "10px" }}
                   >
                     <div
+                      className="show_hide"
                       style={{
                         fontSize: "14px",
                         fontWeight: "bold",
@@ -1605,15 +1678,24 @@ class dashboard extends React.Component {
                       Disclaimer
                     </div>
                     <div style={{ padding: "10px" }}>
-                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      <div
+                        className="show_hide"
+                        style={{ fontSize: "12px", color: "#0d74bc" }}
+                      >
                         1.&nbsp;&nbsp;&nbsp;&nbsp; Prescription is Not Valid For
                         Court{" "}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      <div
+                        className="show_hide"
+                        style={{ fontSize: "12px", color: "#0d74bc" }}
+                      >
                         2.&nbsp;&nbsp;&nbsp;&nbsp; Treatment/Prescription is
                         only applicable for non-emergency medical cases{" "}
                       </div>
-                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      <div
+                        className="show_hide"
+                        style={{ fontSize: "12px", color: "#0d74bc" }}
+                      >
                         3.&nbsp;&nbsp;&nbsp;&nbsp; This is Second Opinion
                         service. It does not replace your primary care Doctor.
                       </div>
@@ -1626,6 +1708,7 @@ class dashboard extends React.Component {
                     <Button
                       disabled
                       variant="contained"
+                      className="show_hide"
                       color="primary"
                       startIcon={<CloudUploadIcon />}
                     >
@@ -1799,6 +1882,7 @@ class dashboard extends React.Component {
                         variant="outlined"
                         color="primary"
                         className="avail_btn"
+                        size="small"
                         style={{ fontSize: "14px" }}
                         onClick={() => this.changeStatus()}
                         startIcon={
@@ -1810,7 +1894,16 @@ class dashboard extends React.Component {
                           />
                         }
                       >
-                        {availability === "Available" ? "Available" : "Away"}
+                        <div
+                          className="availability"
+                          style={{
+                            color:
+                              availability === "Available" ? "green" : "red"
+                          }}
+                        >
+                          {" "}
+                          {availability === "Available" ? "Available" : "Away"}
+                        </div>
                       </Button>
                       {/* <Dropdown>
                         <Dropdown.Toggle
