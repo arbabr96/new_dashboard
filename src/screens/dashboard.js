@@ -45,9 +45,33 @@ import {
 import Ripples, { createRipples } from "react-ripples";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
+import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import { Tabs, Layout, Upload, Icon, notification, Col, Row } from "antd";
+// import { Button } from "reactstrap";
+import { makeStyles } from "@material-ui/core/styles";
+import IconButton from "@material-ui/core/IconButton";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
+import AttachFileIcon from "@material-ui/icons/AttachFile";
+import AddRoundedIcon from "@material-ui/icons/AddRounded";
+import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
+import AddCircleRoundedIcon from "@material-ui/icons/AddCircleRounded";
+import CancelIcon from "@material-ui/icons/Cancel";
+import Tooltip from "@material-ui/core/Tooltip";
+import VideocamIcon from "@material-ui/icons/Videocam";
+import TextField from "@material-ui/core/TextField";
+import SendIcon from "@material-ui/icons/Send";
+import Chip from "@material-ui/core/Chip";
+import CloseIcon from "@material-ui/icons/Close";
+import VideocamOffRoundedIcon from "@material-ui/icons/VideocamOffRounded";
+import SpeakerNotesOffIcon from "@material-ui/icons/SpeakerNotesOff";
 import { connect } from "react-redux";
 import { Card, Dropdown, Container, Modal } from "react-bootstrap";
+import Switch from "@material-ui/core/Switch";
+import Paper from "@material-ui/core/Paper";
+import Zoom from "@material-ui/core/Zoom";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { MDBCol, MDBContainer, MDBRow, MDBFooter } from "mdbreact";
+import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import axios from "axios";
 const signalR = require("@aspnet/signalr");
 const { TextArea } = Input;
@@ -82,7 +106,8 @@ class dashboard extends React.Component {
       lab_tests: [],
       close_chat: false,
       selected_id: 0,
-      select_ticket: []
+      select_ticket: "",
+      show_video: false
     };
     this.url =
       "https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/mp3/iphone-6-original-ringtone-24163.mp3";
@@ -196,6 +221,8 @@ class dashboard extends React.Component {
       var tickets = [...this.props.tickets, event];
       console.log("TIckets === ", tickets);
       this.props.updateTickets(tickets);
+      this.send_TO_CI();
+      this.forceUpdate();
     });
     connection.on("OnCloseWindow", () => {
       console.log("OnCloseWindow ");
@@ -237,11 +264,11 @@ class dashboard extends React.Component {
       isOpen: !this.state.isOpen
     });
   };
-  changeStatus = val => {
-    if (val === "Available") {
+  changeStatus = () => {
+    if (this.state.availability === "Away") {
       if (this.props.connection) {
         this.props.connection
-          .invoke("setAvailability", val)
+          .invoke("setAvailability", "Available")
           .then(r => {
             console.log("r", r);
           })
@@ -249,11 +276,31 @@ class dashboard extends React.Component {
             console.log("e", e);
           });
       }
+      this.setState({
+        availability: "Available"
+      });
       console.log("Value is Available");
+    } else {
+      this.setState({
+        availability: "Away"
+      });
     }
-    this.setState({
-      availability: val
-    });
+    // if (val === "Available") {
+    //   if (this.props.connection) {
+    //     this.props.connection
+    //       .invoke("setAvailability", val)
+    //       .then(r => {
+    //         console.log("r", r);
+    //       })
+    //       .catch(e => {
+    //         console.log("e", e);
+    //       });
+    //   }
+    //   console.log("Value is Available");
+    // }
+    // this.setState({
+    //   availability: "Away"
+    // });
   };
   handlePatientName = event => {
     if (event.target.value !== "") {
@@ -793,32 +840,32 @@ class dashboard extends React.Component {
               var name = (
                 <div id="style-1" className="chatTab">
                   {this.props.call === "UpComming Call" &&
-                    this.props.ticketId === ticket.id ? (
-                      <Icon
-                        type="phone"
-                        theme="filled"
-                        style={{ color: "#2ECC71" }}
-                      />
-                    ) : null
-                    // <Icon
-                    //   style={{
-                    //     color:
-                    //       this.props.message === "New Message" &&
-                    //       this.props.ticketId === ticket.id
-                    //         ? "#2ECC71"
-                    //         : "#f00"
-                    //   }}
-                    //   type="bulb"
-                    //   theme={
-                    //     this.props.message === "New Message" &&
-                    //     this.props.ticketId === ticket.id
-                    //       ? "filled"
-                    //       : ""
-                    //   }
-                    // />
+                  this.props.ticketId === ticket.id ? (
+                    <Icon
+                      type="phone"
+                      theme="filled"
+                      style={{ color: "#2ECC71" }}
+                    />
+                  ) : null
+                  // <Icon
+                  //   style={{
+                  //     color:
+                  //       this.props.message === "New Message" &&
+                  //       this.props.ticketId === ticket.id
+                  //         ? "#2ECC71"
+                  //         : "#f00"
+                  //   }}
+                  //   type="bulb"
+                  //   theme={
+                  //     this.props.message === "New Message" &&
+                  //     this.props.ticketId === ticket.id
+                  //       ? "filled"
+                  //       : ""
+                  //   }
+                  // />
                   }
                   {this.props.message === "New Message" &&
-                    this.props.ticketId === ticket.id
+                  this.props.ticketId === ticket.id
                     ? this.props.message
                     : ticket.patient.username + " - " + ticket.id}
                 </div>
@@ -928,30 +975,685 @@ class dashboard extends React.Component {
       );
     }
   };
+  switch_to_video = () => {
+    console.log("switch_to_video", this.state.show_video);
+    this.setState({
+      show_video: !this.state.show_video
+    });
+  };
   send_TO_CI = () => {
     if (this.props.tickets.length > 0) {
-      console.log('this.props.tickets Dashboard', this.props.tickets[this.state.selected_id])
+      // console.log('this.props.tickets Dashboard', this.state.selected_id)
+
       return (
         <ChatInstance
           connection={this.props.connection}
           ticket={this.props.tickets[this.state.selected_id]}
         />
-      )
-    }
+      );
+    } else {
+      return (
+        <div className="col-9 chat_instance">
+          <div className="row">
+            <div className="col-6">
+              <div className="chat_area" style={{ backgroundColor: "#f6f6f8" }}>
+                <div className="row">
+                  <div className="col">
+                    <div className="mt-1 patient_Name">Patient - 1771</div>
+                  </div>
+                  <div className="col">
+                    <div className="right_bar">
+                      <div className="row">
+                        <FormControlLabel
+                          disabled
+                          className="mt-2"
+                          control={
+                            <Switch
+                              size="small"
+                              checked={this.state.show_video}
+                              onChange={() => this.switch_to_video()}
+                            />
+                          }
+                          label={
+                            this.state.show_video ? (
+                              <div style={{ fontSize: "12px" }}>Hide Video</div>
+                            ) : (
+                              <div style={{ fontSize: "12px" }}>Show Video</div>
+                            )
+                          }
+                        />
+                        <Tooltip title="Start Video Call">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <VideocamIcon style={{ color: "#7a7a7a" }} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Close Chat">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <CloseIcon
+                              style={{
+                                color: "red"
+                              }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {/* <Divider style={{ color: "red" }} /> */}
+                <div className="block-example border-bottom border-primary"></div>
+                <div className="row">
+                  <div className="col">
+                    <div className="middle" id="style-1">
+                      <div
+                        ref={el => {
+                          this.lastMessage = el;
+                        }}
+                        id="style-1"
+                        style={{
+                          overflowX: "hidden",
+                          overflowY: "auto",
+                          maxHeight: "360px"
+                        }}
+                      >
+                        <div className="no_message">
+                          <Chip
+                            icon={<QueryBuilderIcon />}
+                            label="Waiting for Tickets ..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  id="inputField"
+                  className="row"
+                  style={{
+                    backgroundColor: "#ffff"
+                  }}
+                >
+                  <div className="col-9">
+                    <TextField
+                      id="outlined-multiline-static"
+                      multiline
+                      disabled
+                      rowsMax="3"
+                      placeholder="Type Here"
+                      style={{
+                        fontSize: "10px"
+                        // paddingBottom: '10px'
+                      }}
+                      fullWidth={true}
+                      value={this.state.textMessage}
+                      onChange={text =>
+                        this.setState({ textMessage: text.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="col-3">
+                    <Tooltip arrow title="Upload File/Image">
+                      <IconButton
+                        disabled
+                        color="secondary"
+                        aria-label="add an alarm"
+                      >
+                        <AttachFileIcon />
+                      </IconButton>
+                    </Tooltip>
 
-  }
+                    <Tooltip arrow title="Send Message">
+                      <IconButton
+                        disabled
+                        style={{
+                          borderWidth: "0px"
+                        }}
+                        color="primary"
+                        aria-label="add an alarm"
+                      >
+                        <SendIcon
+                          style={{
+                            color: "#0d74bc"
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-6">
+              <div
+                id="style-1"
+                className="prescription_form block-example border border-light"
+                style={{
+                  backgroundColor: "#fff",
+                  overflowX: "hidden",
+                  overflowY: "auto"
+                }}
+              >
+                <div className="heading_1">EHR Form</div>
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
+                <Form>
+                  {/* ///////////////// Customer Details ///////////////// */}
+                  <div className="tab_heading">Customer Details :</div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <FormGroup
+                    className="form_group"
+                    style={{
+                      marginTop: "10px",
+                      paddingLeft: "6px",
+                      paddingRight: "6px"
+                    }}
+                  >
+                    <div className="row">
+                      <div className="col">
+                        {" "}
+                        <Input
+                          type="text"
+                          required={true}
+                          name="health_id"
+                          id="health_id"
+                          placeholder="Health ID #"
+                          style={{ fontSize: "12px" }}
+                          disabled
+                        />
+                      </div>
+
+                      <div className="col">
+                        <Input
+                          type="number"
+                          disabled={true}
+                          name="registeration_id"
+                          id="registeration_id"
+                          placeholder="Registration #"
+                          style={{ fontSize: "12px" }}
+                        />
+                        <span
+                          style={{
+                            color: "red",
+                            fontSize: "12px",
+                            fontWeight: "normal"
+                          }}
+                        >
+                          {this.state.errorAge}
+                        </span>
+                      </div>
+                      <div className="col">
+                        {" "}
+                        <Input
+                          type="text"
+                          required={true}
+                          disabled
+                          name="mr/mrs"
+                          id="mr/mrs"
+                          placeholder="Mr/Mrs"
+                          style={{ fontSize: "12px" }}
+                        />
+                      </div>
+                    </div>
+                  </FormGroup>
+                  <FormGroup
+                    // className="form_group"
+                    style={{
+                      marginTop: "5px",
+                      paddingLeft: "6px",
+                      paddingRight: "6px"
+                    }}
+                  >
+                    <div className="row">
+                      <div className="col">
+                        {" "}
+                        <Input
+                          type="select"
+                          name="gender"
+                          disabled
+                          id="gender"
+                          placeholder="Gender"
+                          style={{ fontSize: "12px" }}
+                        >
+                          <option>Gender</option>
+                          <option>Male</option>
+                          <option>Female</option>
+                        </Input>
+                      </div>
+                      <div className="col">
+                        {" "}
+                        <Input
+                          type="text"
+                          required={true}
+                          name="contact"
+                          id="contact"
+                          placeholder="Contact"
+                          style={{ fontSize: "12px" }}
+                          disabled
+                        />
+                      </div>
+                      <div className="col">
+                        {" "}
+                        <Input
+                          type="text"
+                          required={true}
+                          name="email"
+                          id="email"
+                          placeholder="Email-Address"
+                          style={{ fontSize: "12px" }}
+                          disabled
+                        />
+                      </div>
+                    </div>
+                  </FormGroup>
+                  {/* ///////////////// Customer Details ///////////////// */}
+                  {/* ///////////////// Complaints & Symptoms ///////////////// */}
+                  {/* <Divider /> */}
+                  <div className="row" style={{ backgroundColor: "#ffff" }}>
+                    <div className="col">
+                      <div className="tab_heading">Complaints & Symptoms :</div>
+                    </div>
+                    <div className="col">
+                      <div className="add_btn">
+                        {" "}
+                        <Tooltip title="Add Complaints & Symptoms">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <AddCircleRoundedIcon
+                              style={{ color: "#0b9444" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <div style={{ marginTop: "16px" }}></div>
+                  <div className="col-6">
+                    <FormGroup
+                      style={{
+                        paddingLeft: "6px",
+                        paddingRight: "6px"
+                      }}
+                    >
+                      <InputGroup>
+                        <Input
+                          type="text"
+                          name="symptoms"
+                          disabled
+                          id="symptoms"
+                          placeholder="Symptoms"
+                          style={{ fontSize: "12px" }}
+                        />
+                        <Input
+                          type="text"
+                          name="duration"
+                          disabled
+                          id="duration"
+                          placeholder="Duration"
+                          style={{ fontSize: "12px" }}
+                        />
+                        <InputGroupAddon addonType="append">
+                          <Tooltip title="Remove Complaints & Symptoms">
+                            <IconButton
+                              disabled
+                              size="small"
+                              color="secondary"
+                              aria-label="add an alarm"
+                            >
+                              <RemoveCircleOutlineIcon
+                                style={{ color: "red" }}
+                              />
+                            </IconButton>
+                          </Tooltip>
+                        </InputGroupAddon>
+                      </InputGroup>
+                    </FormGroup>
+                  </div>
+                  {/* ///////////////// Complaints & Symptoms ///////////////// */}
+                  <div style={{ marginTop: "16px" }}></div>
+                  {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
+                  {/* <Divider /> */}
+                  <div className="row" style={{ backgroundColor: "#ffff" }}>
+                    <div className="col">
+                      <div className="tab_heading">Provisional Diagnosis :</div>
+                    </div>
+                    <div className="col">
+                      <div className="add_btn">
+                        {" "}
+                        <Tooltip title="Add Provisional Diagnosis">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <AddCircleRoundedIcon
+                              style={{ color: "#0b9444" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <div style={{ marginTop: "16px" }}></div>
+                  <div className="row" style={{ marginBottom: "10px" }}>
+                    <div className="col-6">
+                      <FormGroup
+                        style={{
+                          paddingLeft: "6px",
+                          paddingRight: "6px"
+                        }}
+                      >
+                        <InputGroup>
+                          <Input
+                            type="text"
+                            name="add_PD"
+                            disabled
+                            id="addPD"
+                            placeholder="Diagnosis"
+                            style={{ fontSize: "12px" }}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <Tooltip title="Remove Provisional Diagnosis">
+                              <IconButton
+                                disabled
+                                size="small"
+                                color="secondary"
+                                aria-label="add an alarm"
+                              >
+                                <RemoveCircleOutlineIcon
+                                  style={{ color: "red" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormGroup>
+                    </div>
+                  </div>
+                  {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
+
+                  {/* ///////////////// PRESCRIPTION ///////////////// */}
+                  {/* <Divider /> */}
+                  <div className="row" style={{ backgroundColor: "#ffff" }}>
+                    <div className="col">
+                      <div className="tab_heading">Prescription :</div>
+                    </div>
+                    <div className="col">
+                      <div className="add_btn">
+                        {" "}
+                        <Tooltip title="Add New Prescription Row">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <AddCircleRoundedIcon
+                              style={{ color: "#0b9444" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <div style={{ marginTop: "16px" }}></div>
+                  <FormGroup
+                    style={{
+                      paddingLeft: "6px",
+                      paddingRight: "6px"
+                    }}
+                  >
+                    <Table striped bordered hover>
+                      <thead>
+                        <tr>
+                          <th></th>
+                          <th style={{ fontSize: "12px" }}>S.No</th>
+                          <th style={{ fontSize: "12px" }}>Medicine</th>
+                          <th style={{ fontSize: "12px" }}>Dosage</th>
+                          <th style={{ fontSize: "12px" }}>Route</th>
+                          <th style={{ fontSize: "12px" }}>Frequency</th>
+                          <th style={{ fontSize: "12px" }}>Duration</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="select">
+                            <Tooltip title="Delete Provisional Diagnosis">
+                              <IconButton
+                                disabled
+                                style={{ marginTop: -"10px", width: "10px" }}
+                                size="small"
+                                color="secondary"
+                                aria-label="add an alarm"
+                              >
+                                <RemoveCircleOutlineIcon
+                                  style={{ color: "red" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </th>
+                          <th scope="row" style={{ fontSize: "10px" }}>
+                            0
+                          </th>
+                          <td>
+                            <Input
+                              type="text"
+                              disabled
+                              name="description"
+                              id="description"
+                              placeholder="Medicine"
+                              style={{ fontSize: "10px" }}
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              type="text"
+                              name="dosage"
+                              disabled
+                              id="dosage"
+                              placeholder="Dosage"
+                              style={{ fontSize: "10px" }}
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              type="text"
+                              name="Route"
+                              disabled
+                              id="Route"
+                              style={{ fontSize: "10px" }}
+                              placeholder="Route"
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              type="text"
+                              name="Frequency"
+                              disabled
+                              id="Frequency"
+                              style={{ fontSize: "10px" }}
+                              placeholder="Frequency"
+                            />
+                          </td>
+                          <td>
+                            <Input
+                              type="text"
+                              name="Duration"
+                              disabled
+                              id="Duration"
+                              style={{ fontSize: "10px" }}
+                              placeholder="Duration"
+                            />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                  </FormGroup>
+                  <div style={{ marginTop: "10px" }}></div>
+                  {/* ///////////////// PRESCRIPTION ///////////////// */}
+
+                  {/* //////////////////// LAB TESTS ///////////////// */}
+                  {/* <Divider /> */}
+                  <div className="row" style={{ backgroundColor: "#ffff" }}>
+                    <div className="col">
+                      <div className="tab_heading">Lab Tests :</div>
+                    </div>
+                    <div className="col">
+                      <div className="add_btn">
+                        {" "}
+                        <Tooltip title="Add Lab Tests">
+                          <IconButton
+                            disabled
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <AddCircleRoundedIcon
+                              style={{ color: "#0b9444" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <div style={{ marginTop: "16px" }}></div>
+                  <div className="row">
+                    <div className="col-6">
+                      <FormGroup
+                        style={{
+                          paddingLeft: "6px",
+                          paddingRight: "6px"
+                        }}
+                      >
+                        <InputGroup>
+                          <Input
+                            disabled
+                            type="text"
+                            name="labtest"
+                            id="labtest"
+                            placeholder={"Test # 1"}
+                            style={{ width: "250px", fontSize: "12px" }}
+                          />
+                          <InputGroupAddon addonType="append">
+                            <Tooltip title="Remove Lab Test">
+                              <IconButton
+                                disabled
+                                size="small"
+                                color="secondary"
+                                aria-label="add an alarm"
+                              >
+                                <RemoveCircleOutlineIcon
+                                  style={{ color: "red" }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </InputGroupAddon>
+                        </InputGroup>
+                      </FormGroup>
+                    </div>
+                  </div>
+                  {/* //////////////////// LAB TESTS ///////////////// */}
+                  {/* //////////////////////////// Follow Up ////////////////// */}
+                  {/* <Divider /> */}
+                  <div className="tab_heading">Follow up :</div>
+                  <div className="block-example border-bottom border-primary"></div>
+                  <div style={{ marginTop: "16px" }}></div>
+                  <FormGroup
+                    style={{
+                      paddingLeft: "6px",
+                      paddingRight: "6px"
+                    }}
+                  >
+                    <div>
+                      <TextField
+                        disabled
+                        id="outlined-multiline-static"
+                        label="Follow up"
+                        multiline
+                        rows="4"
+                        variant="outlined"
+                        style={{ width: "100%" }}
+                      />
+                    </div>
+                  </FormGroup>
+                  {/* //////////////////////////// Follow Up ////////////////// */}
+
+                  {/* /////////////////////// DISCLAIMER ///////////////////// */}
+                  <div
+                    className="block-example border border-primary"
+                    style={{ width: "96%", padding: "10px", margin: "10px" }}
+                  >
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "bold",
+                        color: "#0d74bc"
+                      }}
+                    >
+                      Disclaimer
+                    </div>
+                    <div style={{ padding: "10px" }}>
+                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                        1.&nbsp;&nbsp;&nbsp;&nbsp; Prescription is Not Valid For
+                        Court{" "}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                        2.&nbsp;&nbsp;&nbsp;&nbsp; Treatment/Prescription is
+                        only applicable for non-emergency medical cases{" "}
+                      </div>
+                      <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                        3.&nbsp;&nbsp;&nbsp;&nbsp; This is Second Opinion
+                        service. It does not replace your primary care Doctor.
+                      </div>
+                    </div>
+                  </div>
+                  {/* /////////////////////// DISCLAIMER ///////////////////// */}
+
+                  {/* ////////////////////// SUBMIT ////////////////////// */}
+                  <div className="submit_btn">
+                    <Button
+                      disabled
+                      variant="contained"
+                      color="primary"
+                      startIcon={<CloudUploadIcon />}
+                    >
+                      Upload EHR
+                    </Button>
+                  </div>
+                  {/* ////////////////////// SUBMIT ////////////////////// */}
+                </Form>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
   render() {
     const { isOpen, availability } = this.state;
+
     return (
       <div>
         {this.state.newRequest_check
           ? this.state.newRequest_array.map(val =>
-            this.openNotification(val.key)
-          )
+              this.openNotification(val.key)
+            )
           : null}
         {this.closeChatModal()}
         {/* /////////////////////// NavBar ///////////////////// */}
-        <Navbar color="dark" dark expand="sm">
+        {/* <Navbar color="dark" dark expand="sm">
           <NavbarBrand href="/">Takaful Pakistan</NavbarBrand>
           <NavbarToggler onClick={this.toggle} />
           <Collapse isOpen={isOpen} navbar>
@@ -995,7 +1697,7 @@ class dashboard extends React.Component {
               </a>
             </NavbarText>
           </Collapse>
-        </Navbar>
+        </Navbar> */}
         {/* /////////////////////// NavBar ///////////////////// */}
 
         {/* /////////////////////// Cards ///////////////////// */}
@@ -1058,102 +1760,159 @@ class dashboard extends React.Component {
 
         <div
           // className="chatBox"
-          style={{ borderRadius: "10px", padding: "10px", margin: "10px" }}
+          style={{
+            borderRadius: "10px",
+            padding: "10px",
+            marginLeft: "10px",
+            marginRight: "10px"
+            // marginBottom: '10px'
+          }}
         >
           {/* <div className="row"> */}
           {/* /////////////////////// Chat Area ///////////////////// */}
           {/* <Col style={{ minHeight: 200 }} className="col-6"> */}
           {/* {this.drawChatTabs()} */}
-          <div className="row"> <div className="col-3">
-            <div
-
-              className="chatBox"
-              style={{
-                width: "300px",
-                backgroundColor: "#fafafa",
-                paddingTop: "10px",
-                paddingBottom: "10px"
-                // overflow: "scroll"
-              }}
-            >
-              {/* ////////////////////// Header ///////////////////////// */}
-              <div className="row">
-                <div className="col-6 chat_box_header">
-                  <span className="leftText" style={{ paddingLeft: "20px" }}>
-                    Total Chats - {this.props.tickets.length}
-                  </span>
-                </div>
-                <div className="col-5">
-                  <span className="rightText">
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        split
-                        variant={availability === "Available" ? "success" : "danger"}
+          <div className="row">
+            {" "}
+            <div className="col-3">
+              <div
+                id="style-1"
+                className="chatBox"
+                style={{
+                  width: "300px",
+                  backgroundColor: "#fafafa",
+                  paddingTop: "10px",
+                  paddingBottom: "10px"
+                  // overflow: "scroll"
+                }}
+              >
+                {/* ////////////////////// Header ///////////////////////// */}
+                <div className="row">
+                  <div className="col-6 chat_box_header">
+                    <span className="leftText" style={{ paddingLeft: "10px" }}>
+                      Total Chats - {this.props.tickets.length}
+                    </span>
+                  </div>
+                  <div className="col-6">
+                    <span className="rightText">
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        className="avail_btn"
+                        style={{ fontSize: "14px" }}
+                        onClick={() => this.changeStatus()}
+                        startIcon={
+                          <FiberManualRecordIcon
+                            style={{
+                              color:
+                                availability === "Available" ? "green" : "red"
+                            }}
+                          />
+                        }
                       >
-                        {availability === "Available" ? (
-                          <span style={{ color: "#fff" }}>Available </span>
-                        ) : (
+                        {availability === "Available" ? "Available" : "Away"}
+                      </Button>
+                      {/* <Dropdown>
+                        <Dropdown.Toggle
+                          split
+                          variant={
+                            availability === "Available" ? "success" : "danger"
+                          }
+                        >
+                          {availability === "Available" ? (
+                            <span style={{ color: "#fff" }}>Available </span>
+                          ) : (
                             <span style={{ color: "#fff" }}> Away</span>
                           )}
-                      </Dropdown.Toggle>
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={() => this.changeStatus("Available")}>
-                          Available
-                  </Dropdown.Item>
-                        <Dropdown.Item onClick={() => this.changeStatus("Away")}>
-                          Away
-                  </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </span>
+                        </Dropdown.Toggle>
+                        <Dropdown.Menu>
+                          <Dropdown.Item
+                            onClick={() => this.changeStatus("Available")}
+                          >
+                            Available
+                          </Dropdown.Item>
+                          <Dropdown.Item
+                            onClick={() => this.changeStatus("Away")}
+                          >
+                            Away
+                          </Dropdown.Item>
+                        </Dropdown.Menu>
+                      </Dropdown> */}
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="bottom_Width" />
-              {/* ////////////////////// Header ///////////////////////// */}
-              {this.props.tickets.map((ticket, index) => (
-                <div key={index} >
-                  <Ripples
-                    color="#0d74bc"
-                    during={1500}
-                    onClick={() => this.setState({
-                      select_ticket: ticket,
-                      selected_id: index
-                    }, () => {
-
-                      console.log("Index --- ", index, this.state.select_ticket)
-                      console.log("PROPS TICKET --- ", index, this.props.tickets[index])
-                      this.forceUpdate()
-                    })
-                    }
-                  >
-                    <div
-                      className="chat_Tabs"
-
-                    >
-                      {ticket.patient.username} -
-                    {ticket.id}
+                <div className="bottom_Width" />
+                {/* ////////////////////// Header ///////////////////////// */}
+                {this.props.tickets
+                  .map((ticket, index) => (
+                    <div key={index}>
+                      <Ripples
+                        color="#0d74bc"
+                        during={1500}
+                        onClick={() =>
+                          this.setState(
+                            {
+                              select_ticket: ticket.id,
+                              selected_id: index
+                            },
+                            () => {
+                              this.send_TO_CI();
+                            }
+                          )
+                        }
+                      >
+                        <div
+                          className="chat_Tabs"
+                          style={{
+                            backgroundColor:
+                              this.state.select_ticket !== ""
+                                ? this.state.select_ticket === ticket.id
+                                  ? "#d8d8d8"
+                                  : null
+                                : this.props.tickets[0].id === ticket.id
+                                ? "#d8d8d8"
+                                : null,
+                            fontWeight:
+                              this.state.select_ticket !== ""
+                                ? this.state.select_ticket === ticket.id
+                                  ? "bold"
+                                  : null
+                                : this.props.tickets[0].id === ticket.id
+                                ? "bold"
+                                : null,
+                            color:
+                              this.state.select_ticket !== ""
+                                ? this.state.select_ticket === ticket.id
+                                  ? "#0196ff"
+                                  : null
+                                : this.props.tickets[0].id === ticket.id
+                                ? "#0196ff"
+                                : null
+                          }}
+                        >
+                          {ticket.patient.username} -{ticket.id}
+                        </div>
+                      </Ripples>
+                      <Divider light={true} />
                     </div>
-                  </Ripples>
-                  <Divider light={true} />
-                </div>
-              )).reverse()}
+                  ))
+                  .reverse()}
+              </div>
             </div>
-          </div>
             {this.send_TO_CI()}
           </div>
-          {/* <div className="container-fluid"> */}
-          {/* {this.DrawChats()} */}
-          {/* </div> */}
-          {/* </Col> */}
-          {/* /////////////////////// Chat Area ///////////////////// */}
-          {/* </div>*/}
         </div>
-
-        {/* <footer className="page-footer font-small blue">
-          <div className="footer-copyright text-center py-3">
-            Powered by :<a href="https://avolox.com/"> Avolox</a>
-          </div>
-        </footer> */}
+        <div className="footer">
+          Powered By :{" "}
+          <a
+            className="logo_name"
+            // style={{ color: "red", fontWeight: "bold", fontFamily: "Segoe UI" }}
+            href="#"
+          >
+            {" "}
+            Avolox{" "}
+          </a>
+        </div>
       </div>
     );
   }

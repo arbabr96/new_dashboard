@@ -33,6 +33,12 @@ import Chip from "@material-ui/core/Chip";
 import CloseIcon from "@material-ui/icons/Close";
 import VideocamOffRoundedIcon from "@material-ui/icons/VideocamOffRounded";
 import SpeakerNotesOffIcon from "@material-ui/icons/SpeakerNotesOff";
+import ClearIcon from "@material-ui/icons/Clear";
+import DoneIcon from "@material-ui/icons/Done";
+import Switch from "@material-ui/core/Switch";
+import Paper from "@material-ui/core/Paper";
+import Zoom from "@material-ui/core/Zoom";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 import "../../assets/css.css";
 import axios from "axios";
 import {
@@ -85,7 +91,9 @@ class ChatInstance extends React.Component {
       complaints_symptoms: [],
       provisional_diagnosis: [],
       add_Prescription: [],
-      lab_tests: [], data: []
+      lab_tests: [],
+      data: [],
+      show_video: false
     };
     // this.url = "http://streaming.tdiradio.com:8000/house.mp3";
     this.url =
@@ -93,17 +101,31 @@ class ChatInstance extends React.Component {
     this.audio = new Audio(this.url);
   }
 
-  componentDidMount() {
-    let ticket = this.props.ticket;
-    let connection = this.props.connection;
-
+  UNSAFE_componentWillReceiveProps(props) {
+    const { connection, ticket } = props;
+    if (ticket.id === this.props.ticket.id) {
+      console.log("Same Ticket");
+    } else {
+      this.listening_connection(connection, ticket);
+    }
+    console.log(
+      "UNSAFE_componentWillReceiveProps (Connection) ",
+      connection,
+      "UNSAFE_componentWillReceiveProps (Ticket) ",
+      ticket
+    );
+  }
+  listening_connection = (connection, ticket) => {
+    // let ticket = this.props.ticket;
+    // let connection = this.props.connection;
+    console.log("CHAT INSTANCE RE RENDER ---- ", ticket);
     connection.on("message-" + ticket.id, message => {
       this.props.newMessage("New Message");
       this.props.ticketID(message.ticketID);
 
       ticket.messages.push(message);
 
-      // console.log('textMessage', message);
+      console.log("textMessage - Recieved", message);
       setTimeout(() => {
         this.props.newMessage("");
         this.props.ticketID("");
@@ -162,6 +184,7 @@ class ChatInstance extends React.Component {
         this.audio.pause();
         this.setState({
           showRemoteVideo: false,
+          show_video: false,
           play: false,
           videoState: false
         });
@@ -189,7 +212,8 @@ class ChatInstance extends React.Component {
     connection.on("requestVideo-" + ticket.id, ticketId => {
       console.log("enable video");
       this.setState({
-        showRemoteVideo: true
+        showRemoteVideo: true,
+        show_video: true
       });
     });
 
@@ -289,6 +313,205 @@ class ChatInstance extends React.Component {
     });
 
     this.scrollToBottom();
+  };
+
+  componentDidMount() {
+    let ticket = this.props.ticket;
+    let connection = this.props.connection;
+    this.listening_connection(connection, ticket);
+    // console.log('CHAT INSTANCE RE RENDER ---- ', ticket)
+    // connection.on("message-" + ticket.id, message => {
+    //   this.props.newMessage("New Message");
+    //   this.props.ticketID(message.ticketID);
+
+    //   ticket.messages.push(message);
+
+    //   console.log('textMessage - Recieved', message);
+    //   setTimeout(() => {
+    //     this.props.newMessage("");
+    //     this.props.ticketID("");
+    //   }, 2000);
+
+    //   this.forceUpdate();
+    // });
+
+    // connection.on("requestAudio-" + ticket.id, ticketId => {
+    //   //  console.log('')
+    //   // console.log('Audio Requested');
+    //   ticket["AudioChatRequest"] = true;
+    //   const hide = message.info(`Upcoming Call from Patient ID - ${ticket.id}`);
+    //   setTimeout(hide, 2500);
+    //   this.setState({
+    //     play: true
+    //   });
+    //   console.log("REQUEST AUDIO");
+    //   this.props.callAlert("UpComming Call");
+    //   this.props.ticketID(ticket.id);
+    //   this.props.newCallMsg(ticket.id);
+    //   this.props.newCallNotification(true);
+    //   // console.log("CALL NOTIFY requestAudio ", this.props.newCall);
+    //   this.audio.play();
+    //   // this.getStream();
+    //   this.forceUpdate();
+    // });
+
+    // connection.on("onDeclineAudio-" + ticket.id, ticketId => {
+    //   this.props.newCallNotification(false);
+    //   this.audio.pause();
+    //   if (this.state.isAudioConnected === true) {
+    //     // this.state.peerConn.close()
+    //     console.log("Call isAudioConnected finished ");
+    //     this.setState({
+    //       play: false
+    //     });
+    //     this.props.newCallMsg("");
+    //     // this.props.newCallNotification(false);
+    //     this.props.callAlert("");
+    //     this.props.ticketID("");
+    //     this.setState({ play: false, videoState: false });
+
+    //     if (this.localStream)
+    //       this.localStream.getTracks().map(stream => {
+    //         return stream.stop();
+    //       });
+    //     this.props.ticket.AudioChatRequest = false;
+    //     this.forceUpdate();
+    //   }
+    //   if (this.state.showRemoteVideo === true) {
+    //     console.log("Audio decline showRemoteVideo false");
+    //     // this.localVideo.current.
+    //     this.props.callAlert("");
+    //     this.props.ticketID("");
+    //     this.audio.pause();
+    //     this.setState({
+    //       showRemoteVideo: false,
+    //       play: false,
+    //       videoState: false
+    //     });
+    //     if (this.localStream)
+    //       this.localStream.getTracks().map(stream => {
+    //         return stream.stop();
+    //       });
+    //     this.props.ticket.AudioChatRequest = false;
+    //     this.forceUpdate();
+    //   } else {
+    //     this.props.newCallMsg("");
+    //     if (this.props.newCall) {
+    //       this.props.newCallNotification(false);
+    //     }
+    //     console.log("Call Declined by Client");
+    //     this.props.callAlert("");
+    //     this.props.ticketID("");
+    //     this.setState({ play: false, videoState: false });
+    //     this.audio.pause();
+    //     this.props.ticket.AudioChatRequest = false;
+    //     this.forceUpdate();
+    //   }
+    // });
+
+    // connection.on("requestVideo-" + ticket.id, ticketId => {
+    //   console.log("enable video");
+    //   this.setState({
+    //     showRemoteVideo: true
+    //   });
+    // });
+
+    // connection.on("addIceCandidate-" + ticket.id, evt => {
+    //   var descr = JSON.parse(evt);
+
+    //   if (descr.type === "offer") {
+    //     this.newPeerConnection();
+    //     if (this.state.peerConn) {
+    //       this.state.peerConn
+    //         .setRemoteDescription(new RTCSessionDescription(descr))
+    //         .then(() => {
+    //           this.state.peerConn.createAnswer(
+    //             sessionDescription =>
+    //               this.setLocalAndSendMessage(sessionDescription),
+    //             this.defaultErrorCallback
+    //           );
+    //         });
+    //     }
+
+    //     // setTimeout(() => {
+    //     //   console.log("After New");
+    //     //   this.state.peerConn.setRemoteDescription(
+    //     //     new RTCSessionDescription(descr)
+    //     //   );
+    //     //   this.state.peerConn.createAnswer(
+    //     //     sessionDescription =>
+    //     //       this.setLocalAndSendMessage(sessionDescription),
+    //     //     this.defaultErrorCallback
+    //     //   );
+    //     // }, 1000);
+    //     // this.state.peerConn.createOffer((sessionDescription) => this.setLocalAndSendMessage(sessionDescription), this.defaultErrorCallback);
+    //   } else if (descr.type === "answer") {
+    //     this.state.peerConn.setRemoteDescription(
+    //       new RTCSessionDescription(descr)
+    //     );
+    //   } else if (descr.type === "candidate") {
+    //     var candidate = new RTCIceCandidate({
+    //       sdpMLineIndex: descr.sdpMLineIndex,
+    //       sdpMid: descr.sdpMid,
+    //       candidate: descr.candidate
+    //     });
+    //     this.state.peerConn
+    //       .addIceCandidate(candidate)
+    //       .then(() => {
+    //         console.log("ADDED ICE CANDIDATE Successfully");
+    //       })
+    //       .catch(error => {
+    //         console.log("ADDED ICE CANDIDATE error", error);
+    //       });
+    //     // }
+    //     // this.state.peerConn
+    //     //     .addIceCandidate(candidate)
+    //     //     .catch((error) => {
+    //     //         console.log('error', error);
+    //     //     });
+    //   }
+    // });
+
+    // connection.on("disconnect-" + ticket.id, () => {
+    //   this.setState(
+    //     {
+    //       disconnect_TicketID: ticket.id
+    //     },
+    //     () => {
+    //       console.log("Disconnect method", ticket.id);
+    //     }
+    //   );
+    //   if (this.props.ticket.AudioChatRequest) {
+    //     this.props.connection.invoke("OnDeclineAudio", ticket.id).then(() => {
+    //       this.setState({ play: false });
+    //       this.props.callAlert("");
+    //       this.props.ticketID("");
+    //       this.audio.pause();
+    //       this.props.ticket.AudioChatRequest = false;
+    //       console.log("Audio Declined");
+    //       //this.props.ticket.AudioChatRequest =
+    //       this.forceUpdate();
+    //     });
+    //   }
+
+    //   if (this.state.videoState) {
+    //     this.setState({
+    //       showRemoteVideo: false,
+    //       videoState: false
+    //     });
+    //   }
+    //   // this.localVideo.pause();
+    //   // this.localVideo.src = "";
+    //   // this.localStream.stop();
+
+    //   if (this.localStream)
+    //     this.localStream.getTracks().map(stream => {
+    //       return stream.stop();
+    //     });
+    //   this.forceUpdate();
+    // });
+
+    // this.scrollToBottom();
   }
   audioAlert = () => {
     return <Alert variant="primary">This is a Call alert—check it out!</Alert>;
@@ -337,7 +560,7 @@ class ChatInstance extends React.Component {
     };
 
     // peerConn.addstream(this.localStream);
-    this.localStream.getTracks().forEach(function (track) {
+    this.localStream.getTracks().forEach(function(track) {
       peerConn.addTrack(track);
     });
 
@@ -379,66 +602,134 @@ class ChatInstance extends React.Component {
   componentDidUpdate = () => {
     this.scrollToBottom();
   };
-
+  Form_scrollToBottom = () => {
+    this.form.scrollTop = this.form.scrollHeight;
+  };
   AudioRequestView = () => {
     return (
-      <div className={"message"}>
-        Patient P has requested an audio call session
-        <Button
-          variant="contained"
-          className="acceptCall"
-          color="primary"
-          size="large"
-          //   shape="circle"
-          onClick={() => {
-            this.props.newCallNotification(false);
-            console.log("on Accept ", this.props.newCall);
-            this.props.connection
-              .invoke("requestAudio", this.props.ticket.id)
-              .then(() => {
-                this.setState({ isAudioConnected: true, play: false });
-                this.props.callAlert("");
-                this.props.ticketID("");
-                this.audio.pause();
-                // this.props.newCallMsg("");
-                // this.props.newCallNotification(false);
-                this.props.ticket.AudioChatRequest = false;
-                console.log("AudioChatRequest", this.props.ticket.id);
-                this.getStream();
-                console.log("Audio Accepted");
-                // this.props.ticket.AudioChat = true;
-                console.log("forceStopped");
-                this.forceUpdate();
-              });
-          }}
-        >
-          Accept
-        </Button>
-        <Button
-          variant="contained"
-          className="acceptCall"
-          color="danger"
-          size="large"
-          //   shape="circle"
-          onClick={() => {
-            this.props.newCallNotification(false);
-            console.log("OnDeclineAudio", this.props.newCall);
-            this.props.connection
-              .invoke("OnDeclineAudio", this.props.ticket.id)
-              .then(() => {
-                this.setState({ play: false });
-                this.props.callAlert("");
-                this.props.ticketID("");
-                this.audio.pause();
-                this.props.ticket.AudioChatRequest = false;
-                console.log("Audio Declined");
-                //this.props.ticket.AudioChatRequest =
-                this.forceUpdate();
-              });
-          }}
-        >
-          Decline
-        </Button>
+      <div className="call_request_view">
+        <div className="heading_text">
+          Patient has requested for an audio call session
+        </div>
+
+        <div className="row buttons_call">
+          <div>
+            <Button
+              variant="contained"
+              size="small"
+              color="primary"
+              startIcon={<DoneIcon />}
+              onClick={() => {
+                this.props.newCallNotification(false);
+                console.log("on Accept ", this.props.newCall);
+                this.props.connection
+                  .invoke("requestAudio", this.props.ticket.id)
+                  .then(() => {
+                    this.setState({ isAudioConnected: true, play: false });
+                    this.props.callAlert("");
+                    this.props.ticketID("");
+                    this.audio.pause();
+                    // this.props.newCallMsg("");
+                    // this.props.newCallNotification(false);
+                    this.props.ticket.AudioChatRequest = false;
+                    console.log("AudioChatRequest", this.props.ticket.id);
+                    this.getStream();
+                    console.log("Audio Accepted");
+                    // this.props.ticket.AudioChat = true;
+                    console.log("forceStopped");
+                    this.forceUpdate();
+                  });
+              }}
+            >
+              Accept
+            </Button>
+          </div>
+          &nbsp;&nbsp;
+          <div>
+            <Button
+              variant="contained"
+              size="small"
+              color="secondary"
+              startIcon={<ClearIcon />}
+              onClick={() => {
+                this.props.newCallNotification(false);
+                console.log("OnDeclineAudio", this.props.newCall);
+                this.props.connection
+                  .invoke("OnDeclineAudio", this.props.ticket.id)
+                  .then(() => {
+                    this.setState({ play: false });
+                    this.props.callAlert("");
+                    this.props.ticketID("");
+                    this.audio.pause();
+                    this.props.ticket.AudioChatRequest = false;
+                    console.log("Audio Declined");
+                    //this.props.ticket.AudioChatRequest =
+                    this.forceUpdate();
+                  });
+              }}
+            >
+              Reject
+            </Button>
+          </div>
+        </div>
+        {/* <div className={"message"}>
+          Patient P has requested an audio call session
+          <Button
+            variant="contained"
+            className="acceptCall"
+            color="primary"
+            size="large"
+            //   shape="circle"
+            onClick={() => {
+              this.props.newCallNotification(false);
+              console.log("on Accept ", this.props.newCall);
+              this.props.connection
+                .invoke("requestAudio", this.props.ticket.id)
+                .then(() => {
+                  this.setState({ isAudioConnected: true, play: false });
+                  this.props.callAlert("");
+                  this.props.ticketID("");
+                  this.audio.pause();
+                  // this.props.newCallMsg("");
+                  // this.props.newCallNotification(false);
+                  this.props.ticket.AudioChatRequest = false;
+                  console.log("AudioChatRequest", this.props.ticket.id);
+                  this.getStream();
+                  console.log("Audio Accepted");
+                  // this.props.ticket.AudioChat = true;
+                  console.log("forceStopped");
+                  this.forceUpdate();
+                });
+            }}
+          >
+            Accept
+          </Button>
+          <Button
+            variant="contained"
+            className="acceptCall"
+            color="danger"
+            size="large"
+            //   shape="circle"
+            onClick={() => {
+              this.props.newCallNotification(false);
+              console.log("OnDeclineAudio", this.props.newCall);
+              this.props.connection
+                .invoke("OnDeclineAudio", this.props.ticket.id)
+                .then(() => {
+                  this.setState({ play: false });
+                  this.props.callAlert("");
+                  this.props.ticketID("");
+                  this.audio.pause();
+                  this.props.ticket.AudioChatRequest = false;
+                  console.log("Audio Declined");
+                  //this.props.ticket.AudioChatRequest =
+                  this.forceUpdate();
+                });
+            }}
+          >
+            Decline
+          </Button>
+        </div> */}
       </div>
     );
   };
@@ -573,8 +864,8 @@ class ChatInstance extends React.Component {
     axios
       .post(
         window.API_URL +
-        "api/files/uploadprescription?ticketId=" +
-        this.props.ticket.id,
+          "api/files/uploadprescription?ticketId=" +
+          this.props.ticket.id,
         data,
         config
       )
@@ -715,6 +1006,7 @@ class ChatInstance extends React.Component {
 
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
   add_complaints = event => {
+    this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.complaints_symptoms.length);
     this.setState(prevState => ({
       complaints_symptoms: [
@@ -775,6 +1067,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Provisional Diagnosis /////////////////////////////////////////
 
   addPD = event => {
+    this.Form_scrollToBottom();
     console.log("ADD_____", this.state.treatment_arr.length);
     this.setState(prevState => ({
       provisional_diagnosis: [
@@ -817,6 +1110,7 @@ class ChatInstance extends React.Component {
 
   ////////////////////////// Lab Tests /////////////////////////////////////////
   add_lab_test = event => {
+    this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.lab_tests.length);
     this.setState(prevState => ({
       lab_tests: [
@@ -859,6 +1153,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Lab Tests /////////////////////////////////////////
 
   addPrescriptionRow = () => {
+    this.Form_scrollToBottom();
     console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
     this.setState(prevState => ({
       add_Prescription: [
@@ -1030,7 +1325,7 @@ class ChatInstance extends React.Component {
       }
     );
   };
-  delete_Prescription_Row = (key) => {
+  delete_Prescription_Row = key => {
     this.setState(
       {
         add_Prescription: this.state.add_Prescription.filter((item, index) => {
@@ -1099,19 +1394,27 @@ class ChatInstance extends React.Component {
   };
   addItem = () => {
     this.setState({
-      data: [...this.state.data,
-      {
-        id: this.state.data.length,
-        value: Math.random() * 100
-      }]
-    })
+      data: [
+        ...this.state.data,
+        {
+          id: this.state.data.length,
+          value: Math.random() * 100
+        }
+      ]
+    });
+  };
+  switch_to_video = () => {
+    console.log("switch_to_video", this.state.show_video);
+    this.setState({
+      show_video: !this.state.show_video
+    });
   };
   /////////////////////////////////////////// METHODS FOR ERM ///////////////////////////////////////////////////////////
   render() {
     // console.log('ticket', this.props.ticket);
 
     const fileUploadProps = {
-      onRemove: file => { },
+      onRemove: file => {},
       beforeUpload: file => {
         this.setState(
           {
@@ -1129,53 +1432,64 @@ class ChatInstance extends React.Component {
 
       showUploadList: false
     };
-    console.log('this.props.ticket ==== ', this.props.ticket)
     return (
       <div className="col-9 chat_instance">
         {/* <div className="container-fluid"> */}
         <div className="row">
-
-          < div className="col-6" >
+          <div className="col">
             <div className="chat_area" style={{ backgroundColor: "#f6f6f8" }}>
               <div className="row">
                 <div className="col">
-
-                  <div className="patient_Name">
-                    {this.props.ticket.patient.username} -
-                      {this.props.ticket.id}</div>
-
+                  <div className="mt-1 patient_Name">
+                    {this.props.ticket.patient.username} -{this.props.ticket.id}
+                  </div>
                 </div>
                 <div className="col">
                   <div className="right_bar">
                     <div className="row">
-                      {this.state.videoState &&
-                        !this.state.showRemoteVideo ? (
-                          <Tooltip title="Start Video Call">
-                            <IconButton
-                              onClick={() => {
-                                console.log("video button pressed");
-                                this.props.connection.invoke(
-                                  "requestVideo",
-                                  parseInt(this.props.ticket.id)
-                                );
-                              }}
-                              color="secondary"
-                              aria-label="add an alarm"
-                            >
-                              <VideocamIcon style={{ color: "#7a7a7a" }} />
-                            </IconButton>
-                          </Tooltip>
-                        ) : null}
+                      {this.state.videoState ? (
+                        <FormControlLabel
+                          className="mt-2"
+                          control={
+                            <Switch
+                              size="small"
+                              checked={this.state.show_video}
+                              onChange={() => this.switch_to_video()}
+                            />
+                          }
+                          label={
+                            this.state.show_video ? (
+                              <div style={{ fontSize: "12px" }}>Hide Video</div>
+                            ) : (
+                              <div style={{ fontSize: "12px" }}>Show Video</div>
+                            )
+                          }
+                        />
+                      ) : null}
+                      {this.state.videoState && !this.state.showRemoteVideo ? (
+                        <Tooltip title="Start Video Call">
+                          <IconButton
+                            onClick={() => {
+                              console.log("video button pressed");
+                              this.props.connection.invoke(
+                                "requestVideo",
+                                parseInt(this.props.ticket.id)
+                              );
+                            }}
+                            color="secondary"
+                            aria-label="add an alarm"
+                          >
+                            <VideocamIcon style={{ color: "#7a7a7a" }} />
+                          </IconButton>
+                        </Tooltip>
+                      ) : null}
                       {this.state.showRemoteVideo ? (
                         <Tooltip title="Close Video Call">
                           <IconButton
                             onClick={() => {
                               console.log("close video button");
                               this.props.connection
-                                .invoke(
-                                  "OnDeclineAudio",
-                                  this.props.ticket.id
-                                )
+                                .invoke("OnDeclineAudio", this.props.ticket.id)
                                 .then(() => {
                                   this.props.ticket.AudioChatRequest = false;
                                   if (this.state.videoState) {
@@ -1192,9 +1506,7 @@ class ChatInstance extends React.Component {
                             color="secondary"
                             aria-label="add an alarm"
                           >
-                            <VideocamOffRoundedIcon
-                              style={{ color: "red" }}
-                            />
+                            <VideocamOffRoundedIcon style={{ color: "red" }} />
                           </IconButton>
                         </Tooltip>
                       ) : null}
@@ -1231,7 +1543,7 @@ class ChatInstance extends React.Component {
                   </div>
                 </div>
               </div>
-              <Divider light={true} />
+              <div className="block-example border-bottom border-primary"></div>
               <div className="row">
                 <div className="col">
                   <div className="middle" id="style-1">
@@ -1240,14 +1552,70 @@ class ChatInstance extends React.Component {
                         this.lastMessage = el;
                       }}
                       id="style-1"
-                      style={{ overflowX: 'hidden', overflowY: 'auto', maxHeight: '360px' }}
+                      style={{
+                        overflowX: "hidden",
+                        overflowY: "auto",
+                        maxHeight: "425px"
+                      }}
                     >
                       {this.props.close_Ticket ? this.removeTicket() : null}
-                      {this.props.ticket.messages.length === 0 ? (
+                      {this.props.ticket.messages.length === 0 &&
+                      !this.state.showRemoteVideo ? (
                         <div className="no_message">
                           <Chip label="No messages" />
                         </div>
                       ) : null}
+                      <Zoom
+                        in={this.state.show_video}
+                        style={{
+                          transitionDelay: this.state.show_video
+                            ? "200ms"
+                            : "0ms"
+                        }}
+                      >
+                        <div className="video_show">
+                          <div className="col">
+                            <div
+                              style={{
+                                // marginLeft: "10px",
+                                position: "relative"
+                              }}
+                            >
+                              <video
+                                ref={this.localVideo}
+                                style={{
+                                  // border: '1px solid #000',
+                                  position: "absolute",
+                                  bottom: "0px",
+                                  right: "0px",
+                                  width: "100px",
+                                  height: "80px",
+                                  display: this.state.showRemoteVideo
+                                    ? "block"
+                                    : "none"
+                                }}
+                                autoPlay
+                              ></video>
+                              <div>
+                                <video
+                                  ref={this.remoteVideo}
+                                  style={{
+                                    width: "200px",
+                                    height: "100%",
+                                    // border: "1px solid #000",
+                                    // background: "#777",
+
+                                    display: this.state.showRemoteVideo
+                                      ? "block"
+                                      : "none"
+                                  }}
+                                  autoPlay
+                                ></video>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Zoom>
                       {this.props.ticket.messages.map((message, index) => {
                         var isSenderPatient =
                           message.senderID === this.props.ticket.patientID;
@@ -1256,81 +1624,81 @@ class ChatInstance extends React.Component {
                           <Row key={index}>
                             <Col>
                               {isSenderPatient ? (
-                                <div span={6} className={"message-right"}>
+                                <div className={"message-right"}>
                                   {message.file == null ? message.text : null}
 
                                   {message.file != null &&
-                                    message.file.fileType === 0 ? (
-                                      <img
-                                        alt=""
-                                        style={{
-                                          width: "200px",
-                                          padding: "5px"
-                                        }}
-                                        src={
-                                          window.API_URL +
-                                          "/images/" +
-                                          message.file.path
-                                        }
-                                      />
-                                    ) : (
-                                      ""
-                                    )}
+                                  message.file.fileType === 0 ? (
+                                    <img
+                                      alt=""
+                                      style={{
+                                        width: "200px",
+                                        padding: "5px"
+                                      }}
+                                      src={
+                                        window.API_URL +
+                                        "/images/" +
+                                        message.file.path
+                                      }
+                                    />
+                                  ) : (
+                                    ""
+                                  )}
                                   {message.file != null &&
-                                    message.file.fileType === 1 ? (
-                                      <a
-                                        style={{ color: "#fff" }}
-                                        href={
-                                          window.API_URL +
-                                          "/images/" +
-                                          message.file.path
-                                        }
-                                        target="blank"
-                                      >
-                                        {message.file.originalName}
-                                      </a>
-                                    ) : (
-                                      ""
-                                    )}
+                                  message.file.fileType === 1 ? (
+                                    <a
+                                      style={{ color: "#fff" }}
+                                      href={
+                                        window.API_URL +
+                                        "/images/" +
+                                        message.file.path
+                                      }
+                                      target="blank"
+                                    >
+                                      {message.file.originalName}
+                                    </a>
+                                  ) : (
+                                    ""
+                                  )}
                                 </div>
                               ) : (
-                                  <div className={"message-left"}>
-                                    {message.file == null ? message.text : null}
-                                    {message.file != null &&
-                                      message.file.fileType === 0 ? (
-                                        <img
-                                          alt=""
-                                          style={{
-                                            width: "200px",
-                                            padding: "5px"
-                                          }}
-                                          src={
-                                            window.API_URL +
-                                            "/images/" +
-                                            message.file.path
-                                          }
-                                        />
-                                      ) : (
-                                        ""
-                                      )}
-                                    {message.file != null &&
-                                      message.file.fileType === 1 ? (
-                                        <a
-                                          style={{ color: "#fff" }}
-                                          href={
-                                            window.API_URL +
-                                            "/images/" +
-                                            message.file.path
-                                          }
-                                          target="blank"
-                                        >
-                                          {message.file.originalName}
-                                        </a>
-                                      ) : (
-                                        ""
-                                      )}
-                                  </div>
-                                )}
+                                <div className={"message-left"}>
+                                  {message.file == null ? message.text : null}
+                                  {message.file != null &&
+                                  message.file.fileType === 0 ? (
+                                    <img
+                                      alt=""
+                                      style={{
+                                        width: "200px",
+                                        padding: "5px"
+                                      }}
+                                      src={
+                                        window.API_URL +
+                                        "/images/" +
+                                        message.file.path
+                                      }
+                                    />
+                                  ) : (
+                                    ""
+                                  )}
+                                  {message.file != null &&
+                                  message.file.fileType === 1 ? (
+                                    <a
+                                      style={{ color: "#fff" }}
+                                      href={
+                                        window.API_URL +
+                                        "/images/" +
+                                        message.file.path
+                                      }
+                                      target="blank"
+                                    >
+                                      {message.file.originalName}
+                                    </a>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              )}
                             </Col>
                           </Row>
                         );
@@ -1388,71 +1756,70 @@ class ChatInstance extends React.Component {
                   />
                 </div>
               ) : (
-                  <div
-                    id="inputField"
-                    className="row"
-                    style={{
-                      backgroundColor: "#ffff",
-                    }}
-                  >
-                    <div className="col-9">
-                      <TextField
-                        id="outlined-multiline-static"
-                        multiline
-                        rowsMax="2"
-                        placeholder="Type Here"
-                        style={{
-                          fontSize: "10px"
-                        }}
-                        fullWidth={true}
-                        value={this.state.textMessage}
-                        onChange={text =>
-                          this.setState({ textMessage: text.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="col-3">
-
-                      <Upload {...fileUploadProps}>
-                        <Tooltip arrow title="Upload File/Image">
-                          <IconButton
-
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <AttachFileIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Upload>
-
-                      <Tooltip arrow title="Send Message">
-                        <IconButton
-                          onClick={() =>
-                            this.sendMessage(this.props.ticket.id)
-                          }
-                          style={{
-                            borderWidth: "0px"
-                          }}
-                          color="primary"
-                          aria-label="add an alarm"
-                        >
-                          <SendIcon
-                            style={{
-                              color: "#0d74bc"
-                            }}
-                          />
+                <div
+                  id="inputField"
+                  className="row"
+                  style={{
+                    backgroundColor: "#ffff"
+                  }}
+                >
+                  <div className="col-9">
+                    <TextField
+                      id="outlined-multiline-static"
+                      multiline
+                      rowsMax="3"
+                      placeholder="Type Here"
+                      style={{
+                        fontSize: "10px"
+                      }}
+                      fullWidth={true}
+                      value={this.state.textMessage}
+                      onChange={text =>
+                        this.setState({ textMessage: text.target.value })
+                      }
+                    />
+                  </div>
+                  <div className="col-3">
+                    <Upload {...fileUploadProps}>
+                      <Tooltip arrow title="Upload File/Image">
+                        <IconButton color="secondary" aria-label="add an alarm">
+                          <AttachFileIcon />
                         </IconButton>
                       </Tooltip>
-                    </div>
+                    </Upload>
+
+                    <Tooltip arrow title="Send Message">
+                      <IconButton
+                        onClick={() => {
+                          console.log("Send MEssage");
+                          this.sendMessage(this.props.ticket.id);
+                        }}
+                        style={{
+                          borderWidth: "0px"
+                        }}
+                        color="primary"
+                        aria-label="add an alarm"
+                      >
+                        <SendIcon
+                          style={{
+                            color: "#0d74bc"
+                          }}
+                        />
+                      </IconButton>
+                    </Tooltip>
                   </div>
-                )}
+                </div>
+              )}
               {/* </div> */}
             </div>
             {/* </div> */}
-          </div >
+          </div>
 
           <div className="col-6">
             <div
+              ref={el => {
+                this.form = el;
+              }}
               id="style-1"
               className="prescription_form block-example border border-light"
               style={{
@@ -1461,12 +1828,13 @@ class ChatInstance extends React.Component {
                 overflowY: "auto"
               }}
             >
-              <div className="heading_1">Prescription Form</div>
-              <Divider />
+              <div className="heading_1">EHR Form</div>
+              <div className="block-example border-bottom border-primary"></div>
               <Form>
                 {/* ///////////////// Customer Details ///////////////// */}
                 <div className="tab_heading">Customer Details :</div>
-                <Divider />
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
                 <FormGroup
                   className="form_group"
                   style={{
@@ -1491,10 +1859,8 @@ class ChatInstance extends React.Component {
                     <div className="col">
                       <Input
                         type="number"
-                        disabled={true}
                         name="registeration_id"
                         id="registeration_id"
-                        defaultValue={this.props.ticket.id}
                         placeholder="Registration #"
                         style={{ fontSize: "12px" }}
                       />
@@ -1523,7 +1889,11 @@ class ChatInstance extends React.Component {
                 </FormGroup>
                 <FormGroup
                   // className="form_group"
-                  style={{ marginLeft: "5px" }}
+                  style={{
+                    marginTop: "5px",
+                    paddingLeft: "6px",
+                    paddingRight: "6px"
+                  }}
                 >
                   <div className="row">
                     <div className="col">
@@ -1540,14 +1910,40 @@ class ChatInstance extends React.Component {
                         <option>Female</option>
                       </Input>
                     </div>
-                    <div className="col"></div>
-                    <div className="col"></div>
+                    <div className="col">
+                      <Input
+                        type="text"
+                        required={true}
+                        name="contact"
+                        id="contact"
+                        placeholder="Contact"
+                        style={{ fontSize: "12px" }}
+                      />
+                    </div>
+                    <div className="col">
+                      {" "}
+                      <Input
+                        type="email"
+                        required={true}
+                        name="email"
+                        id="email"
+                        placeholder="Email-Address"
+                        style={{ fontSize: "12px" }}
+                      />
+                    </div>
                   </div>
                 </FormGroup>
                 {/* ///////////////// Customer Details ///////////////// */}
                 {/* ///////////////// Complaints & Symptoms ///////////////// */}
-                <Divider />
-                <div className="row">
+                {/* <Divider /> */}
+                <div
+                  className="row"
+                  style={{
+                    backgroundColor: "#ffff",
+                    borderBottomWidth: "1px",
+                    borderColor: "#0d74bc"
+                  }}
+                >
                   <div className="col">
                     <div className="tab_heading">Complaints & Symptoms :</div>
                   </div>
@@ -1560,88 +1956,88 @@ class ChatInstance extends React.Component {
                           color="secondary"
                           aria-label="add an alarm"
                         >
-                          <AddCircleRoundedIcon style={{ color: "green" }} />
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
                         </IconButton>
                       </Tooltip>
                     </div>
                   </div>
                 </div>
-                <Divider />
+                <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row">
                   {this.state.complaints_symptoms.length == 0
                     ? null
                     : this.state.complaints_symptoms.map((val, index) => {
-                      return (
-                        <div className="col-6" key={index}>
-                          <FormGroup
-                            style={{
-                              paddingLeft: "6px",
-                              paddingRight: "6px"
-                            }}
-                          >
-                            <InputGroup>
-                              <Input
-                                type="text"
-                                name="symptoms"
-                                id="symptoms"
-                                value={
-                                  this.state.complaints_symptoms[index]
-                                    .symptoms
-                                }
-                                placeholder="Symptoms"
-                                style={{ fontSize: "12px" }}
-                                onChange={text =>
-                                  this.complaints_add_array(
-                                    text.target.value,
-                                    index
-                                  )
-                                }
-                              />
-                              <Input
-                                type="text"
-                                name="duration"
-                                id="duration"
-                                value={
-                                  this.state.complaints_symptoms[index]
-                                    .duration
-                                }
-                                placeholder="Duration"
-                                style={{ fontSize: "12px" }}
-                                onChange={text =>
-                                  this.complaints_add_array1(
-                                    text.target.value,
-                                    index
-                                  )
-                                }
-                              />
-                              <InputGroupAddon addonType="append">
-                                <Tooltip title="Remove Complaints & Symptoms">
-                                  <IconButton
-                                    onClick={() =>
-                                      this.delete_complaints(index)
-                                    }
-                                    size="small"
-                                    color="secondary"
-                                    aria-label="add an alarm"
-                                  >
-                                    <RemoveCircleOutlineIcon
-                                      style={{ color: "red" }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormGroup>
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div className="col-6" key={index}>
+                            <FormGroup
+                              style={{
+                                paddingLeft: "6px",
+                                paddingRight: "6px"
+                              }}
+                            >
+                              <InputGroup>
+                                <Input
+                                  type="text"
+                                  name="symptoms"
+                                  id="symptoms"
+                                  value={
+                                    this.state.complaints_symptoms[index]
+                                      .symptoms
+                                  }
+                                  placeholder="Symptoms"
+                                  style={{ fontSize: "12px" }}
+                                  onChange={text =>
+                                    this.complaints_add_array(
+                                      text.target.value,
+                                      index
+                                    )
+                                  }
+                                />
+                                <Input
+                                  type="text"
+                                  name="duration"
+                                  id="duration"
+                                  value={
+                                    this.state.complaints_symptoms[index]
+                                      .duration
+                                  }
+                                  placeholder="Duration"
+                                  style={{ fontSize: "12px" }}
+                                  onChange={text =>
+                                    this.complaints_add_array1(
+                                      text.target.value,
+                                      index
+                                    )
+                                  }
+                                />
+                                <InputGroupAddon addonType="append">
+                                  <Tooltip title="Remove Complaints & Symptoms">
+                                    <IconButton
+                                      onClick={() =>
+                                        this.delete_complaints(index)
+                                      }
+                                      size="small"
+                                      color="secondary"
+                                      aria-label="add an alarm"
+                                    >
+                                      <RemoveCircleOutlineIcon
+                                        style={{ color: "red" }}
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormGroup>
+                          </div>
+                        );
+                      })}
                 </div>
                 {/* ///////////////// Complaints & Symptoms ///////////////// */}
                 <div style={{ marginTop: "16px" }}></div>
                 {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
-                <Divider />
-                <div className="row">
+                {/* <Divider /> */}
+                <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
                     <div className="tab_heading">Provisional Diagnosis :</div>
                   </div>
@@ -1654,66 +2050,67 @@ class ChatInstance extends React.Component {
                           color="secondary"
                           aria-label="add an alarm"
                         >
-                          <AddCircleRoundedIcon style={{ color: "green" }} />
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
                         </IconButton>
                       </Tooltip>
                     </div>
                   </div>
                 </div>
-                <Divider />
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row" style={{ marginBottom: "10px" }}>
                   {this.state.provisional_diagnosis.length == 0
                     ? null
                     : this.state.provisional_diagnosis.map((val, index) => {
-                      return (
-                        <div className="col-6" key={index}>
-                          <FormGroup
-                            style={{
-                              paddingLeft: "6px",
-                              paddingRight: "6px"
-                            }}
-                          >
-                            <InputGroup>
-                              <Input
-                                type="text"
-                                name="add_PD"
-                                id="addPD"
-                                value={
-                                  this.state.provisional_diagnosis[index]
-                                    .diagnose
-                                }
-                                placeholder="Diagnosis"
-                                style={{ fontSize: "12px" }}
-                                onChange={text =>
-                                  this.PD_arr(text.target.value, index)
-                                }
-                              />
-                              <InputGroupAddon addonType="append">
-                                <Tooltip title="Remove Provisional Diagnosis">
-                                  <IconButton
-                                    onClick={() => this.deletePD(index)}
-                                    size="small"
-                                    color="secondary"
-                                    aria-label="add an alarm"
-                                  >
-                                    <RemoveCircleOutlineIcon
-                                      style={{ color: "red" }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormGroup>
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div className="col-6" key={index}>
+                            <FormGroup
+                              style={{
+                                paddingLeft: "6px",
+                                paddingRight: "6px"
+                              }}
+                            >
+                              <InputGroup>
+                                <Input
+                                  type="text"
+                                  name="add_PD"
+                                  id="addPD"
+                                  value={
+                                    this.state.provisional_diagnosis[index]
+                                      .diagnose
+                                  }
+                                  placeholder="Diagnosis"
+                                  style={{ fontSize: "12px" }}
+                                  onChange={text =>
+                                    this.PD_arr(text.target.value, index)
+                                  }
+                                />
+                                <InputGroupAddon addonType="append">
+                                  <Tooltip title="Remove Provisional Diagnosis">
+                                    <IconButton
+                                      onClick={() => this.deletePD(index)}
+                                      size="small"
+                                      color="secondary"
+                                      aria-label="add an alarm"
+                                    >
+                                      <RemoveCircleOutlineIcon
+                                        style={{ color: "red" }}
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormGroup>
+                          </div>
+                        );
+                      })}
                 </div>
                 {/* ///////////////// PROVISIONAL DIAGNOSIS ///////////////// */}
 
                 {/* ///////////////// PRESCRIPTION ///////////////// */}
-                <Divider />
-                <div className="row">
+                {/* <Divider /> */}
+                <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
                     <div className="tab_heading">Prescription :</div>
                   </div>
@@ -1726,13 +2123,14 @@ class ChatInstance extends React.Component {
                           color="secondary"
                           aria-label="add an alarm"
                         >
-                          <AddCircleRoundedIcon style={{ color: "green" }} />
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
                         </IconButton>
                       </Tooltip>
                     </div>
                   </div>
                 </div>
-                <Divider />
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <FormGroup
                   style={{
@@ -1755,117 +2153,109 @@ class ChatInstance extends React.Component {
                     <tbody>
                       {this.state.add_Prescription.length > 0
                         ? this.state.add_Prescription.map((item, index) => {
-                          return (
-                            <tr key={index}>
-                              <th scope="select">
-                                <Tooltip title="Delete Provisional Diagnosis">
-                                  <IconButton
-                                    style={{ width: '10px', height: '10px' }}
-                                    size='small'
-                                    onClick={() => this.delete_Prescription_Row(index)}
-                                    color="secondary"
-                                    aria-label="add an alarm"
-                                  >
-                                    <RemoveCircleOutlineIcon style={{ color: "red" }} />
-                                  </IconButton>
-                                </Tooltip>
-                              </th>
-                              <th scope="row" style={{ fontSize: "10px" }}>
-                                {this.state.add_Prescription[index].sr}
-                              </th>
-                              <td>
-                                <Input
-                                  type="text"
-                                  name="description"
-                                  id="description"
-                                  style={{ fontSize: "10px" }}
-                                  value={
-                                    this.state.add_Prescription[index]
-                                      .description
-                                  }
-                                  onChange={text =>
-                                    this.add_description(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td>
-                                <Input
-                                  type="text"
-                                  name="dosage"
-                                  id="dosage"
-                                  style={{ fontSize: "10px" }}
-                                  value={
-                                    this.state.add_Prescription[index]
-                                      .dosage
-                                  }
-                                  onChange={text =>
-                                    this.add_dosage(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td>
-                                <Input
-                                  type="text"
-                                  name="Period"
-                                  id="Period"
-                                  style={{ fontSize: "10px" }}
-                                  value={
-                                    this.state.add_Prescription[index]
-                                      .period
-                                  }
-                                  onChange={text =>
-                                    this.add_period(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td>
-                                <Input
-                                  type="text"
-                                  name="dosageForm"
-                                  id="dosageForm"
-                                  style={{ fontSize: "10px" }}
-                                  value={
-                                    this.state.add_Prescription[index]
-                                      .dosageForm
-                                  }
-                                  onChange={text =>
-                                    this.add_dosageForm(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                              </td>
-                              <td>
-                                <Input
-                                  type="text"
-                                  name="comment"
-                                  id="comment"
-                                  style={{ fontSize: "10px" }}
-                                  value={
-                                    this.state.add_Prescription[index]
-                                      .comment
-                                  }
-                                  onChange={text =>
-                                    this.add_comment(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                              </td>
-                            </tr>
-                          );
-                        })
+                            return (
+                              <tr key={index}>
+                                <th scope="select">
+                                  <Tooltip title="Delete Provisional Diagnosis">
+                                    <IconButton
+                                      style={{ width: "10px" }}
+                                      size="small"
+                                      onClick={() =>
+                                        this.delete_Prescription_Row(index)
+                                      }
+                                      color="secondary"
+                                      aria-label="add an alarm"
+                                    >
+                                      <RemoveCircleOutlineIcon
+                                        style={{ color: "red" }}
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                </th>
+                                <th scope="row" style={{ fontSize: "10px" }}>
+                                  {this.state.add_Prescription[index].sr}
+                                </th>
+                                <td>
+                                  <Input
+                                    type="text"
+                                    name="description"
+                                    id="description"
+                                    style={{ fontSize: "10px" }}
+                                    value={
+                                      this.state.add_Prescription[index]
+                                        .description
+                                    }
+                                    onChange={text =>
+                                      this.add_description(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <Input
+                                    type="text"
+                                    name="dosage"
+                                    id="dosage"
+                                    style={{ fontSize: "10px" }}
+                                    value={
+                                      this.state.add_Prescription[index].dosage
+                                    }
+                                    onChange={text =>
+                                      this.add_dosage(text.target.value, index)
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <Input
+                                    type="text"
+                                    name="Period"
+                                    id="Period"
+                                    style={{ fontSize: "10px" }}
+                                    value={
+                                      this.state.add_Prescription[index].period
+                                    }
+                                    onChange={text =>
+                                      this.add_period(text.target.value, index)
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <Input
+                                    type="text"
+                                    name="dosageForm"
+                                    id="dosageForm"
+                                    style={{ fontSize: "10px" }}
+                                    value={
+                                      this.state.add_Prescription[index]
+                                        .dosageForm
+                                    }
+                                    onChange={text =>
+                                      this.add_dosageForm(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                </td>
+                                <td>
+                                  <Input
+                                    type="text"
+                                    name="comment"
+                                    id="comment"
+                                    style={{ fontSize: "10px" }}
+                                    value={
+                                      this.state.add_Prescription[index].comment
+                                    }
+                                    onChange={text =>
+                                      this.add_comment(text.target.value, index)
+                                    }
+                                  />
+                                </td>
+                              </tr>
+                            );
+                          })
                         : null}
                     </tbody>
                   </Table>
@@ -1874,8 +2264,8 @@ class ChatInstance extends React.Component {
                 {/* ///////////////// PRESCRIPTION ///////////////// */}
 
                 {/* //////////////////// LAB TESTS ///////////////// */}
-                <Divider />
-                <div className="row">
+                {/* <Divider /> */}
+                <div className="row" style={{ backgroundColor: "#ffff" }}>
                   <div className="col">
                     <div className="tab_heading">Lab Tests :</div>
                   </div>
@@ -1888,69 +2278,139 @@ class ChatInstance extends React.Component {
                           color="secondary"
                           aria-label="add an alarm"
                         >
-                          <AddCircleRoundedIcon style={{ color: "green" }} />
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
                         </IconButton>
                       </Tooltip>
                     </div>
                   </div>
                 </div>
-                <Divider />
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row">
                   {this.state.lab_tests.length == 0
                     ? null
                     : this.state.lab_tests.map((val, index) => {
-                      return (
-                        <div className="col-6" key={index}>
-                          <FormGroup style={{
-                            paddingLeft: "6px",
-                            paddingRight: "6px"
-                          }}>
-                            <InputGroup>
-                              <Input
-                                type="text"
-                                name="labtest"
-                                id="labtest"
-                                value={
-                                  this.state.lab_tests[index].test
-                                }
-                                placeholder={"Test # " + index}
-                                style={{ width: "250px", fontSize: '12px' }}
-                                onChange={text =>
-                                  this.tests_add_array(
-                                    text.target.value,
-                                    index
-                                  )
-                                }
-                              />
-                              <InputGroupAddon addonType="append">
-                                <Tooltip title="Remove Lab Test">
-                                  <IconButton
-                                    onClick={() => this.delete_lab_test(index)}
-                                    size="small"
-                                    color="secondary"
-                                    aria-label="add an alarm"
-                                  >
-                                    <RemoveCircleOutlineIcon
-                                      style={{ color: "red" }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-
-                              </InputGroupAddon>
-                            </InputGroup>
-                          </FormGroup>
-                        </div>
-                      );
-                    })}
+                        return (
+                          <div className="col-6" key={index}>
+                            <FormGroup
+                              style={{
+                                paddingLeft: "6px",
+                                paddingRight: "6px"
+                              }}
+                            >
+                              <InputGroup>
+                                <Input
+                                  type="text"
+                                  name="labtest"
+                                  id="labtest"
+                                  value={this.state.lab_tests[index].test}
+                                  placeholder={"Test # " + index}
+                                  style={{ width: "250px", fontSize: "12px" }}
+                                  onChange={text =>
+                                    this.tests_add_array(
+                                      text.target.value,
+                                      index
+                                    )
+                                  }
+                                />
+                                <InputGroupAddon addonType="append">
+                                  <Tooltip title="Remove Lab Test">
+                                    <IconButton
+                                      onClick={() =>
+                                        this.delete_lab_test(index)
+                                      }
+                                      size="small"
+                                      color="secondary"
+                                      aria-label="add an alarm"
+                                    >
+                                      <RemoveCircleOutlineIcon
+                                        style={{ color: "red" }}
+                                      />
+                                    </IconButton>
+                                  </Tooltip>
+                                </InputGroupAddon>
+                              </InputGroup>
+                            </FormGroup>
+                          </div>
+                        );
+                      })}
                 </div>
                 {/* //////////////////// LAB TESTS ///////////////// */}
+
+                {/* //////////////////////////// Follow Up ////////////////// */}
+                {/* <Divider /> */}
+                <div className="tab_heading">Follow up :</div>
+                {/* <Divider /> */}
+                <div className="block-example border-bottom border-primary"></div>
+                <div style={{ marginTop: "16px" }}></div>
+                <FormGroup
+                  style={{
+                    paddingLeft: "6px",
+                    paddingRight: "6px"
+                  }}
+                >
+                  <div>
+                    <TextField
+                      id="outlined-multiline-static"
+                      label="Follow up"
+                      multiline
+                      rows="4"
+                      variant="outlined"
+                      style={{ width: "100%" }}
+                    />
+                  </div>
+                </FormGroup>
+                {/* //////////////////////////// Follow Up ////////////////// */}
+
+                {/* /////////////////////// DISCLAIMER ///////////////////// */}
+                <div
+                  className="block-example border border-primary"
+                  style={{ width: "96%", padding: "10px", margin: "10px" }}
+                >
+                  <div
+                    style={{
+                      fontSize: "14px",
+                      fontWeight: "bold",
+                      color: "#0d74bc"
+                    }}
+                  >
+                    Disclaimer
+                  </div>
+                  <div style={{ padding: "10px" }}>
+                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      1.&nbsp;&nbsp;&nbsp;&nbsp; Prescription is Not Valid For
+                      Court{" "}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      2.&nbsp;&nbsp;&nbsp;&nbsp; Treatment/Prescription is only
+                      applicable for non-emergency medical cases{" "}
+                    </div>
+                    <div style={{ fontSize: "12px", color: "#0d74bc" }}>
+                      3.&nbsp;&nbsp;&nbsp;&nbsp; This is Second Opinion service.
+                      It does not replace your primary care Doctor.
+                    </div>
+                  </div>
+                </div>
+                {/* /////////////////////// DISCLAIMER ///////////////////// */}
+
+                {/* ////////////////////// SUBMIT ////////////////////// */}
+                <div className="submit_btn">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<CloudUploadIcon />}
+                  >
+                    Upload EHR
+                  </Button>
+                </div>
+                {/* ////////////////////// SUBMIT ////////////////////// */}
               </Form>
             </div>
           </div>
-        </div >
+        </div>
         {/* </div> */}
-      </div >
+      </div>
     );
   }
 }
