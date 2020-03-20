@@ -1880,7 +1880,7 @@ class dashboard extends React.Component {
                 className="chatBox"
                 style={{
                   // width: "300px",
-                  backgroundColor: "#fafafa",
+                  backgroundColor: "#ffff",
                   paddingTop: "10px",
                   paddingBottom: "10px"
                   // overflow: "scroll"
@@ -1951,14 +1951,14 @@ class dashboard extends React.Component {
                     </span>
                   </div>
                 </div>
-                <div className="bottom_Width" />
+                {/* <div className="bottom_Width" /> */}
                 {/* ////////////////////// Header ///////////////////////// */}
                 {this.props.tickets
                   .map((ticket, index) => (
                     <StyleRoot>
                       <div style={styles.bounce}>
                         <Ripples
-                          className="chat_Tabs_Back block-example border-bottom border-success rounded mb-0"
+                          className="chat_Tabs_Back"
                           color="#0d74bc"
                           during={1500}
                           onClick={() =>
@@ -1980,18 +1980,18 @@ class dashboard extends React.Component {
                                 this.state.select_ticket !== ""
                                   ? this.state.select_ticket === ticket.id
                                     ? "#f6f6f8"
-                                    : null
+                                    : "#ffff"
                                   : this.props.tickets[0].id === ticket.id
                                   ? "#f6f6f8"
-                                  : null,
-                              color:
-                                this.state.select_ticket !== ""
-                                  ? this.state.select_ticket === ticket.id
-                                    ? "#0196ff"
-                                    : null
-                                  : this.props.tickets[0].id === ticket.id
-                                  ? "#0196ff"
-                                  : null
+                                  : "#ffff"
+                              // color:
+                              //   this.state.select_ticket !== ""
+                              //     ? this.state.select_ticket === ticket.id
+                              //       ? "#0196ff"
+                              //       : null
+                              //     : this.props.tickets[0].id === ticket.id
+                              //     ? "#0196ff"
+                              //     : null
                             }}
                           >
                             <div className="col">
