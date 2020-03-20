@@ -42,6 +42,8 @@ import {
   InputGroupText,
   InputGroupAddon
 } from "reactstrap";
+import Radium, { StyleRoot } from "radium";
+import { bounce, bounceInUp } from "react-animations";
 import Ripples, { createRipples } from "react-ripples";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
@@ -78,6 +80,13 @@ import axios from "axios";
 const signalR = require("@aspnet/signalr");
 const { TextArea } = Input;
 const { TabPane } = Tabs;
+
+const styles = {
+  bounce: {
+    animation: "x 1s",
+    animationName: Radium.keyframes(bounceInUp, "bounceInUp")
+  }
+};
 
 class dashboard extends React.Component {
   localStream;
@@ -1865,7 +1874,7 @@ class dashboard extends React.Component {
           {/* {this.drawChatTabs()} */}
           <div className="row">
             {" "}
-            <div className="col">
+            <div className="col-3">
               <div
                 id="style-1"
                 className="chatBox"
@@ -1946,56 +1955,60 @@ class dashboard extends React.Component {
                 {/* ////////////////////// Header ///////////////////////// */}
                 {this.props.tickets
                   .map((ticket, index) => (
-                    <div key={index}>
-                      <Ripples
-                        color="#0d74bc"
-                        during={1500}
-                        onClick={() =>
-                          this.setState(
-                            {
-                              select_ticket: ticket.id,
-                              selected_id: index
-                            },
-                            () => {
-                              this.send_TO_CI();
-                            }
-                          )
-                        }
-                      >
-                        <div
-                          className="chat_Tabs"
-                          style={{
-                            backgroundColor:
-                              this.state.select_ticket !== ""
-                                ? this.state.select_ticket === ticket.id
-                                  ? "#d8d8d8"
-                                  : null
-                                : this.props.tickets[0].id === ticket.id
-                                ? "#d8d8d8"
-                                : null,
-                            fontWeight:
-                              this.state.select_ticket !== ""
-                                ? this.state.select_ticket === ticket.id
-                                  ? "bold"
-                                  : null
-                                : this.props.tickets[0].id === ticket.id
-                                ? "bold"
-                                : null,
-                            color:
-                              this.state.select_ticket !== ""
-                                ? this.state.select_ticket === ticket.id
+                    <StyleRoot>
+                      <div style={styles.bounce}>
+                        <Ripples
+                          className="chat_Tabs_Back block-example border-bottom border-success rounded mb-0"
+                          color="#0d74bc"
+                          during={1500}
+                          onClick={() =>
+                            this.setState(
+                              {
+                                select_ticket: ticket.id,
+                                selected_id: index
+                              },
+                              () => {
+                                // this.send_TO_CI();
+                              }
+                            )
+                          }
+                        >
+                          <div
+                            className="chat_Tabs "
+                            style={{
+                              backgroundColor:
+                                this.state.select_ticket !== ""
+                                  ? this.state.select_ticket === ticket.id
+                                    ? "#f6f6f8"
+                                    : null
+                                  : this.props.tickets[0].id === ticket.id
+                                  ? "#f6f6f8"
+                                  : null,
+                              color:
+                                this.state.select_ticket !== ""
+                                  ? this.state.select_ticket === ticket.id
+                                    ? "#0196ff"
+                                    : null
+                                  : this.props.tickets[0].id === ticket.id
                                   ? "#0196ff"
                                   : null
-                                : this.props.tickets[0].id === ticket.id
-                                ? "#0196ff"
-                                : null
-                          }}
-                        >
-                          {ticket.patient.username} -{ticket.id}
-                        </div>
-                      </Ripples>
-                      <Divider light={true} />
-                    </div>
+                            }}
+                          >
+                            <div className="col">
+                              <div className="p_name">
+                                {ticket.patient.username}
+                              </div>
+                              <div className="p_hid">
+                                Ticket Id : {ticket.id}
+                              </div>
+                              <div className="p_policy">Policy # 1111221</div>
+                            </div>
+                          </div>
+                        </Ripples>
+
+                        {/* <Divider light={true} /> */}
+                      </div>
+                    </StyleRoot>
                   ))
                   .reverse()}
               </div>
