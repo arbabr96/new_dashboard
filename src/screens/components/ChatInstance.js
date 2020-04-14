@@ -12,9 +12,11 @@ import {
   Table,
   InputGroup,
   InputGroupText,
-  InputGroupAddon
+  InputGroupAddon,
 } from "reactstrap";
+import "../../index.css";
 // import { Button } from "reactstrap";
+import CircularProgress from "@material-ui/core/CircularProgress";
 import Ripples, { createRipples } from "react-ripples";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
@@ -38,10 +40,13 @@ import DoneIcon from "@material-ui/icons/Done";
 import Switch from "@material-ui/core/Switch";
 import Paper from "@material-ui/core/Paper";
 import Zoom from "@material-ui/core/Zoom";
+import { Spinner } from "reactstrap";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import "../../assets/css.css";
 import axios from "axios";
 import logo from "../../assets/logo.png";
+import close from "../../assets/close.png";
+import doc from "../../assets/doc.png";
 import {
   newMessage,
   ticketID,
@@ -52,11 +57,29 @@ import {
   modalShow,
   closeChat,
   closeTicket,
-  ermModal
+  ermModal,
 } from "../../store/actions/livechat";
 import { CloseButton } from "react-bootstrap";
 const { TextArea } = Input;
 const { Icon } = Layout;
+
+function getBase64(img, callback) {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+}
+
+function beforeUpload(file) {
+  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+  if (!isJpgOrPng) {
+    message.error("You can only upload JPG/PNG file!");
+  }
+  const isLt2M = file.size / 1024 / 1024 < 2;
+  if (!isLt2M) {
+    message.error("Image must smaller than 2MB!");
+  }
+  return isJpgOrPng && isLt2M;
+}
 
 class ChatInstance extends React.Component {
   localStream;
@@ -94,7 +117,10 @@ class ChatInstance extends React.Component {
       add_Prescription: [],
       lab_tests: [],
       data: [],
-      show_video: false
+      show_video: false,
+      file_uri: "",
+      file_type: "",
+      uploading: false,
     };
     // this.url = "http://streaming.tdiradio.com:8000/house.mp3";
     this.url =
@@ -120,7 +146,7 @@ class ChatInstance extends React.Component {
     // let ticket = this.props.ticket;
     // let connection = this.props.connection;
     console.log("CHAT INSTANCE RE RENDER ---- ", ticket);
-    connection.on("message-" + ticket.id, message => {
+    connection.on("message-" + ticket.id, (message) => {
       this.props.newMessage("New Message");
       this.props.ticketID(message.ticketID);
 
@@ -135,14 +161,14 @@ class ChatInstance extends React.Component {
       this.forceUpdate();
     });
 
-    connection.on("requestAudio-" + ticket.id, ticketId => {
+    connection.on("requestAudio-" + ticket.id, (ticketId) => {
       //  console.log('')
       // console.log('Audio Requested');
       ticket["AudioChatRequest"] = true;
       const hide = message.info(`Upcoming Call from Patient ID - ${ticket.id}`);
       setTimeout(hide, 2500);
       this.setState({
-        play: true
+        play: true,
       });
       console.log("REQUEST AUDIO");
       this.props.callAlert("UpComming Call");
@@ -155,14 +181,14 @@ class ChatInstance extends React.Component {
       this.forceUpdate();
     });
 
-    connection.on("onDeclineAudio-" + ticket.id, ticketId => {
+    connection.on("onDeclineAudio-" + ticket.id, (ticketId) => {
       this.props.newCallNotification(false);
       this.audio.pause();
       if (this.state.isAudioConnected === true) {
         // this.state.peerConn.close()
         console.log("Call isAudioConnected finished ");
         this.setState({
-          play: false
+          play: false,
         });
         this.props.newCallMsg("");
         // this.props.newCallNotification(false);
@@ -171,7 +197,7 @@ class ChatInstance extends React.Component {
         this.setState({ play: false, videoState: false });
 
         if (this.localStream)
-          this.localStream.getTracks().map(stream => {
+          this.localStream.getTracks().map((stream) => {
             return stream.stop();
           });
         this.props.ticket.AudioChatRequest = false;
@@ -187,10 +213,10 @@ class ChatInstance extends React.Component {
           showRemoteVideo: false,
           show_video: false,
           play: false,
-          videoState: false
+          videoState: false,
         });
         if (this.localStream)
-          this.localStream.getTracks().map(stream => {
+          this.localStream.getTracks().map((stream) => {
             return stream.stop();
           });
         this.props.ticket.AudioChatRequest = false;
@@ -210,15 +236,15 @@ class ChatInstance extends React.Component {
       }
     });
 
-    connection.on("requestVideo-" + ticket.id, ticketId => {
+    connection.on("requestVideo-" + ticket.id, (ticketId) => {
       console.log("enable video");
       this.setState({
         showRemoteVideo: true,
-        show_video: true
+        show_video: true,
       });
     });
 
-    connection.on("addIceCandidate-" + ticket.id, evt => {
+    connection.on("addIceCandidate-" + ticket.id, (evt) => {
       var descr = JSON.parse(evt);
 
       if (descr.type === "offer") {
@@ -228,7 +254,7 @@ class ChatInstance extends React.Component {
             .setRemoteDescription(new RTCSessionDescription(descr))
             .then(() => {
               this.state.peerConn.createAnswer(
-                sessionDescription =>
+                (sessionDescription) =>
                   this.setLocalAndSendMessage(sessionDescription),
                 this.defaultErrorCallback
               );
@@ -255,14 +281,14 @@ class ChatInstance extends React.Component {
         var candidate = new RTCIceCandidate({
           sdpMLineIndex: descr.sdpMLineIndex,
           sdpMid: descr.sdpMid,
-          candidate: descr.candidate
+          candidate: descr.candidate,
         });
         this.state.peerConn
           .addIceCandidate(candidate)
           .then(() => {
             console.log("ADDED ICE CANDIDATE Successfully");
           })
-          .catch(error => {
+          .catch((error) => {
             console.log("ADDED ICE CANDIDATE error", error);
           });
         // }
@@ -277,7 +303,7 @@ class ChatInstance extends React.Component {
     connection.on("disconnect-" + ticket.id, () => {
       this.setState(
         {
-          disconnect_TicketID: ticket.id
+          disconnect_TicketID: ticket.id,
         },
         () => {
           console.log("Disconnect method", ticket.id);
@@ -299,7 +325,7 @@ class ChatInstance extends React.Component {
       if (this.state.videoState) {
         this.setState({
           showRemoteVideo: false,
-          videoState: false
+          videoState: false,
         });
       }
       // this.localVideo.pause();
@@ -307,7 +333,7 @@ class ChatInstance extends React.Component {
       // this.localStream.stop();
 
       if (this.localStream)
-        this.localStream.getTracks().map(stream => {
+        this.localStream.getTracks().map((stream) => {
           return stream.stop();
         });
       this.forceUpdate();
@@ -534,13 +560,13 @@ class ChatInstance extends React.Component {
           urls: "turn:110.93.216.20:3478?transport=tcp",
           username: "test",
           lifetime: 600,
-          credential: "test"
-        }
-      ]
+          credential: "test",
+        },
+      ],
     });
 
     // s    end any ice candidates to the other peer
-    peerConn.onicecandidate = evt => {
+    peerConn.onicecandidate = (evt) => {
       if (evt.candidate) {
         // console.log("candidate", evt);
 
@@ -553,13 +579,13 @@ class ChatInstance extends React.Component {
             type: "candidate",
             sdpMLineIndex: evt.candidate.sdpMLineIndex,
             sdpMid: evt.candidate.sdpMid,
-            candidate: evt.candidate.candidate
+            candidate: evt.candidate.candidate,
           })
         );
       } else {
         console.log("End of candidates.");
         this.setState({
-          videoState: true
+          videoState: true,
         });
         //   console.log(this.state.showRemoteVideo)
       }
@@ -567,13 +593,13 @@ class ChatInstance extends React.Component {
     };
 
     // peerConn.addstream(this.localStream);
-    this.localStream.getTracks().forEach(function(track) {
+    this.localStream.getTracks().forEach(function (track) {
       peerConn.addTrack(track);
     });
 
     peerConn.addEventListener(
       "addstream",
-      stream => {
+      (stream) => {
         //  this.remoteVideo = React.createRef();
         console.log("remoteStream on addstream", stream);
         this.remoteVideo.current.srcObject = stream.stream;
@@ -584,15 +610,15 @@ class ChatInstance extends React.Component {
     );
 
     this.setState({
-      peerConn: peerConn
+      peerConn: peerConn,
     });
   };
 
-  defaultErrorCallback = err => {
+  defaultErrorCallback = (err) => {
     console.log("err", err);
   };
 
-  setLocalAndSendMessage = sessionDescription => {
+  setLocalAndSendMessage = (sessionDescription) => {
     // console.log('setLocalAndSendMessage', this.props.ticket);
     this.state.peerConn.setLocalDescription(sessionDescription);
     this.props.connection.invoke(
@@ -770,7 +796,7 @@ class ChatInstance extends React.Component {
           onClick={() => {
             this.props.connection
               .invoke("OnReject", this.props.msg)
-              .then(response => {
+              .then((response) => {
                 console.log("REJECT RESPONSE ______ ", response);
                 this.props.modalShow(false);
               });
@@ -792,13 +818,13 @@ class ChatInstance extends React.Component {
     // navigator.mediaDevices.
     navigator.getUserMedia(
       { audio: true, video: true },
-      stream => {
+      (stream) => {
         this.localStream = stream;
         const mediaRecorder = new MediaRecorder(stream);
         mediaRecorder.start();
 
         const audioChunks = [];
-        mediaRecorder.addEventListener("dataavailable", event => {
+        mediaRecorder.addEventListener("dataavailable", (event) => {
           audioChunks.push(event.data);
         });
 
@@ -807,7 +833,7 @@ class ChatInstance extends React.Component {
           const audioUrl = window.URL.createObjectURL(audioBlob);
           console.log("AUDIO URL === ", audioUrl);
           this.setState({
-            recordURL: audioUrl
+            recordURL: audioUrl,
           });
         });
 
@@ -817,19 +843,19 @@ class ChatInstance extends React.Component {
         console.log("local stream without video", this.localStream);
         this.localVideo.current.srcObject = stream;
       },
-      error => {
+      (error) => {
         console.log("error", error);
       }
     );
   };
 
-  remove_Track = pc => {
+  remove_Track = (pc) => {
     //  pc.removeTrack(pc);
   };
 
   startRemoteVideo = () => {
     this.setState({
-      showRemoteVideo: true
+      showRemoteVideo: true,
     });
   };
 
@@ -841,24 +867,24 @@ class ChatInstance extends React.Component {
     // navigator.mediaDevices.
     navigator.getUserMedia(
       { audio: true, video: true },
-      stream => {
+      (stream) => {
         this.localStream = stream;
 
         console.log("local stream  video", this.localStream);
         this.localVideo.current.srcObject = this.localStream;
       },
-      error => {
+      (error) => {
         console.log("error", error);
       }
     );
   };
-  onChange = e => {
+  onChange = (e) => {
     let files = e.target.files;
   };
   // fileList,
   customRequest = () => {
     console.log("File Request ", this.state.file);
-
+    this.setState({ uploading: true });
     var data = new FormData();
 
     // data.append("prescription", this.state.file);
@@ -866,8 +892,8 @@ class ChatInstance extends React.Component {
     console.log("DATA APPENDED", data);
     var config = {
       headers: {
-        "Content-Type": "multipart/form-data"
-      }
+        "Content-Type": "multipart/form-data",
+      },
     };
 
     axios
@@ -878,16 +904,26 @@ class ChatInstance extends React.Component {
         data,
         config
       )
-      .then(response => {
+      .then((response) => {
         console.log("File Uploaded ----- ", response);
+        if (response.status === 200) {
+          this.setState({
+            file: "",
+            fileName: "",
+            file_type: "",
+            file_uri: "",
+            uploading: false,
+          });
+        }
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(
           "File Uploaded -----  Error",
           error,
           error.response,
           error.request
         );
+        this.setState({ uploading: false });
         alert("Upload failed!");
       });
   };
@@ -910,7 +946,7 @@ class ChatInstance extends React.Component {
     }
   };
 
-  sendMessage = ticket_id => {
+  sendMessage = (ticket_id) => {
     console.log(
       "ticket_id == ",
       ticket_id,
@@ -924,7 +960,7 @@ class ChatInstance extends React.Component {
         this.state.textMessage
       );
       this.setState({
-        textMessage: ""
+        textMessage: "",
       });
     } else {
       alert("Empty message cannot send");
@@ -933,19 +969,19 @@ class ChatInstance extends React.Component {
         var someText = this.state.textMessage.replace(/(\r\n|\n|\r)/gm, "");
         console.log("REMOVE ENTER ", someText);
         this.setState({
-          textMessage: someText
+          textMessage: someText,
         });
       }
     }
   };
   //////////////////////////////////////////// METHODS FOR ERM /////////////////////////////////////////////////////////
 
-  handlePatientName = event => {
+  handlePatientName = (event) => {
     if (event.target.value !== "") {
       this.setState(
         {
           patientName: event.target.value,
-          error_PatientName: ""
+          error_PatientName: "",
         },
         () => {
           console.log("Patient Name === ", this.state.patientName);
@@ -953,44 +989,44 @@ class ChatInstance extends React.Component {
       );
     } else {
       this.setState({
-        error_PatientName: "Enter Patient Name"
+        error_PatientName: "Enter Patient Name",
       });
     }
   };
 
-  handleAge = event => {
+  handleAge = (event) => {
     console.log("EVENT AGE ==", event.target.value);
     if (event.target.value > 0 && event.target.value < 99) {
       console.log("Age -- ", event.target.value);
       this.setState({
         Age: event.target.value,
-        errorAge: ""
+        errorAge: "",
       });
     } else {
       // document.getElementById("age").style.borderColor = "red";
       this.setState({
         Age: "",
-        errorAge: "Age Must be Greater Than 0 and Less than 99"
+        errorAge: "Age Must be Greater Than 0 and Less than 99",
       });
     }
   };
   ///////////////////////////// Disease ///////////////////////////////////////////
-  addTreatment = event => {
+  addTreatment = (event) => {
     console.log("ADD_____", this.state.treatment_arr.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       treatment_arr: [
         ...prevState.treatment_arr,
-        { treatment: "", key: this.state.treatment_arr.length }
-      ]
+        { treatment: "", key: this.state.treatment_arr.length },
+      ],
     }));
   };
-  deleteTreatment = event => {
+  deleteTreatment = (event) => {
     console.log("DELETE Disease INDEX ", event);
     this.setState(
       {
         treatment_arr: this.state.treatment_arr.filter((item, index) => {
           return index !== event;
-        })
+        }),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.treatment_arr);
@@ -1005,8 +1041,8 @@ class ChatInstance extends React.Component {
     console.log("Treatment_arr  ", temp);
     this.state.treatment_arr.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          treatment_arr: temp
+        this.setState((prevState) => ({
+          treatment_arr: temp,
         }));
       }
     });
@@ -1014,21 +1050,21 @@ class ChatInstance extends React.Component {
   ////////////////////////////////////// Disease //////////////////////////////////////////
 
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
-  add_complaints = event => {
+  add_complaints = (event) => {
     // this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.complaints_symptoms.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       complaints_symptoms: [
         ...prevState.complaints_symptoms,
         {
           symptoms: "",
           duration: "",
-          key: this.state.complaints_symptoms.length
-        }
-      ]
+          key: this.state.complaints_symptoms.length,
+        },
+      ],
     }));
   };
-  delete_complaints = event => {
+  delete_complaints = (event) => {
     console.log("DELETE complaints_symptoms INDEX ", event);
     this.setState(
       {
@@ -1036,7 +1072,7 @@ class ChatInstance extends React.Component {
           (item, index) => {
             return index !== event;
           }
-        )
+        ),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.complaints_symptoms);
@@ -1051,8 +1087,8 @@ class ChatInstance extends React.Component {
     console.log("complaints_symptoms 1 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          complaints_symptoms: temp
+        this.setState((prevState) => ({
+          complaints_symptoms: temp,
         }));
       }
     });
@@ -1064,8 +1100,8 @@ class ChatInstance extends React.Component {
     console.log("complaints_symptoms 2 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          complaints_symptoms: temp
+        this.setState((prevState) => ({
+          complaints_symptoms: temp,
         }));
       }
     });
@@ -1075,17 +1111,17 @@ class ChatInstance extends React.Component {
 
   ////////////////////////// Provisional Diagnosis /////////////////////////////////////////
 
-  addPD = event => {
+  addPD = (event) => {
     // this.Form_scrollToBottom();
     console.log("ADD_____", this.state.treatment_arr.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       provisional_diagnosis: [
         ...prevState.provisional_diagnosis,
-        { diagnose: "", key: this.state.provisional_diagnosis.length }
-      ]
+        { diagnose: "", key: this.state.provisional_diagnosis.length },
+      ],
     }));
   };
-  deletePD = event => {
+  deletePD = (event) => {
     console.log("DELETE Disease INDEX ", event);
     this.setState(
       {
@@ -1093,7 +1129,7 @@ class ChatInstance extends React.Component {
           (item, index) => {
             return index !== event;
           }
-        )
+        ),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.provisional_diagnosis);
@@ -1108,8 +1144,8 @@ class ChatInstance extends React.Component {
     console.log("Treatment_arr  ", temp);
     this.state.provisional_diagnosis.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          provisional_diagnosis: temp
+        this.setState((prevState) => ({
+          provisional_diagnosis: temp,
         }));
       }
     });
@@ -1118,26 +1154,26 @@ class ChatInstance extends React.Component {
   ////////////////////////// Provisional Diagnosis /////////////////////////////////////////
 
   ////////////////////////// Lab Tests /////////////////////////////////////////
-  add_lab_test = event => {
+  add_lab_test = (event) => {
     // this.Form_scrollToBottom();
     console.log("add_complaints _____", this.state.lab_tests.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       lab_tests: [
         ...prevState.lab_tests,
         {
           test: "",
-          key: this.state.lab_tests.length
-        }
-      ]
+          key: this.state.lab_tests.length,
+        },
+      ],
     }));
   };
-  delete_lab_test = event => {
+  delete_lab_test = (event) => {
     console.log("DELETE lab_tests INDEX ", event);
     this.setState(
       {
         lab_tests: this.state.lab_tests.filter((item, index) => {
           return index !== event;
-        })
+        }),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.lab_tests);
@@ -1152,8 +1188,8 @@ class ChatInstance extends React.Component {
     console.log("lab_tests  ", temp);
     this.state.lab_tests.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          lab_tests: temp
+        this.setState((prevState) => ({
+          lab_tests: temp,
         }));
       }
     });
@@ -1164,7 +1200,7 @@ class ChatInstance extends React.Component {
   addPrescriptionRow = () => {
     // this.Form_scrollToBottom();
     console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       add_Prescription: [
         ...prevState.add_Prescription,
         {
@@ -1175,9 +1211,9 @@ class ChatInstance extends React.Component {
           dosageForm: "",
           comment: "",
           interval: "",
-          intervalUOM: ""
-        }
-      ]
+          intervalUOM: "",
+        },
+      ],
     }));
   };
   add_description = (event, key) => {
@@ -1188,7 +1224,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1208,7 +1244,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1228,7 +1264,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1248,7 +1284,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1268,7 +1304,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1288,7 +1324,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1308,7 +1344,7 @@ class ChatInstance extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -1320,11 +1356,11 @@ class ChatInstance extends React.Component {
       }
     });
   };
-  delete_Prescription = index => {
+  delete_Prescription = (index) => {
     console.log("Delete Prescription Index ==== ", index);
     this.setState(
       {
-        delete_Prescription_key: index
+        delete_Prescription_key: index,
       },
       () => {
         console.log(
@@ -1334,12 +1370,12 @@ class ChatInstance extends React.Component {
       }
     );
   };
-  delete_Prescription_Row = key => {
+  delete_Prescription_Row = (key) => {
     this.setState(
       {
         add_Prescription: this.state.add_Prescription.filter((item, index) => {
           return index !== key;
-        })
+        }),
       },
       () => {
         console.log(
@@ -1350,54 +1386,54 @@ class ChatInstance extends React.Component {
     );
   };
   state = {
-    value: 1
+    value: 1,
   };
 
-  onConsultationChange = e => {
+  onConsultationChange = (e) => {
     if (this.state.consultation === e) {
       this.setState({
-        consultation: ""
+        consultation: "",
       });
     } else {
       console.log("consultation checked", e.target.value);
       this.setState({
-        consultation: e.target.value
+        consultation: e.target.value,
       });
     }
   };
-  onLaboratoryChange = e => {
+  onLaboratoryChange = (e) => {
     if (this.state.laboratory === e) {
       this.setState({
-        laboratory: ""
+        laboratory: "",
       });
     } else {
       console.log("laboratory checked", e.target.value);
       this.setState({
-        laboratory: e.target.value
+        laboratory: e.target.value,
       });
     }
   };
-  onMastersChange = e => {
+  onMastersChange = (e) => {
     if (this.state.masters === e) {
       this.setState({
-        masters: ""
+        masters: "",
       });
     } else {
       console.log("laboratory checked", e.target.value);
       this.setState({
-        masters: e.target.value
+        masters: e.target.value,
       });
     }
   };
-  onSettingsChange = e => {
+  onSettingsChange = (e) => {
     if (this.state.settings === e) {
       this.setState({
-        settings: ""
+        settings: "",
       });
     } else {
       console.log("settings checked", e.target.value);
       this.setState({
-        settings: e.target.value
+        settings: e.target.value,
       });
     }
   };
@@ -1407,39 +1443,55 @@ class ChatInstance extends React.Component {
         ...this.state.data,
         {
           id: this.state.data.length,
-          value: Math.random() * 100
-        }
-      ]
+          value: Math.random() * 100,
+        },
+      ],
     });
   };
   switch_to_video = () => {
     console.log("switch_to_video", this.state.show_video);
     this.setState({
-      show_video: !this.state.show_video
+      show_video: !this.state.show_video,
     });
+  };
+  handleimageUpload = (info) => {
+    console.log("INFO ", info);
+    if (info.file.status === "done") {
+      getBase64(info.file.originFileObj, (imageUrl) =>
+        this.setState({
+          file_uri: imageUrl,
+        })
+      );
+    }
   };
   /////////////////////////////////////////// METHODS FOR ERM ///////////////////////////////////////////////////////////
   render() {
     // console.log('ticket', this.props.ticket);
 
     const fileUploadProps = {
-      onRemove: file => {},
-      beforeUpload: file => {
+      onRemove: (file) => {},
+      beforeUpload: (file) => {
         this.setState(
           {
             file,
-            fileName: file.name
+            fileName: file.name,
+            file_type: file.type,
           },
           () => {
             console.log("file Before", this.state.file);
-            this.customRequest();
+            // this.customRequest();
           }
         );
+        getBase64(file, (imageUrl) => {
+          this.setState({
+            file_uri: imageUrl,
+          });
+        });
 
         return false;
       },
 
-      showUploadList: false
+      showUploadList: false,
     };
     return (
       <div className="col-9 chat_instance">
@@ -1514,7 +1566,7 @@ class ChatInstance extends React.Component {
                                   if (this.state.videoState) {
                                     this.setState({
                                       showRemoteVideo: false,
-                                      videoState: false
+                                      videoState: false,
                                     });
                                   }
                                   console.log("VIdeo call declined");
@@ -1534,7 +1586,7 @@ class ChatInstance extends React.Component {
                           onClick={() => {
                             this.setState(
                               {
-                                closeTicketID: this.props.ticket.id
+                                closeTicketID: this.props.ticket.id,
                               },
                               () => {
                                 this.props.closeChat(true);
@@ -1553,7 +1605,7 @@ class ChatInstance extends React.Component {
                         >
                           <CloseIcon
                             style={{
-                              color: "red"
+                              color: "red",
                             }}
                           />
                         </IconButton>
@@ -1565,16 +1617,22 @@ class ChatInstance extends React.Component {
               <div className="block-example border-bottom border-primary"></div>
               <div className="row">
                 <div className="col">
-                  <div className="middle" id="style-1">
+                  <div
+                    className={
+                      this.state.file_uri != "" ? "with_img" : "middle"
+                    }
+                    id="style-1"
+                  >
                     <div
-                      ref={el => {
+                      ref={(el) => {
                         this.lastMessage = el;
                       }}
                       id="style-1"
                       style={{
                         overflowX: "hidden",
                         overflowY: "auto",
-                        maxHeight: "425px"
+                        maxHeight:
+                          this.state.file_uri != "" ? "320px" : "420px",
                       }}
                     >
                       {this.props.close_Ticket ? this.removeTicket() : null}
@@ -1589,7 +1647,7 @@ class ChatInstance extends React.Component {
                         style={{
                           transitionDelay: this.state.show_video
                             ? "200ms"
-                            : "0ms"
+                            : "0ms",
                         }}
                       >
                         <div className="video_show">
@@ -1597,7 +1655,7 @@ class ChatInstance extends React.Component {
                             <div
                               style={{
                                 // marginLeft: "10px",
-                                position: "relative"
+                                position: "relative",
                               }}
                             >
                               <video
@@ -1611,7 +1669,7 @@ class ChatInstance extends React.Component {
                                   height: "80px",
                                   display: this.state.showRemoteVideo
                                     ? "block"
-                                    : "none"
+                                    : "none",
                                 }}
                                 autoPlay
                                 muted
@@ -1627,7 +1685,7 @@ class ChatInstance extends React.Component {
 
                                     display: this.state.showRemoteVideo
                                       ? "block"
-                                      : "none"
+                                      : "none",
                                   }}
                                   autoPlay
                                 ></video>
@@ -1644,7 +1702,7 @@ class ChatInstance extends React.Component {
                           <Row key={index}>
                             <Col>
                               {isSenderPatient ? (
-                                <div className={"message-right show_hide"}>
+                                <div className={"message_right"}>
                                   {message.file == null ? message.text : null}
 
                                   {message.file != null &&
@@ -1653,7 +1711,7 @@ class ChatInstance extends React.Component {
                                       alt=""
                                       style={{
                                         width: "200px",
-                                        padding: "5px"
+                                        padding: "5px",
                                       }}
                                       src={
                                         window.API_URL +
@@ -1682,7 +1740,7 @@ class ChatInstance extends React.Component {
                                   )}
                                 </div>
                               ) : (
-                                <div className={"message-left show_hide"}>
+                                <div className={"message_left"}>
                                   {message.file == null ? message.text : null}
                                   {message.file != null &&
                                   message.file.fileType === 0 ? (
@@ -1690,7 +1748,7 @@ class ChatInstance extends React.Component {
                                       alt=""
                                       style={{
                                         width: "200px",
-                                        padding: "5px"
+                                        padding: "5px",
                                       }}
                                       src={
                                         window.API_URL +
@@ -1763,7 +1821,70 @@ class ChatInstance extends React.Component {
                   </div>
                 </div>*/}
               </div>
+              {this.state.file_uri != "" ? (
+                <div className="preview_img">
+                  <div className="close_btn">
+                    <img
+                      onClick={() => {
+                        this.setState({
+                          file: "",
+                          fileName: "",
+                          file_type: "",
+                          file_uri: "",
+                        });
+                      }}
+                      alt=""
+                      style={{
+                        width: "20px",
+                        height: "20px",
+                        marginTop: "-8px",
+                        marginRight: "-8px",
+                        zIndex: 9999,
+                      }}
+                      src={close}
+                    />
+                  </div>
+                  {this.state.file_type === "image/png" ||
+                  this.state.file_type === "image/jpg" ||
+                  (this.state.file_type === "image/jpeg" &&
+                    this.state.file_type != "") ? (
+                    <img
+                      alt=""
+                      style={{
+                        width: "120px",
+                        height: "100px",
+                        marginTop: "-12px",
+                        borderRadius: "8px",
+                      }}
+                      src={this.state.file_uri}
+                    />
+                  ) : (
+                    <img
+                      alt=""
+                      style={{
+                        width: "120px",
+                        height: "100px",
+                        marginTop: "-12px",
+                        borderRadius: "8px",
+                      }}
+                      src={doc}
+                    />
+                  )}
 
+                  {this.state.uploading ? (
+                    <div className="img_send">
+                      <Spinner color="primary" size="sm" />
+                    </div>
+                  ) : (
+                    <div
+                      className="img_send"
+                      onClick={() => this.customRequest()}
+                    >
+                      Send
+                    </div>
+                  )}
+                </div>
+              ) : null}
               {/* <div className="container-fluid"> */}
               {/* <div className="row"> */}
               {this.state.disconnect_TicketID === this.props.ticket.id ? (
@@ -1781,7 +1902,7 @@ class ChatInstance extends React.Component {
                   id="inputField"
                   className="row"
                   style={{
-                    backgroundColor: "#ffff"
+                    backgroundColor: "#ffff",
                   }}
                 >
                   <div className="col-9">
@@ -1791,12 +1912,12 @@ class ChatInstance extends React.Component {
                       rowsMax="3"
                       placeholder="Type Here"
                       style={{
-                        fontSize: "10px"
+                        fontSize: "10px",
                       }}
                       className="show_hide"
                       fullWidth={true}
                       value={this.state.textMessage}
-                      onChange={text =>
+                      onChange={(text) =>
                         this.setState({ textMessage: text.target.value })
                       }
                     />
@@ -1804,7 +1925,11 @@ class ChatInstance extends React.Component {
                   <div className="col-3">
                     <Upload {...fileUploadProps}>
                       <Tooltip arrow title="Upload File/Image">
-                        <IconButton color="secondary" aria-label="add an alarm">
+                        <IconButton
+                          size="small"
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
                           <AttachFileIcon />
                         </IconButton>
                       </Tooltip>
@@ -1817,14 +1942,14 @@ class ChatInstance extends React.Component {
                           this.sendMessage(this.props.ticket.id);
                         }}
                         style={{
-                          borderWidth: "0px"
+                          borderWidth: "0px",
                         }}
                         color="primary"
                         aria-label="add an alarm"
                       >
                         <SendIcon
                           style={{
-                            color: "#0d74bc"
+                            color: "#0d74bc",
                           }}
                         />
                       </IconButton>
@@ -1839,7 +1964,7 @@ class ChatInstance extends React.Component {
 
           <div className="col-6">
             <div
-              ref={el => {
+              ref={(el) => {
                 this.form = el;
               }}
               id="style-1"
@@ -1847,7 +1972,7 @@ class ChatInstance extends React.Component {
               style={{
                 backgroundColor: "#fff",
                 overflowX: "hidden",
-                overflowY: "auto"
+                overflowY: "auto",
               }}
             >
               <div className="heading_1 show_hide">
@@ -1868,7 +1993,7 @@ class ChatInstance extends React.Component {
                   style={{
                     marginTop: "10px",
                     paddingLeft: "6px",
-                    paddingRight: "6px"
+                    paddingRight: "6px",
                   }}
                 >
                   <div className="row">
@@ -1898,7 +2023,7 @@ class ChatInstance extends React.Component {
                         style={{
                           color: "red",
                           fontSize: "12px",
-                          fontWeight: "normal"
+                          fontWeight: "normal",
                         }}
                       >
                         {this.state.errorAge}
@@ -1923,7 +2048,7 @@ class ChatInstance extends React.Component {
                   style={{
                     marginTop: "5px",
                     paddingLeft: "6px",
-                    paddingRight: "6px"
+                    paddingRight: "6px",
                   }}
                 >
                   <div className="row">
@@ -1975,7 +2100,7 @@ class ChatInstance extends React.Component {
                   style={{
                     backgroundColor: "#ffff",
                     borderBottomWidth: "1px",
-                    borderColor: "#0d74bc"
+                    borderColor: "#0d74bc",
                   }}
                 >
                   <div className="col">
@@ -2009,7 +2134,7 @@ class ChatInstance extends React.Component {
                             <FormGroup
                               style={{
                                 paddingLeft: "6px",
-                                paddingRight: "6px"
+                                paddingRight: "6px",
                               }}
                             >
                               <InputGroup>
@@ -2024,7 +2149,7 @@ class ChatInstance extends React.Component {
                                   }
                                   placeholder="Symptoms"
                                   style={{ fontSize: "12px" }}
-                                  onChange={text =>
+                                  onChange={(text) =>
                                     this.complaints_add_array(
                                       text.target.value,
                                       index
@@ -2042,7 +2167,7 @@ class ChatInstance extends React.Component {
                                   }
                                   placeholder="Duration"
                                   style={{ fontSize: "12px" }}
-                                  onChange={text =>
+                                  onChange={(text) =>
                                     this.complaints_add_array1(
                                       text.target.value,
                                       index
@@ -2108,7 +2233,7 @@ class ChatInstance extends React.Component {
                             <FormGroup
                               style={{
                                 paddingLeft: "6px",
-                                paddingRight: "6px"
+                                paddingRight: "6px",
                               }}
                             >
                               <InputGroup>
@@ -2123,7 +2248,7 @@ class ChatInstance extends React.Component {
                                   }
                                   placeholder="Diagnosis"
                                   style={{ fontSize: "12px" }}
-                                  onChange={text =>
+                                  onChange={(text) =>
                                     this.PD_arr(text.target.value, index)
                                   }
                                 />
@@ -2176,7 +2301,7 @@ class ChatInstance extends React.Component {
                 <FormGroup
                   style={{
                     paddingLeft: "6px",
-                    paddingRight: "6px"
+                    paddingRight: "6px",
                   }}
                 >
                   <Table striped bordered hover>
@@ -2242,7 +2367,7 @@ class ChatInstance extends React.Component {
                                       this.state.add_Prescription[index]
                                         .description
                                     }
-                                    onChange={text =>
+                                    onChange={(text) =>
                                       this.add_description(
                                         text.target.value,
                                         index
@@ -2260,7 +2385,7 @@ class ChatInstance extends React.Component {
                                     value={
                                       this.state.add_Prescription[index].dosage
                                     }
-                                    onChange={text =>
+                                    onChange={(text) =>
                                       this.add_dosage(text.target.value, index)
                                     }
                                   />
@@ -2275,7 +2400,7 @@ class ChatInstance extends React.Component {
                                     value={
                                       this.state.add_Prescription[index].period
                                     }
-                                    onChange={text =>
+                                    onChange={(text) =>
                                       this.add_period(text.target.value, index)
                                     }
                                   />
@@ -2291,7 +2416,7 @@ class ChatInstance extends React.Component {
                                       this.state.add_Prescription[index]
                                         .dosageForm
                                     }
-                                    onChange={text =>
+                                    onChange={(text) =>
                                       this.add_dosageForm(
                                         text.target.value,
                                         index
@@ -2309,7 +2434,7 @@ class ChatInstance extends React.Component {
                                     value={
                                       this.state.add_Prescription[index].comment
                                     }
-                                    onChange={text =>
+                                    onChange={(text) =>
                                       this.add_comment(text.target.value, index)
                                     }
                                   />
@@ -2357,7 +2482,7 @@ class ChatInstance extends React.Component {
                             <FormGroup
                               style={{
                                 paddingLeft: "6px",
-                                paddingRight: "6px"
+                                paddingRight: "6px",
                               }}
                             >
                               <InputGroup>
@@ -2369,7 +2494,7 @@ class ChatInstance extends React.Component {
                                   value={this.state.lab_tests[index].test}
                                   placeholder={"Test # " + index}
                                   style={{ width: "250px", fontSize: "12px" }}
-                                  onChange={text =>
+                                  onChange={(text) =>
                                     this.tests_add_array(
                                       text.target.value,
                                       index
@@ -2409,7 +2534,7 @@ class ChatInstance extends React.Component {
                 <FormGroup
                   style={{
                     paddingLeft: "6px",
-                    paddingRight: "6px"
+                    paddingRight: "6px",
                   }}
                 >
                   <div>
@@ -2436,7 +2561,7 @@ class ChatInstance extends React.Component {
                     style={{
                       fontSize: "14px",
                       fontWeight: "bold",
-                      color: "#0d74bc"
+                      color: "#0d74bc",
                     }}
                   >
                     Disclaimer
@@ -2498,10 +2623,10 @@ const mapDispatchToProps = {
   modalShow,
   closeChat,
   closeTicket,
-  ermModal
+  ermModal,
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   var message = state.LiveChatReducer.message;
   var ticketId = state.LiveChatReducer.ticketId;
   var tickets = state.LiveChatReducer.tickets;
@@ -2520,7 +2645,7 @@ const mapStateToProps = state => {
     newCall,
     msg,
     close_Ticket,
-    close
+    close,
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(ChatInstance);
