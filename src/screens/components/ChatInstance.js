@@ -105,17 +105,24 @@ class ChatInstance extends React.Component {
       disconnect_TicketID: "",
       fileName: "",
       recordURL: "",
+      h_id: "",
       patientName: "",
-      error_PatientName: "",
-      Age: "",
-      Gender: "",
-      error_Gender: "",
-      errorAge: "",
+      registraton_id: "",
+      age: "",
+      gender: "",
+      contact: "",
+      email: "",
+      follow_up: "",
       treatment_arr: [],
       complaints_symptoms: [],
       provisional_diagnosis: [],
       add_Prescription: [],
       lab_tests: [],
+      error_hid: false,
+      error_pname: false,
+      error_gender: false,
+      error_contact: false,
+      error_email: false,
       data: [],
       show_video: false,
       file_uri: "",
@@ -768,7 +775,6 @@ class ChatInstance extends React.Component {
       </div>
     );
   };
-
   ChatRequestView = () => {
     return (
       <div className={"message"}>
@@ -807,7 +813,6 @@ class ChatInstance extends React.Component {
       </div>
     );
   };
-
   getStream = () => {
     // this.localStream = null;
 
@@ -848,17 +853,14 @@ class ChatInstance extends React.Component {
       }
     );
   };
-
   remove_Track = (pc) => {
     //  pc.removeTrack(pc);
   };
-
   startRemoteVideo = () => {
     this.setState({
       showRemoteVideo: true,
     });
   };
-
   getVideoStream = () => {
     navigator.getUserMedia =
       navigator.getUserMedia ||
@@ -927,7 +929,6 @@ class ChatInstance extends React.Component {
         alert("Upload failed!");
       });
   };
-
   removeTicket = () => {
     var ticket_arr = this.props.tickets;
     for (let i = 0; i < ticket_arr.length; i++) {
@@ -945,7 +946,6 @@ class ChatInstance extends React.Component {
       }
     }
   };
-
   sendMessage = (ticket_id) => {
     console.log(
       "ticket_id == ",
@@ -975,40 +975,30 @@ class ChatInstance extends React.Component {
     }
   };
   //////////////////////////////////////////// METHODS FOR ERM /////////////////////////////////////////////////////////
-
-  handlePatientName = (event) => {
-    if (event.target.value !== "") {
-      this.setState(
-        {
-          patientName: event.target.value,
-          error_PatientName: "",
-        },
-        () => {
-          console.log("Patient Name === ", this.state.patientName);
-        }
-      );
-    } else {
-      this.setState({
-        error_PatientName: "Enter Patient Name",
-      });
-    }
+  handleHealthID = (event) => {
+    this.setState({
+      h_id: event.target.value,
+    });
   };
-
-  handleAge = (event) => {
-    console.log("EVENT AGE ==", event.target.value);
-    if (event.target.value > 0 && event.target.value < 99) {
-      console.log("Age -- ", event.target.value);
-      this.setState({
-        Age: event.target.value,
-        errorAge: "",
-      });
-    } else {
-      // document.getElementById("age").style.borderColor = "red";
-      this.setState({
-        Age: "",
-        errorAge: "Age Must be Greater Than 0 and Less than 99",
-      });
-    }
+  handlePatientName = (event) => {
+    this.setState({
+      patientName: event.target.value,
+    });
+  };
+  handleGender = (event) => {
+    this.setState({
+      age: event.target.value,
+    });
+  };
+  handleContact = (event) => {
+    this.setState({
+      contact: event.target.value,
+    });
+  };
+  handleEmail = (event) => {
+    this.setState({
+      email: event.target.value,
+    });
   };
   ///////////////////////////// Disease ///////////////////////////////////////////
   addTreatment = (event) => {
@@ -1463,6 +1453,37 @@ class ChatInstance extends React.Component {
         })
       );
     }
+  };
+  submit_form = () => {
+    const {
+      h_id,
+      patientName,
+      registraton_id,
+      gender,
+      contact,
+      email,
+      follow_up,
+      treatment_arr,
+      complaints_symptoms,
+      provisional_diagnosis,
+      add_Prescription,
+      lab_tests,
+    } = this.state;
+    var data = {
+      health_id: h_id,
+      p_name: patientName,
+      r_id: registraton_id,
+      gender: gender,
+      contact: contact,
+      email: email,
+      f_up: follow_up,
+      T_arr: treatment_arr,
+      c_s: complaints_symptoms,
+      p_D: provisional_diagnosis,
+      A_P: add_Prescription,
+      L_test: lab_tests,
+    };
+    console.log("Data === ", data);
   };
   /////////////////////////////////////////// METHODS FOR ERM ///////////////////////////////////////////////////////////
   render() {
@@ -1998,7 +2019,6 @@ class ChatInstance extends React.Component {
                 >
                   <div className="row">
                     <div className="col">
-                      {" "}
                       <Input
                         type="text"
                         required={true}
@@ -2007,30 +2027,22 @@ class ChatInstance extends React.Component {
                         id="health_id"
                         placeholder="Health ID #"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.error_hid}
+                        onChange={(e) => this.handleHealthID(e)}
                       />
                     </div>
 
                     <div className="col">
                       <Input
-                        type="number"
+                        type="text"
                         name="registeration_id"
                         id="registeration_id"
                         className="show_hide"
                         placeholder="Registration #"
                         style={{ fontSize: "12px" }}
                       />
-                      <span
-                        style={{
-                          color: "red",
-                          fontSize: "12px",
-                          fontWeight: "normal",
-                        }}
-                      >
-                        {this.state.errorAge}
-                      </span>
                     </div>
                     <div className="col">
-                      {" "}
                       <Input
                         type="text"
                         required={true}
@@ -2039,6 +2051,8 @@ class ChatInstance extends React.Component {
                         id="mr/mrs"
                         placeholder="Mr/Mrs"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.error_pname}
+                        onChange={(e) => this.handlePatientName(e)}
                       />
                     </div>
                   </div>
@@ -2061,6 +2075,8 @@ class ChatInstance extends React.Component {
                         id="gender"
                         placeholder="Gender"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.error_gender}
+                        onChange={(e) => this.handleGender(e)}
                       >
                         <option>Gender</option>
                         <option>Male</option>
@@ -2076,6 +2092,8 @@ class ChatInstance extends React.Component {
                         id="contact"
                         placeholder="Contact"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.error_contact}
+                        onChange={(e) => this.handleContact(e)}
                       />
                     </div>
                     <div className="col">
@@ -2088,6 +2106,8 @@ class ChatInstance extends React.Component {
                         id="email"
                         placeholder="Email-Address"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.error_email}
+                        onChange={(e) => this.handleEmail(e)}
                       />
                     </div>
                   </div>
@@ -2595,6 +2615,10 @@ class ChatInstance extends React.Component {
                 {/* ////////////////////// SUBMIT ////////////////////// */}
                 <div className="submit_btn">
                   <Button
+                    onCLick={() => {
+                      console.log("Upload EHR PRESSE");
+                      // this.submit_form();
+                    }}
                     variant="contained"
                     color="primary"
                     className="show_hide"
