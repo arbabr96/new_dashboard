@@ -4,11 +4,12 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
 } from "react-router-dom";
 import Dashboard from "./screens/dashboard";
 import Login from "./screens/Login";
 import { connect } from "react-redux";
+import SignUp from "./screens/SignUp";
 
 class App extends React.Component {
   constructor(props) {
@@ -26,31 +27,40 @@ class App extends React.Component {
             <div className={this.props.auth ? null : "auth-inner"}>
               <Switch>
                 <Route
-                  path="/dashboard"
+                  path="/TakafulPanel/dashboard"
                   render={() => {
                     return this.props.auth ? (
                       <Dashboard />
                     ) : (
                       <Redirect
                         to={{
-                          pathname: "/"
+                          pathname: "/TakafulPanel/signIn",
                         }}
                       />
                     );
                   }}
                 />
                 <Route
-                  path="/"
+                  path="/TakafulPanel/signIn"
+                  // render={() => {
+                  //   return this.props.auth ? (
+                  //     <Redirect
+                  //       to={{
+                  //         pathname: "/dashboard"
+                  //       }}
+                  //     />
+                  //   ) : (
+                  //     <Login />
+                  //   );
+                  // }}
                   render={() => {
-                    return this.props.auth ? (
-                      <Redirect
-                        to={{
-                          pathname: "/dashboard"
-                        }}
-                      />
-                    ) : (
-                      <Login />
-                    );
+                    return <Login />;
+                  }}
+                />
+                <Route
+                  path="/TakafulPanel/signUP"
+                  render={() => {
+                    return <SignUp />;
                   }}
                 />
               </Switch>
@@ -62,9 +72,9 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    auth: state.AuthReducer.auth
+    auth: state.AuthReducer.auth,
   };
 };
 

@@ -6,16 +6,16 @@ import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Store from "./store/store";
-import { BrowserRouter } from 'react-router-dom'
-
+import { BrowserRouter } from "react-router-dom";
+import HttpsRedirect from "react-https-redirect";
 import { Provider } from "react-redux";
 
 ReactDOM.render(
-  <BrowserRouter>
+  <HttpsRedirect>
     <Provider store={Store}>
       <App />
     </Provider>
-  </BrowserRouter>,
+  </HttpsRedirect>,
   document.getElementById("root")
 );
 

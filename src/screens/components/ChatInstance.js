@@ -523,13 +523,19 @@ class ChatInstance extends React.Component {
       window.mozRTCPeerConnection ||
       window.webkitRTCPeerConnection ||
       window.RTCPeerConnection;
-    let peerConn = new window.RTCPeerConnection({
+    let peerConn = new RTCPeerConnection({
       iceServers: [
         { url: "stun:stun.l.google.com:19302" },
         { url: "stun:stun1.l.google.com:19302" },
         { url: "stun:stun2.l.google.com:19302" },
         { url: "stun:stun3.l.google.com:19302" },
-        { url: "stun:stun4.l.google.com:19302" }
+        { url: "stun:stun4.l.google.com:19302" },
+        {
+          urls: "turn:110.93.216.20:3478?transport=tcp",
+          username: "test",
+          lifetime: 600,
+          credential: "test"
+        }
       ]
     });
 
@@ -1608,6 +1614,7 @@ class ChatInstance extends React.Component {
                                     : "none"
                                 }}
                                 autoPlay
+                                muted
                               ></video>
                               <div>
                                 <video
