@@ -120,9 +120,11 @@ class ChatInstance extends React.Component {
       lab_tests: [],
       error_hid: false,
       error_pname: false,
+      errorR_id: false,
       error_gender: false,
       error_contact: false,
       error_email: false,
+      error_fup: false,
       data: [],
       show_video: false,
       file_uri: "",
@@ -980,6 +982,11 @@ class ChatInstance extends React.Component {
       h_id: event.target.value,
     });
   };
+  handleR_id = (event) => {
+    this.setState({
+      registraton_id: event.target.value,
+    });
+  };
   handlePatientName = (event) => {
     this.setState({
       patientName: event.target.value,
@@ -987,7 +994,7 @@ class ChatInstance extends React.Component {
   };
   handleGender = (event) => {
     this.setState({
-      age: event.target.value,
+      gender: event.target.value,
     });
   };
   handleContact = (event) => {
@@ -998,6 +1005,11 @@ class ChatInstance extends React.Component {
   handleEmail = (event) => {
     this.setState({
       email: event.target.value,
+    });
+  };
+  handle_FUP = (event) => {
+    this.setState({
+      follow_up: event.target.value,
     });
   };
   ///////////////////////////// Disease ///////////////////////////////////////////
@@ -1189,26 +1201,23 @@ class ChatInstance extends React.Component {
 
   addPrescriptionRow = () => {
     // this.Form_scrollToBottom();
-    console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
+    // console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
     this.setState((prevState) => ({
       add_Prescription: [
         ...prevState.add_Prescription,
         {
           sr: this.state.add_Prescription.length,
-          description: "",
+          medicine: "",
           dosage: "",
-          period: "",
-          dosageForm: "",
-          comment: "",
-          interval: "",
-          intervalUOM: "",
+          route: "",
+          frequency: "",
+          duration: "",
         },
       ],
     }));
   };
   add_description = (event, key) => {
-    console.log("add_description ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].description = event;
+    this.state.add_Prescription[key].medicine = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1227,7 +1236,7 @@ class ChatInstance extends React.Component {
     });
   };
   add_dosage = (event, key) => {
-    console.log("add_dosage ---- ", event, " at Index ", key);
+    // console.log("add_dosage ---- ", event, " at Index ", key);
     this.state.add_Prescription[key].dosage = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
@@ -1247,8 +1256,8 @@ class ChatInstance extends React.Component {
     });
   };
   add_period = (event, key) => {
-    console.log("add_period ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].period = event;
+    // console.log("add_period ---- ", event, " at Index ", key);
+    this.state.add_Prescription[key].route = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1267,8 +1276,8 @@ class ChatInstance extends React.Component {
     });
   };
   add_dosageForm = (event, key) => {
-    console.log("add_dosageForm ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].dosageForm = event;
+    // console.log("add_dosageForm ---- ", event, " at Index ", key);
+    this.state.add_Prescription[key].frequency = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1287,8 +1296,8 @@ class ChatInstance extends React.Component {
     });
   };
   add_comment = (event, key) => {
-    console.log("add_comment ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].comment = event;
+    // console.log("add_comment ---- ", event, " at Index ", key);
+    this.state.add_Prescription[key].duration = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1306,46 +1315,7 @@ class ChatInstance extends React.Component {
       }
     });
   };
-  add_interval = (event, key) => {
-    console.log("add_interval ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].interval = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_interval == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_intervalUOM = (event, key) => {
-    console.log("add_intervalUOM ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].intervalUOM = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_intervalUOM == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
+
   delete_Prescription = (index) => {
     console.log("Delete Prescription Index ==== ", index);
     this.setState(
@@ -1469,21 +1439,60 @@ class ChatInstance extends React.Component {
       add_Prescription,
       lab_tests,
     } = this.state;
-    var data = {
-      health_id: h_id,
-      p_name: patientName,
-      r_id: registraton_id,
-      gender: gender,
-      contact: contact,
-      email: email,
-      f_up: follow_up,
-      T_arr: treatment_arr,
-      c_s: complaints_symptoms,
-      p_D: provisional_diagnosis,
-      A_P: add_Prescription,
-      L_test: lab_tests,
-    };
-    console.log("Data === ", data);
+    if (h_id != "") {
+      if (patientName != "") {
+        if (gender != "Gender" || gender != "") {
+          if (contact != "") {
+            if (email != "") {
+              var data = {
+                health_id: h_id,
+                p_name: patientName,
+                r_id: registraton_id,
+                gender: gender,
+                contact: contact,
+                email: email,
+                f_up: follow_up,
+                c_s: complaints_symptoms,
+                p_D: provisional_diagnosis,
+                A_P: add_Prescription,
+                L_test: lab_tests,
+              };
+              console.log("Data === ", data);
+            } else {
+              this.setState({
+                error_email: true,
+                error_contact: false,
+                error_gender: false,
+                error_pname: false,
+                error_hid: false,
+              });
+            }
+          } else {
+            this.setState({
+              error_contact: true,
+              error_gender: false,
+              error_pname: false,
+              error_hid: false,
+            });
+          }
+        } else {
+          this.setState({
+            error_gender: true,
+            error_pname: false,
+            error_hid: false,
+          });
+        }
+      } else {
+        this.setState({
+          error_pname: true,
+          error_hid: false,
+        });
+      }
+    } else {
+      this.setState({
+        error_hid: true,
+      });
+    }
   };
   /////////////////////////////////////////// METHODS FOR ERM ///////////////////////////////////////////////////////////
   render() {
@@ -2040,6 +2049,8 @@ class ChatInstance extends React.Component {
                         className="show_hide"
                         placeholder="Registration #"
                         style={{ fontSize: "12px" }}
+                        invalid={this.state.errorR_id}
+                        onChange={(e) => this.handleR_id(e)}
                       />
                     </div>
                     <div className="col">
@@ -2243,7 +2254,7 @@ class ChatInstance extends React.Component {
                 </div>
                 {/* <Divider /> */}
                 <div className="block-example border-bottom border-primary"></div>
-                {/* <div style={{ marginTop: "16px" }}></div> */}
+                <div style={{ marginTop: "16px" }}></div>
                 <div className="row" style={{ marginBottom: "16px" }}>
                   {this.state.provisional_diagnosis.length == 0
                     ? null
@@ -2385,7 +2396,7 @@ class ChatInstance extends React.Component {
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index]
-                                        .description
+                                        .medicine
                                     }
                                     onChange={(text) =>
                                       this.add_description(
@@ -2413,12 +2424,12 @@ class ChatInstance extends React.Component {
                                 <td>
                                   <Input
                                     type="text"
-                                    name="Period"
-                                    id="Period"
+                                    name="route"
+                                    id="route"
                                     className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
-                                      this.state.add_Prescription[index].period
+                                      this.state.add_Prescription[index].route
                                     }
                                     onChange={(text) =>
                                       this.add_period(text.target.value, index)
@@ -2428,13 +2439,13 @@ class ChatInstance extends React.Component {
                                 <td>
                                   <Input
                                     type="text"
-                                    name="dosageForm"
-                                    id="dosageForm"
+                                    name="frequency"
+                                    id="frequency"
                                     className="show_hide"
                                     style={{ fontSize: "10px" }}
                                     value={
                                       this.state.add_Prescription[index]
-                                        .dosageForm
+                                        .frequency
                                     }
                                     onChange={(text) =>
                                       this.add_dosageForm(
@@ -2447,12 +2458,13 @@ class ChatInstance extends React.Component {
                                 <td>
                                   <Input
                                     type="text"
-                                    name="comment"
+                                    name="duration"
                                     className="show_hide"
-                                    id="comment"
+                                    id="duration"
                                     style={{ fontSize: "10px" }}
                                     value={
-                                      this.state.add_Prescription[index].comment
+                                      this.state.add_Prescription[index]
+                                        .duration
                                     }
                                     onChange={(text) =>
                                       this.add_comment(text.target.value, index)
@@ -2566,6 +2578,8 @@ class ChatInstance extends React.Component {
                       rows="4"
                       variant="outlined"
                       style={{ width: "100%" }}
+                      invalid={this.state.error_fup}
+                      onChange={(e) => this.handle_FUP(e)}
                     />
                   </div>
                 </FormGroup>
@@ -2615,10 +2629,7 @@ class ChatInstance extends React.Component {
                 {/* ////////////////////// SUBMIT ////////////////////// */}
                 <div className="submit_btn">
                   <Button
-                    onCLick={() => {
-                      console.log("Upload EHR PRESSE");
-                      // this.submit_form();
-                    }}
+                    onClick={this.submit_form}
                     variant="contained"
                     color="primary"
                     className="show_hide"
