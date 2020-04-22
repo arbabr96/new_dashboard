@@ -119,17 +119,31 @@ class ChatInstance extends React.Component {
       add_Prescription: [],
       lab_tests: [],
       error_hid: false,
+      valid_pname: false,
       error_pname: false,
       errorR_id: false,
+      valid_gender: false,
       error_gender: false,
+      valid_contact: false,
       error_contact: false,
+      valid_email: false,
       error_email: false,
+      valid_pname: false,
       error_fup: false,
       data: [],
       show_video: false,
       file_uri: "",
       file_type: "",
       uploading: false,
+      s_required: "",
+      d_required: "",
+      pd_required: "",
+      test_required: "",
+      m_required: "",
+      do_required: "",
+      r_required: "",
+      f_required: "",
+      du_required: "",
     };
     // this.url = "http://streaming.tdiradio.com:8000/house.mp3";
     this.url =
@@ -1059,9 +1073,8 @@ class ChatInstance extends React.Component {
       complaints_symptoms: [
         ...prevState.complaints_symptoms,
         {
-          symptoms: "",
-          duration: "",
-          key: this.state.complaints_symptoms.length,
+          Symptoms: "",
+          Duration: "",
         },
       ],
     }));
@@ -1084,7 +1097,7 @@ class ChatInstance extends React.Component {
   };
   complaints_add_array = (event, key) => {
     console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].symptoms = event;
+    this.state.complaints_symptoms[key].Symptoms = event;
     var temp = this.state.complaints_symptoms;
     console.log("complaints_symptoms 1 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
@@ -1097,7 +1110,7 @@ class ChatInstance extends React.Component {
   };
   complaints_add_array1 = (event, key) => {
     console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].duration = event;
+    this.state.complaints_symptoms[key].Duration = event;
     var temp = this.state.complaints_symptoms;
     console.log("complaints_symptoms 2 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
@@ -1119,7 +1132,7 @@ class ChatInstance extends React.Component {
     this.setState((prevState) => ({
       provisional_diagnosis: [
         ...prevState.provisional_diagnosis,
-        { diagnose: "", key: this.state.provisional_diagnosis.length },
+        { Value: "", Type: 1 },
       ],
     }));
   };
@@ -1141,7 +1154,7 @@ class ChatInstance extends React.Component {
   };
   PD_arr = (event, key) => {
     console.log("Treatment_arr Name ---- ", event, " at Index ", key);
-    this.state.provisional_diagnosis[key].diagnose = event;
+    this.state.provisional_diagnosis[key].Value = event;
     var temp = this.state.provisional_diagnosis;
     console.log("Treatment_arr  ", temp);
     this.state.provisional_diagnosis.filter((item, index) => {
@@ -1163,8 +1176,8 @@ class ChatInstance extends React.Component {
       lab_tests: [
         ...prevState.lab_tests,
         {
-          test: "",
-          key: this.state.lab_tests.length,
+          Value: "",
+          Type: 0,
         },
       ],
     }));
@@ -1185,7 +1198,7 @@ class ChatInstance extends React.Component {
   };
   tests_add_array = (event, key) => {
     console.log("lab_tests Name ---- ", event, " at Index ", key);
-    this.state.lab_tests[key].test = event;
+    this.state.lab_tests[key].Value = event;
     var temp = this.state.lab_tests;
     console.log("lab_tests  ", temp);
     this.state.lab_tests.filter((item, index) => {
@@ -1206,18 +1219,17 @@ class ChatInstance extends React.Component {
       add_Prescription: [
         ...prevState.add_Prescription,
         {
-          sr: this.state.add_Prescription.length,
-          medicine: "",
-          dosage: "",
-          route: "",
-          frequency: "",
-          duration: "",
+          Medicine: "",
+          Dosage: "",
+          Route: "",
+          Frequency: "",
+          Duration: "",
         },
       ],
     }));
   };
   add_description = (event, key) => {
-    this.state.add_Prescription[key].medicine = event;
+    this.state.add_Prescription[key].Medicine = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1237,7 +1249,7 @@ class ChatInstance extends React.Component {
   };
   add_dosage = (event, key) => {
     // console.log("add_dosage ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].dosage = event;
+    this.state.add_Prescription[key].Dosage = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1257,7 +1269,7 @@ class ChatInstance extends React.Component {
   };
   add_period = (event, key) => {
     // console.log("add_period ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].route = event;
+    this.state.add_Prescription[key].Route = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1277,7 +1289,7 @@ class ChatInstance extends React.Component {
   };
   add_dosageForm = (event, key) => {
     // console.log("add_dosageForm ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].frequency = event;
+    this.state.add_Prescription[key].Frequency = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1297,7 +1309,7 @@ class ChatInstance extends React.Component {
   };
   add_comment = (event, key) => {
     // console.log("add_comment ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].duration = event;
+    this.state.add_Prescription[key].Duration = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
@@ -1428,76 +1440,225 @@ class ChatInstance extends React.Component {
     const {
       h_id,
       patientName,
-      registraton_id,
       gender,
       contact,
       email,
       follow_up,
-      treatment_arr,
       complaints_symptoms,
       provisional_diagnosis,
       add_Prescription,
       lab_tests,
     } = this.state;
-    if (h_id != "") {
-      if (patientName != "") {
+    if (patientName != "") {
+      if (email != "") {
         if (gender != "Gender" || gender != "") {
           if (contact != "") {
-            if (email != "") {
-              var data = {
-                health_id: h_id,
-                p_name: patientName,
-                r_id: registraton_id,
-                gender: gender,
-                contact: contact,
-                email: email,
-                f_up: follow_up,
-                c_s: complaints_symptoms,
-                p_D: provisional_diagnosis,
-                A_P: add_Prescription,
-                L_test: lab_tests,
-              };
-              console.log("Data === ", data);
-            } else {
-              this.setState({
-                error_email: true,
-                error_contact: false,
-                error_gender: false,
-                error_pname: false,
-                error_hid: false,
-              });
+            this.setState({
+              error_email: false,
+              error_contact: false,
+              valid_contact: true,
+              error_gender: false,
+              error_pname: false,
+            });
+            if (complaints_symptoms.length > 0) {
+              for (let i = 0; i < complaints_symptoms.length; ++i) {
+                if (complaints_symptoms[i].Symptoms === "") {
+                  this.setState({
+                    s_required: i,
+                  });
+                  this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                }
+                if (complaints_symptoms[i].Duration === "") {
+                  this.setState({
+                    d_required: i,
+                  });
+                  this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                }
+              }
             }
+            if (provisional_diagnosis.length > 0) {
+              for (let i = 0; i < provisional_diagnosis.length; ++i) {
+                if (provisional_diagnosis[i].Value === "") {
+                  this.setState({
+                    pd_required: i,
+                  });
+                  this.form.scrollTo({ top: 200, left: 0, behavior: "smooth" });
+                }
+              }
+            }
+            if (add_Prescription.length > 0) {
+              for (let i = 0; i < add_Prescription.length; ++i) {
+                if (add_Prescription[i].Medicine === "") {
+                  this.setState({
+                    m_required: i,
+                  });
+                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+                }
+                if (add_Prescription[i].Dosage === "") {
+                  this.setState({
+                    do_required: i,
+                  });
+                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+                }
+                if (add_Prescription[i].Route === "") {
+                  this.setState({
+                    r_required: i,
+                  });
+                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+                }
+                if (add_Prescription[i].Frequency === "") {
+                  this.setState({
+                    f_required: i,
+                  });
+                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+                }
+                if (add_Prescription[i].Duration === "") {
+                  this.setState({
+                    du_required: i,
+                  });
+                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+                }
+              }
+            }
+            if (lab_tests.length > 0) {
+              for (let i = 0; i < lab_tests.length; ++i) {
+                if (lab_tests[i].Value === "") {
+                  this.setState({
+                    test_required: i,
+                  });
+                }
+              }
+            }
+            // var data = {
+            //   Name: patientName,
+            //   Contact: contact,
+            //   HealthID: h_id,
+            //   Gender: gender,
+            //   Email: email,
+            //   Followup: follow_up,
+            //   ComplaintsSymptoms: complaints_symptoms,
+            //   Diagnosis: provisional_diagnosis,
+            //   Prescriptions: add_Prescription,
+            //   Tests: lab_tests,
+            //   TicketId: this.props.ticket.id,
+            // };
+            // console.log("Data === ", data);
+            // try {
+            //   axios
+            //     .post(window.Tak_API + "api/EHR", data)
+            //     .then((r) => {
+            //       // if (r.status === 200) {
+            //       console.log("Response --- ", r);
+            //       // }
+            //     })
+            //     .catch((c) => {
+            //       console.log("EHR error", c);
+            //     });
+            // } catch (error) {
+            //   console.log("EHR Catch Error -- ", error);
+            // }
           } else {
             this.setState({
               error_contact: true,
-              error_gender: false,
               error_pname: false,
-              error_hid: false,
+              error_gender: false,
+              valid_gender: true,
+              valid_contact: false,
+              error_email: false,
+              valid_email: true,
             });
+            this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
           }
         } else {
           this.setState({
             error_gender: true,
             error_pname: false,
-            error_hid: false,
+            valid_pname: true,
+            valid_gender: false,
+            error_email: false,
+            valid_email: true,
           });
+          this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         }
       } else {
         this.setState({
-          error_pname: true,
-          error_hid: false,
+          error_email: true,
+          error_pname: false,
+          valid_pname: true,
+          valid_email: false,
         });
+        this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       }
     } else {
       this.setState({
-        error_hid: true,
+        error_pname: true,
+        valid_pname: false,
       });
+      // this.form.scrollTo({ behavior: "smooth" }, 0, 0);
+      this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
     }
   };
+  postData = () => {
+    const {
+      h_id,
+      patientName,
+      gender,
+      contact,
+      email,
+      follow_up,
+      complaints_symptoms,
+      provisional_diagnosis,
+      add_Prescription,
+      lab_tests,
+    } = this.state;
+    var data = {
+      Name: patientName,
+      Contact: contact,
+      HealthID: h_id,
+      Gender: gender,
+      Email: email,
+      Followup: follow_up,
+      ComplaintsSymptoms: complaints_symptoms,
+      Diagnosis: provisional_diagnosis,
+      Prescriptions: add_Prescription,
+      Tests: lab_tests,
+      TicketId: this.props.ticket.id,
+    };
+    console.log("Data === ", data);
+    try {
+      axios
+        .post(window.Tak_API + "api/EHR", data)
+        .then((r) => {
+          // if (r.status === 200) {
+          console.log("Response --- ", r);
+          // }
+        })
+        .catch((c) => {
+          console.log("EHR error", c);
+        });
+    } catch (error) {
+      console.log("EHR Catch Error -- ", error);
+    }
+  };
+
   /////////////////////////////////////////// METHODS FOR ERM ///////////////////////////////////////////////////////////
   render() {
     // console.log('ticket', this.props.ticket);
-
+    const {
+      valid_pname,
+      valid_email,
+      valid_contact,
+      valid_gender,
+      s_required,
+      d_required,
+      pd_required,
+      test_required,
+      m_required,
+      do_required,
+      r_required,
+      f_required,
+      du_required,
+    } = this.state;
     const fileUploadProps = {
       onRemove: (file) => {},
       beforeUpload: (file) => {
@@ -1523,6 +1684,7 @@ class ChatInstance extends React.Component {
 
       showUploadList: false,
     };
+
     return (
       <div className="col-9 chat_instance">
         {/* <div className="container-fluid"> */}
@@ -2030,10 +2192,10 @@ class ChatInstance extends React.Component {
                     <div className="col">
                       <Input
                         type="text"
-                        required={true}
                         name="health_id"
                         className="show_hide"
                         id="health_id"
+                        disabled={true}
                         placeholder="Health ID #"
                         style={{ fontSize: "12px" }}
                         invalid={this.state.error_hid}
@@ -2041,7 +2203,7 @@ class ChatInstance extends React.Component {
                       />
                     </div>
 
-                    <div className="col">
+                    {/* <div className="col">
                       <Input
                         type="text"
                         name="registeration_id"
@@ -2052,11 +2214,12 @@ class ChatInstance extends React.Component {
                         invalid={this.state.errorR_id}
                         onChange={(e) => this.handleR_id(e)}
                       />
-                    </div>
+                    </div> */}
                     <div className="col">
                       <Input
                         type="text"
                         required={true}
+                        valid={valid_pname}
                         name="mr/mrs"
                         className="show_hide"
                         id="mr/mrs"
@@ -2064,6 +2227,20 @@ class ChatInstance extends React.Component {
                         style={{ fontSize: "12px" }}
                         invalid={this.state.error_pname}
                         onChange={(e) => this.handlePatientName(e)}
+                      />
+                    </div>
+                    <div className="col">
+                      <Input
+                        type="email"
+                        required={true}
+                        className="show_hide"
+                        valid={valid_email}
+                        name="email"
+                        id="email"
+                        placeholder="Email-Address"
+                        style={{ fontSize: "12px" }}
+                        invalid={this.state.error_email}
+                        onChange={(e) => this.handleEmail(e)}
                       />
                     </div>
                   </div>
@@ -2086,6 +2263,7 @@ class ChatInstance extends React.Component {
                         id="gender"
                         placeholder="Gender"
                         style={{ fontSize: "12px" }}
+                        valid={valid_gender}
                         invalid={this.state.error_gender}
                         onChange={(e) => this.handleGender(e)}
                       >
@@ -2100,27 +2278,16 @@ class ChatInstance extends React.Component {
                         required={true}
                         name="contact"
                         className="show_hide"
+                        valid={valid_contact}
                         id="contact"
                         placeholder="Contact"
                         style={{ fontSize: "12px" }}
+                        valid={valid_contact}
                         invalid={this.state.error_contact}
                         onChange={(e) => this.handleContact(e)}
                       />
                     </div>
-                    <div className="col">
-                      {" "}
-                      <Input
-                        type="email"
-                        required={true}
-                        className="show_hide"
-                        name="email"
-                        id="email"
-                        placeholder="Email-Address"
-                        style={{ fontSize: "12px" }}
-                        invalid={this.state.error_email}
-                        onChange={(e) => this.handleEmail(e)}
-                      />
-                    </div>
+                    <div className="col"> </div>
                   </div>
                 </FormGroup>
                 {/* ///////////////// Customer Details ///////////////// */}
@@ -2169,42 +2336,86 @@ class ChatInstance extends React.Component {
                               }}
                             >
                               <InputGroup>
-                                <Input
-                                  type="text"
-                                  name="symptoms"
-                                  className="show_hide"
-                                  id="symptoms"
-                                  value={
-                                    this.state.complaints_symptoms[index]
-                                      .symptoms
-                                  }
-                                  placeholder="Symptoms"
-                                  style={{ fontSize: "12px" }}
-                                  onChange={(text) =>
-                                    this.complaints_add_array(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
-                                <Input
-                                  type="text"
-                                  name="duration"
-                                  id="duration"
-                                  className="show_hide"
-                                  value={
-                                    this.state.complaints_symptoms[index]
-                                      .duration
-                                  }
-                                  placeholder="Duration"
-                                  style={{ fontSize: "12px" }}
-                                  onChange={(text) =>
-                                    this.complaints_add_array1(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
+                                {s_required === index ? (
+                                  <Input
+                                    type="text"
+                                    name="symptoms"
+                                    className="show_hide"
+                                    id="symptoms"
+                                    value={
+                                      this.state.complaints_symptoms[index]
+                                        .Symptoms
+                                    }
+                                    placeholder="Symptoms"
+                                    style={{ fontSize: "12px" }}
+                                    invalid={true}
+                                    onChange={(text) =>
+                                      this.complaints_add_array(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                ) : (
+                                  <Input
+                                    type="text"
+                                    name="symptoms"
+                                    className="show_hide"
+                                    id="symptoms"
+                                    value={
+                                      this.state.complaints_symptoms[index]
+                                        .Symptoms
+                                    }
+                                    placeholder="Symptoms"
+                                    style={{ fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.complaints_add_array(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                )}
+                                {d_required === index ? (
+                                  <Input
+                                    type="text"
+                                    name="duration"
+                                    id="duration"
+                                    className="show_hide"
+                                    value={
+                                      this.state.complaints_symptoms[index]
+                                        .Duration
+                                    }
+                                    invalid={true}
+                                    placeholder="Duration"
+                                    style={{ fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.complaints_add_array1(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                ) : (
+                                  <Input
+                                    type="text"
+                                    name="duration"
+                                    id="duration"
+                                    className="show_hide"
+                                    value={
+                                      this.state.complaints_symptoms[index]
+                                        .Duration
+                                    }
+                                    placeholder="Duration"
+                                    style={{ fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.complaints_add_array1(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                )}
                                 <InputGroupAddon addonType="append">
                                   <Tooltip title="Remove Complaints & Symptoms">
                                     <IconButton
@@ -2268,21 +2479,40 @@ class ChatInstance extends React.Component {
                               }}
                             >
                               <InputGroup>
-                                <Input
-                                  type="text"
-                                  name="add_PD"
-                                  id="addPD"
-                                  className="show_hide"
-                                  value={
-                                    this.state.provisional_diagnosis[index]
-                                      .diagnose
-                                  }
-                                  placeholder="Diagnosis"
-                                  style={{ fontSize: "12px" }}
-                                  onChange={(text) =>
-                                    this.PD_arr(text.target.value, index)
-                                  }
-                                />
+                                {pd_required === index ? (
+                                  <Input
+                                    type="text"
+                                    name="add_PD"
+                                    id="addPD"
+                                    invalid={true}
+                                    className="show_hide"
+                                    value={
+                                      this.state.provisional_diagnosis[index]
+                                        .Value
+                                    }
+                                    placeholder="Diagnosis"
+                                    style={{ fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.PD_arr(text.target.value, index)
+                                    }
+                                  />
+                                ) : (
+                                  <Input
+                                    type="text"
+                                    name="add_PD"
+                                    id="addPD"
+                                    className="show_hide"
+                                    value={
+                                      this.state.provisional_diagnosis[index]
+                                        .Value
+                                    }
+                                    placeholder="Diagnosis"
+                                    style={{ fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.PD_arr(text.target.value, index)
+                                    }
+                                  />
+                                )}
                                 <InputGroupAddon addonType="append">
                                   <Tooltip title="Remove Provisional Diagnosis">
                                     <IconButton
@@ -2339,9 +2569,9 @@ class ChatInstance extends React.Component {
                     <thead>
                       <tr>
                         <th></th>
-                        <th className="show_hide" style={{ fontSize: "12px" }}>
+                        {/* <th className="show_hide" style={{ fontSize: "12px" }}>
                           S.No
-                        </th>
+                        </th> */}
                         <th className="show_hide" style={{ fontSize: "12px" }}>
                           Medicine
                         </th>
@@ -2384,92 +2614,206 @@ class ChatInstance extends React.Component {
                                     </IconButton>
                                   </Tooltip>
                                 </th>
-                                <th scope="row" style={{ fontSize: "10px" }}>
+                                {/* <th scope="row" style={{ fontSize: "10px" }}>
                                   {this.state.add_Prescription[index].sr}
-                                </th>
+                                </th> */}
                                 <td>
-                                  <Input
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    className="show_hide"
-                                    style={{ fontSize: "10px" }}
-                                    value={
-                                      this.state.add_Prescription[index]
-                                        .medicine
-                                    }
-                                    onChange={(text) =>
-                                      this.add_description(
-                                        text.target.value,
-                                        index
-                                      )
-                                    }
-                                  />
+                                  {m_required === index ? (
+                                    <Input
+                                      type="text"
+                                      name="description"
+                                      id="description"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      invalid={true}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .medicine
+                                      }
+                                      onChange={(text) =>
+                                        this.add_description(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  ) : (
+                                    <Input
+                                      type="text"
+                                      name="description"
+                                      id="description"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .medicine
+                                      }
+                                      onChange={(text) =>
+                                        this.add_description(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  )}
                                 </td>
                                 <td>
-                                  <Input
-                                    type="text"
-                                    name="dosage"
-                                    id="dosage"
-                                    className="show_hide"
-                                    style={{ fontSize: "10px" }}
-                                    value={
-                                      this.state.add_Prescription[index].dosage
-                                    }
-                                    onChange={(text) =>
-                                      this.add_dosage(text.target.value, index)
-                                    }
-                                  />
+                                  {do_required === index ? (
+                                    <Input
+                                      type="text"
+                                      name="dosage"
+                                      id="dosage"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      invalid={true}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .dosage
+                                      }
+                                      onChange={(text) =>
+                                        this.add_dosage(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  ) : (
+                                    <Input
+                                      type="text"
+                                      name="dosage"
+                                      id="dosage"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .dosage
+                                      }
+                                      onChange={(text) =>
+                                        this.add_dosage(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  )}
                                 </td>
                                 <td>
-                                  <Input
-                                    type="text"
-                                    name="route"
-                                    id="route"
-                                    className="show_hide"
-                                    style={{ fontSize: "10px" }}
-                                    value={
-                                      this.state.add_Prescription[index].route
-                                    }
-                                    onChange={(text) =>
-                                      this.add_period(text.target.value, index)
-                                    }
-                                  />
+                                  {r_required === index ? (
+                                    <Input
+                                      type="text"
+                                      name="route"
+                                      id="route"
+                                      className="show_hide"
+                                      invalid={true}
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index].route
+                                      }
+                                      onChange={(text) =>
+                                        this.add_period(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  ) : (
+                                    <Input
+                                      type="text"
+                                      name="route"
+                                      id="route"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index].route
+                                      }
+                                      onChange={(text) =>
+                                        this.add_period(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  )}
                                 </td>
                                 <td>
-                                  <Input
-                                    type="text"
-                                    name="frequency"
-                                    id="frequency"
-                                    className="show_hide"
-                                    style={{ fontSize: "10px" }}
-                                    value={
-                                      this.state.add_Prescription[index]
-                                        .frequency
-                                    }
-                                    onChange={(text) =>
-                                      this.add_dosageForm(
-                                        text.target.value,
-                                        index
-                                      )
-                                    }
-                                  />
+                                  {f_required === index ? (
+                                    <Input
+                                      type="text"
+                                      name="frequency"
+                                      id="frequency"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      invalid={true}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .frequency
+                                      }
+                                      onChange={(text) =>
+                                        this.add_dosageForm(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  ) : (
+                                    <Input
+                                      type="text"
+                                      name="frequency"
+                                      id="frequency"
+                                      className="show_hide"
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .frequency
+                                      }
+                                      onChange={(text) =>
+                                        this.add_dosageForm(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  )}
                                 </td>
                                 <td>
-                                  <Input
-                                    type="text"
-                                    name="duration"
-                                    className="show_hide"
-                                    id="duration"
-                                    style={{ fontSize: "10px" }}
-                                    value={
-                                      this.state.add_Prescription[index]
-                                        .duration
-                                    }
-                                    onChange={(text) =>
-                                      this.add_comment(text.target.value, index)
-                                    }
-                                  />
+                                  {du_required === index ? (
+                                    <Input
+                                      type="text"
+                                      name="duration"
+                                      className="show_hide"
+                                      id="duration"
+                                      style={{ fontSize: "10px" }}
+                                      invalid={true}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .duration
+                                      }
+                                      onChange={(text) =>
+                                        this.add_comment(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  ) : (
+                                    <Input
+                                      type="text"
+                                      name="duration"
+                                      className="show_hide"
+                                      id="duration"
+                                      style={{ fontSize: "10px" }}
+                                      value={
+                                        this.state.add_Prescription[index]
+                                          .duration
+                                      }
+                                      onChange={(text) =>
+                                        this.add_comment(
+                                          text.target.value,
+                                          index
+                                        )
+                                      }
+                                    />
+                                  )}
                                 </td>
                               </tr>
                             );
@@ -2518,21 +2862,40 @@ class ChatInstance extends React.Component {
                               }}
                             >
                               <InputGroup>
-                                <Input
-                                  type="text"
-                                  name="labtest"
-                                  className="show_hide"
-                                  id="labtest"
-                                  value={this.state.lab_tests[index].test}
-                                  placeholder={"Test # " + index}
-                                  style={{ width: "250px", fontSize: "12px" }}
-                                  onChange={(text) =>
-                                    this.tests_add_array(
-                                      text.target.value,
-                                      index
-                                    )
-                                  }
-                                />
+                                {test_required === index ? (
+                                  <Input
+                                    type="text"
+                                    name="labtest"
+                                    className="show_hide"
+                                    id="labtest"
+                                    value={this.state.lab_tests[index].Value}
+                                    placeholder={"Test # " + index}
+                                    invalid={true}
+                                    style={{ width: "250px", fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.tests_add_array(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                ) : (
+                                  <Input
+                                    type="text"
+                                    name="labtest"
+                                    className="show_hide"
+                                    id="labtest"
+                                    value={this.state.lab_tests[index].Value}
+                                    placeholder={"Test # " + index}
+                                    style={{ width: "250px", fontSize: "12px" }}
+                                    onChange={(text) =>
+                                      this.tests_add_array(
+                                        text.target.value,
+                                        index
+                                      )
+                                    }
+                                  />
+                                )}
                                 <InputGroupAddon addonType="append">
                                   <Tooltip title="Remove Lab Test">
                                     <IconButton

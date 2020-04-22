@@ -18,6 +18,7 @@ class App extends React.Component {
     // window.API_URL = "http://192.168.21.212:5000/";
     // window.API_URL = "http://54.36.109.50/TakafulAPI";
     window.API_URL = "https://iteck.pk/Takaful/";
+    window.Tak_API = "https://iteck.pk/TakafulAPI/";
   }
   render() {
     return (

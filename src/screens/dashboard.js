@@ -16,7 +16,7 @@ import {
   callAlert,
   newCallNotification,
   newCallMsg,
-  ermModal
+  ermModal,
 } from "../store/actions/livechat";
 import add from "../assets/add.png";
 import ChatInstance from "./components/ChatInstance";
@@ -40,7 +40,7 @@ import {
   Table,
   InputGroup,
   InputGroupText,
-  InputGroupAddon
+  InputGroupAddon,
 } from "reactstrap";
 import Radium, { StyleRoot } from "radium";
 import { bounce, bounceInUp } from "react-animations";
@@ -84,8 +84,8 @@ const { TabPane } = Tabs;
 const styles = {
   bounce: {
     animation: "x 1s",
-    animationName: Radium.keyframes(bounceInUp, "bounceInUp")
-  }
+    animationName: Radium.keyframes(bounceInUp, "bounceInUp"),
+  },
 };
 
 class dashboard extends React.Component {
@@ -118,7 +118,7 @@ class dashboard extends React.Component {
       close_chat: false,
       selected_id: 0,
       select_ticket: "",
-      show_video: false
+      show_video: false,
     };
     this.url =
       "https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/mp3/iphone-6-original-ringtone-24163.mp3";
@@ -151,29 +151,29 @@ class dashboard extends React.Component {
       .withUrl(window.API_URL + "livechat", {
         accessTokenFactory: () => {
           return this.props.auth.token;
-        }
+        },
       })
       .build();
 
-    connection.on("exception", exception => {
+    connection.on("exception", (exception) => {
       console.log("connectWithLiveChatHub exception", exception);
     });
 
-    connection.on("NewRequest", event => {
+    connection.on("NewRequest", (event) => {
       console.log("NewRequest ==== ", event);
       this.setState({
-        newRequest_check: true
+        newRequest_check: true,
       });
       this.setState(
-        prevState => ({
-          newRequest_array: [...prevState.newRequest_array, { key: event }]
+        (prevState) => ({
+          newRequest_array: [...prevState.newRequest_array, { key: event }],
         }),
         () => {
           console.log("newRequest_array ======= ", this.state.newRequest_array);
         }
       );
     });
-    connection.on("AcceptedBySomeDoctor", event => {
+    connection.on("AcceptedBySomeDoctor", (event) => {
       console.log("AcceptedBySomeDoctor --- ", event);
 
       this.setState(
@@ -182,7 +182,7 @@ class dashboard extends React.Component {
             (item, index) => {
               return item.key !== JSON.stringify(event);
             }
-          )
+          ),
         },
         () => {
           console.log(
@@ -192,26 +192,26 @@ class dashboard extends React.Component {
         }
       );
     });
-    connection.on("OnTimeExceed", event => {
+    connection.on("OnTimeExceed", (event) => {
       console.log("OnTimeExceed ------ ----- ", JSON.stringify(event));
       // notification.close(event);
       this.setState({
         newRequest_array: this.state.newRequest_array.filter((item, index) => {
           return item.key !== JSON.stringify(event);
-        })
+        }),
       });
       this.setState(
-        prevState => ({
-          timeExceed_array: [...prevState.timeExceed_array, { key: event }]
+        (prevState) => ({
+          timeExceed_array: [...prevState.timeExceed_array, { key: event }],
         }),
         () => {
           console.log("timeExceed_array ======= ", this.state.timeExceed_array);
         }
       );
     });
-    connection.on("newWindow", event => {
+    connection.on("newWindow", (event) => {
       this.setState({
-        newRequest_check: false
+        newRequest_check: false,
       });
       this.setState(
         {
@@ -219,7 +219,7 @@ class dashboard extends React.Component {
             (item, index) => {
               return item.key !== JSON.stringify(event);
             }
-          )
+          ),
         },
         () => {
           console.log(
@@ -249,12 +249,12 @@ class dashboard extends React.Component {
     });
   };
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
-  addNewMessageToTicket = message => {
+  addNewMessageToTicket = (message) => {
     var ticketNumber = message.ticketID;
 
     var tickets = [...this.props.tickets];
 
-    var ticket = tickets.find(x => x.id === ticketNumber);
+    var ticket = tickets.find((x) => x.id === ticketNumber);
 
     if (ticket) {
       // console.log(message.ticket.id, '===', tickets);
@@ -265,14 +265,14 @@ class dashboard extends React.Component {
     }
   };
 
-  handleModeChange = e => {
+  handleModeChange = (e) => {
     const mode = e.target.value;
     this.setState({ mode });
   };
 
   toggle = () => {
     this.setState({
-      isOpen: !this.state.isOpen
+      isOpen: !this.state.isOpen,
     });
   };
   changeStatus = () => {
@@ -280,20 +280,20 @@ class dashboard extends React.Component {
       if (this.props.connection) {
         this.props.connection
           .invoke("setAvailability", "Available")
-          .then(r => {
+          .then((r) => {
             console.log("r", r);
           })
-          .catch(e => {
+          .catch((e) => {
             console.log("e", e);
           });
       }
       this.setState({
-        availability: "Available"
+        availability: "Available",
       });
       console.log("Value is Available");
     } else {
       this.setState({
-        availability: "Away"
+        availability: "Away",
       });
     }
     // if (val === "Available") {
@@ -313,12 +313,12 @@ class dashboard extends React.Component {
     //   availability: "Away"
     // });
   };
-  handlePatientName = event => {
+  handlePatientName = (event) => {
     if (event.target.value !== "") {
       this.setState(
         {
           patientName: event.target.value,
-          error_PatientName: ""
+          error_PatientName: "",
         },
         () => {
           console.log("Patient Name === ", this.state.patientName);
@@ -326,44 +326,44 @@ class dashboard extends React.Component {
       );
     } else {
       this.setState({
-        error_PatientName: "Enter Patient Name"
+        error_PatientName: "Enter Patient Name",
       });
     }
   };
 
-  handleAge = event => {
+  handleAge = (event) => {
     console.log("EVENT AGE ==", event.target.value);
     if (event.target.value > 0 && event.target.value < 99) {
       console.log("Age -- ", event.target.value);
       this.setState({
         Age: event.target.value,
-        errorAge: ""
+        errorAge: "",
       });
     } else {
       // document.getElementById("age").style.borderColor = "red";
       this.setState({
         Age: "",
-        errorAge: "Age Must be Greater Than 0 and Less than 99"
+        errorAge: "Age Must be Greater Than 0 and Less than 99",
       });
     }
   };
   ///////////////////////////// Disease ///////////////////////////////////////////
-  addTreatment = event => {
+  addTreatment = (event) => {
     console.log("ADD_____", this.state.treatment_arr.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       treatment_arr: [
         ...prevState.treatment_arr,
-        { treatment: "", key: this.state.treatment_arr.length }
-      ]
+        { treatment: "", key: this.state.treatment_arr.length },
+      ],
     }));
   };
-  deleteTreatment = event => {
+  deleteTreatment = (event) => {
     console.log("DELETE Disease INDEX ", event);
     this.setState(
       {
         treatment_arr: this.state.treatment_arr.filter((item, index) => {
           return index !== event;
-        })
+        }),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.treatment_arr);
@@ -378,8 +378,8 @@ class dashboard extends React.Component {
     console.log("Treatment_arr  ", temp);
     this.state.treatment_arr.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          treatment_arr: temp
+        this.setState((prevState) => ({
+          treatment_arr: temp,
         }));
       }
     });
@@ -387,20 +387,20 @@ class dashboard extends React.Component {
   ////////////////////////////////////// Disease //////////////////////////////////////////
 
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
-  add_complaints = event => {
+  add_complaints = (event) => {
     console.log("add_complaints _____", this.state.complaints_symptoms.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       complaints_symptoms: [
         ...prevState.complaints_symptoms,
         {
           symptoms: "",
           duration: "",
-          key: this.state.complaints_symptoms.length
-        }
-      ]
+          key: this.state.complaints_symptoms.length,
+        },
+      ],
     }));
   };
-  delete_complaints = event => {
+  delete_complaints = (event) => {
     console.log("DELETE complaints_symptoms INDEX ", event);
     this.setState(
       {
@@ -408,7 +408,7 @@ class dashboard extends React.Component {
           (item, index) => {
             return index !== event;
           }
-        )
+        ),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.complaints_symptoms);
@@ -423,8 +423,8 @@ class dashboard extends React.Component {
     console.log("complaints_symptoms 1 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          complaints_symptoms: temp
+        this.setState((prevState) => ({
+          complaints_symptoms: temp,
         }));
       }
     });
@@ -436,8 +436,8 @@ class dashboard extends React.Component {
     console.log("complaints_symptoms 2 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          complaints_symptoms: temp
+        this.setState((prevState) => ({
+          complaints_symptoms: temp,
         }));
       }
     });
@@ -446,25 +446,25 @@ class dashboard extends React.Component {
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
 
   ////////////////////////// Lab Tests /////////////////////////////////////////
-  add_lab_test = event => {
+  add_lab_test = (event) => {
     console.log("add_complaints _____", this.state.lab_tests.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       lab_tests: [
         ...prevState.lab_tests,
         {
           test: "",
-          key: this.state.lab_tests.length
-        }
-      ]
+          key: this.state.lab_tests.length,
+        },
+      ],
     }));
   };
-  delete_lab_test = event => {
+  delete_lab_test = (event) => {
     console.log("DELETE lab_tests INDEX ", event);
     this.setState(
       {
         lab_tests: this.state.lab_tests.filter((item, index) => {
           return index !== event;
-        })
+        }),
       },
       () => {
         console.log("DISEASE ARRAY +_++++ ", this.state.lab_tests);
@@ -479,8 +479,8 @@ class dashboard extends React.Component {
     console.log("lab_tests  ", temp);
     this.state.lab_tests.filter((item, index) => {
       if (index === key) {
-        this.setState(prevState => ({
-          lab_tests: temp
+        this.setState((prevState) => ({
+          lab_tests: temp,
         }));
       }
     });
@@ -490,7 +490,7 @@ class dashboard extends React.Component {
 
   addPrescriptionRow = () => {
     console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       add_Prescription: [
         ...prevState.add_Prescription,
         {
@@ -501,9 +501,9 @@ class dashboard extends React.Component {
           dosageForm: "",
           comment: "",
           interval: "",
-          intervalUOM: ""
-        }
-      ]
+          intervalUOM: "",
+        },
+      ],
     }));
   };
   add_description = (event, key) => {
@@ -514,7 +514,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -534,7 +534,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -554,7 +554,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -574,7 +574,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -594,7 +594,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -614,7 +614,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -634,7 +634,7 @@ class dashboard extends React.Component {
       if (index === key) {
         this.setState(
           {
-            add_Prescription: temp
+            add_Prescription: temp,
           },
           () => {
             console.log(
@@ -646,11 +646,11 @@ class dashboard extends React.Component {
       }
     });
   };
-  delete_Prescription = index => {
+  delete_Prescription = (index) => {
     console.log("Delete Prescription Index ==== ", index);
     this.setState(
       {
-        delete_Prescription_key: index
+        delete_Prescription_key: index,
       },
       () => {
         console.log(
@@ -665,7 +665,7 @@ class dashboard extends React.Component {
       {
         add_Prescription: this.state.add_Prescription.filter((item, index) => {
           return index !== this.state.delete_Prescription_key;
-        })
+        }),
       },
       () => {
         console.log(
@@ -679,7 +679,7 @@ class dashboard extends React.Component {
     if (this.state.form1) {
       this.setState({
         form1: false,
-        form2: true
+        form2: true,
       });
     }
   };
@@ -687,7 +687,7 @@ class dashboard extends React.Component {
     if (this.state.form2) {
       this.setState({
         form2: false,
-        form1: true
+        form1: true,
       });
     }
   };
@@ -695,7 +695,7 @@ class dashboard extends React.Component {
     if (this.state.form2) {
       this.setState({
         form2: false,
-        form3: true
+        form3: true,
       });
     }
   };
@@ -703,7 +703,7 @@ class dashboard extends React.Component {
     if (this.state.form3) {
       this.setState({
         form3: false,
-        form2: true
+        form2: true,
       });
     }
   };
@@ -711,59 +711,59 @@ class dashboard extends React.Component {
     if (this.state.form2) {
       this.setState({
         form2: false,
-        form3: true
+        form3: true,
       });
     }
   };
   state = {
-    value: 1
+    value: 1,
   };
 
-  onConsultationChange = e => {
+  onConsultationChange = (e) => {
     if (this.state.consultation === e) {
       this.setState({
-        consultation: ""
+        consultation: "",
       });
     } else {
       console.log("consultation checked", e.target.value);
       this.setState({
-        consultation: e.target.value
+        consultation: e.target.value,
       });
     }
   };
-  onLaboratoryChange = e => {
+  onLaboratoryChange = (e) => {
     if (this.state.laboratory === e) {
       this.setState({
-        laboratory: ""
+        laboratory: "",
       });
     } else {
       console.log("laboratory checked", e.target.value);
       this.setState({
-        laboratory: e.target.value
+        laboratory: e.target.value,
       });
     }
   };
-  onMastersChange = e => {
+  onMastersChange = (e) => {
     if (this.state.masters === e) {
       this.setState({
-        masters: ""
+        masters: "",
       });
     } else {
       console.log("laboratory checked", e.target.value);
       this.setState({
-        masters: e.target.value
+        masters: e.target.value,
       });
     }
   };
-  onSettingsChange = e => {
+  onSettingsChange = (e) => {
     if (this.state.settings === e) {
       this.setState({
-        settings: ""
+        settings: "",
       });
     } else {
       console.log("settings checked", e.target.value);
       this.setState({
-        settings: e.target.value
+        settings: e.target.value,
       });
     }
   };
@@ -841,7 +841,7 @@ class dashboard extends React.Component {
             overflowY: "auto",
             overflowX: "hidden",
             borderWidth: "0px",
-            borderColor: "#fff"
+            borderColor: "#fff",
           }}
         >
           {this.props.tickets
@@ -850,30 +850,31 @@ class dashboard extends React.Component {
 
               var name = (
                 <div id="style-1" className="chatTab">
-                  {this.props.call === "UpComming Call" &&
-                  this.props.ticketId === ticket.id ? (
-                    <Icon
-                      type="phone"
-                      theme="filled"
-                      style={{ color: "#2ECC71" }}
-                    />
-                  ) : null
-                  // <Icon
-                  //   style={{
-                  //     color:
-                  //       this.props.message === "New Message" &&
-                  //       this.props.ticketId === ticket.id
-                  //         ? "#2ECC71"
-                  //         : "#f00"
-                  //   }}
-                  //   type="bulb"
-                  //   theme={
-                  //     this.props.message === "New Message" &&
-                  //     this.props.ticketId === ticket.id
-                  //       ? "filled"
-                  //       : ""
-                  //   }
-                  // />
+                  {
+                    this.props.call === "UpComming Call" &&
+                    this.props.ticketId === ticket.id ? (
+                      <Icon
+                        type="phone"
+                        theme="filled"
+                        style={{ color: "#2ECC71" }}
+                      />
+                    ) : null
+                    // <Icon
+                    //   style={{
+                    //     color:
+                    //       this.props.message === "New Message" &&
+                    //       this.props.ticketId === ticket.id
+                    //         ? "#2ECC71"
+                    //         : "#f00"
+                    //   }}
+                    //   type="bulb"
+                    //   theme={
+                    //     this.props.message === "New Message" &&
+                    //     this.props.ticketId === ticket.id
+                    //       ? "filled"
+                    //       : ""
+                    //   }
+                    // />
                   }
                   {this.props.message === "New Message" &&
                   this.props.ticketId === ticket.id
@@ -904,14 +905,14 @@ class dashboard extends React.Component {
     }
   };
   //////////////////////////////////////// DRAW DYNAMIC CHAT TABS //////////////////////////////////////////////////
-  openNotification = key => {
+  openNotification = (key) => {
     console.log("Modal State on Notification ---- --- ", key);
     const close = () => {
-      this.props.connection.invoke("OnReject", key).then(response => {
+      this.props.connection.invoke("OnReject", key).then((response) => {
         console.log("Reject ID" + key + "REJECT RESPONSE ______ ", response);
         notification.close(key);
         this.setState({
-          newRequest_check: false
+          newRequest_check: false,
         });
 
         if (this.props.modal) {
@@ -933,7 +934,7 @@ class dashboard extends React.Component {
             console.log("Accept ID" + key + "Accept");
             notification.close(key);
             this.setState({
-              newRequest_check: false
+              newRequest_check: false,
             });
             if (this.props.modal) {
               this.props.modalShow(false);
@@ -951,7 +952,7 @@ class dashboard extends React.Component {
       btn,
       key,
       onClose: close,
-      duration: 2000
+      duration: 2000,
     });
   };
   closeChatModal = () => {
@@ -991,7 +992,7 @@ class dashboard extends React.Component {
   switch_to_video = () => {
     console.log("switch_to_video", this.state.show_video);
     this.setState({
-      show_video: !this.state.show_video
+      show_video: !this.state.show_video,
     });
   };
   send_TO_CI = () => {
@@ -1062,7 +1063,7 @@ class dashboard extends React.Component {
                           >
                             <CloseIcon
                               style={{
-                                color: "red"
+                                color: "red",
                               }}
                             />
                           </IconButton>
@@ -1077,14 +1078,14 @@ class dashboard extends React.Component {
                   <div className="col">
                     <div className="middle" id="style-1">
                       <div
-                        ref={el => {
+                        ref={(el) => {
                           this.lastMessage = el;
                         }}
                         id="style-1"
                         style={{
                           overflowX: "hidden",
                           overflowY: "auto",
-                          maxHeight: "360px"
+                          maxHeight: "360px",
                         }}
                       >
                         <div className="no_message">
@@ -1101,7 +1102,7 @@ class dashboard extends React.Component {
                   id="inputField"
                   className="row"
                   style={{
-                    backgroundColor: "#ffff"
+                    backgroundColor: "#ffff",
                   }}
                 >
                   <div className="col-9">
@@ -1112,12 +1113,12 @@ class dashboard extends React.Component {
                       rowsMax="3"
                       placeholder="Type Here"
                       style={{
-                        fontSize: "10px"
+                        fontSize: "10px",
                         // paddingBottom: '10px'
                       }}
                       fullWidth={true}
                       value={this.state.textMessage}
-                      onChange={text =>
+                      onChange={(text) =>
                         this.setState({ textMessage: text.target.value })
                       }
                     />
@@ -1137,14 +1138,14 @@ class dashboard extends React.Component {
                       <IconButton
                         disabled
                         style={{
-                          borderWidth: "0px"
+                          borderWidth: "0px",
                         }}
                         color="primary"
                         aria-label="add an alarm"
                       >
                         <SendIcon
                           style={{
-                            color: "#0d74bc"
+                            color: "#0d74bc",
                           }}
                         />
                       </IconButton>
@@ -1161,7 +1162,7 @@ class dashboard extends React.Component {
                 style={{
                   backgroundColor: "#fff",
                   overflowX: "hidden",
-                  overflowY: "auto"
+                  overflowY: "auto",
                 }}
               >
                 <div className="heading_1 show_hide">
@@ -1184,7 +1185,7 @@ class dashboard extends React.Component {
                     style={{
                       marginTop: "10px",
                       paddingLeft: "6px",
-                      paddingRight: "6px"
+                      paddingRight: "6px",
                     }}
                   >
                     <div className="row">
@@ -1202,7 +1203,7 @@ class dashboard extends React.Component {
                         />
                       </div>
 
-                      <div className="col">
+                      {/* <div className="col">
                         <Input
                           type="number"
                           disabled={true}
@@ -1221,7 +1222,8 @@ class dashboard extends React.Component {
                         >
                           {this.state.errorAge}
                         </span>
-                      </div>
+                      </div> */}
+
                       <div className="col">
                         {" "}
                         <Input
@@ -1235,6 +1237,18 @@ class dashboard extends React.Component {
                           style={{ fontSize: "12px" }}
                         />
                       </div>
+                      <div className="col">
+                        <Input
+                          type="text"
+                          required={true}
+                          name="email"
+                          className="show_hide"
+                          id="email"
+                          placeholder="Email-Address"
+                          style={{ fontSize: "12px" }}
+                          disabled
+                        />
+                      </div>
                     </div>
                   </FormGroup>
                   <FormGroup
@@ -1242,7 +1256,7 @@ class dashboard extends React.Component {
                     style={{
                       marginTop: "5px",
                       paddingLeft: "6px",
-                      paddingRight: "6px"
+                      paddingRight: "6px",
                     }}
                   >
                     <div className="row">
@@ -1275,19 +1289,7 @@ class dashboard extends React.Component {
                           className="show_hide"
                         />
                       </div>
-                      <div className="col">
-                        {" "}
-                        <Input
-                          type="text"
-                          required={true}
-                          name="email"
-                          className="show_hide"
-                          id="email"
-                          placeholder="Email-Address"
-                          style={{ fontSize: "12px" }}
-                          disabled
-                        />
-                      </div>
+                      <div className="col"> </div>
                     </div>
                   </FormGroup>
                   {/* ///////////////// Customer Details ///////////////// */}
@@ -1323,7 +1325,7 @@ class dashboard extends React.Component {
                       <FormGroup
                         style={{
                           paddingLeft: "6px",
-                          paddingRight: "6px"
+                          paddingRight: "6px",
                         }}
                       >
                         <InputGroup>
@@ -1397,7 +1399,7 @@ class dashboard extends React.Component {
                       <FormGroup
                         style={{
                           paddingLeft: "6px",
-                          paddingRight: "6px"
+                          paddingRight: "6px",
                         }}
                       >
                         <InputGroup>
@@ -1460,7 +1462,7 @@ class dashboard extends React.Component {
                   <FormGroup
                     style={{
                       paddingLeft: "6px",
-                      paddingRight: "6px"
+                      paddingRight: "6px",
                     }}
                   >
                     <Table striped bordered hover>
@@ -1621,7 +1623,7 @@ class dashboard extends React.Component {
                       <FormGroup
                         style={{
                           paddingLeft: "6px",
-                          paddingRight: "6px"
+                          paddingRight: "6px",
                         }}
                       >
                         <InputGroup>
@@ -1661,7 +1663,7 @@ class dashboard extends React.Component {
                   <FormGroup
                     style={{
                       paddingLeft: "6px",
-                      paddingRight: "6px"
+                      paddingRight: "6px",
                     }}
                   >
                     <div>
@@ -1689,7 +1691,7 @@ class dashboard extends React.Component {
                       style={{
                         fontSize: "14px",
                         fontWeight: "bold",
-                        color: "#0d74bc"
+                        color: "#0d74bc",
                       }}
                     >
                       Disclaimer
@@ -1747,7 +1749,7 @@ class dashboard extends React.Component {
     return (
       <div>
         {this.state.newRequest_check
-          ? this.state.newRequest_array.map(val =>
+          ? this.state.newRequest_array.map((val) =>
               this.openNotification(val.key)
             )
           : null}
@@ -1864,7 +1866,7 @@ class dashboard extends React.Component {
             borderRadius: "10px",
             padding: "10px",
             marginLeft: "10px",
-            marginRight: "10px"
+            marginRight: "10px",
             // marginBottom: '10px'
           }}
         >
@@ -1882,7 +1884,7 @@ class dashboard extends React.Component {
                   // width: "300px",
                   backgroundColor: "#ffff",
                   paddingTop: "10px",
-                  paddingBottom: "10px"
+                  paddingBottom: "10px",
                   // overflow: "scroll"
                 }}
               >
@@ -1906,7 +1908,7 @@ class dashboard extends React.Component {
                           <FiberManualRecordIcon
                             style={{
                               color:
-                                availability === "Available" ? "green" : "red"
+                                availability === "Available" ? "green" : "red",
                             }}
                           />
                         }
@@ -1915,7 +1917,7 @@ class dashboard extends React.Component {
                           className="availability"
                           style={{
                             color:
-                              availability === "Available" ? "green" : "red"
+                              availability === "Available" ? "green" : "red",
                           }}
                         >
                           {" "}
@@ -1965,7 +1967,7 @@ class dashboard extends React.Component {
                             this.setState(
                               {
                                 select_ticket: ticket.id,
-                                selected_id: index
+                                selected_id: index,
                               },
                               () => {
                                 // this.send_TO_CI();
@@ -1983,7 +1985,7 @@ class dashboard extends React.Component {
                                     : "#ffff"
                                   : this.props.tickets[0].id === ticket.id
                                   ? "#f6f6f8"
-                                  : "#ffff"
+                                  : "#ffff",
                               // color:
                               //   this.state.select_ticket !== ""
                               //     ? this.state.select_ticket === ticket.id
@@ -2032,7 +2034,7 @@ class dashboard extends React.Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   var auth = state.AuthReducer.auth;
   var connection = state.LiveChatReducer.connection;
   var tickets = state.LiveChatReducer.tickets;
@@ -2057,7 +2059,7 @@ const mapStateToProps = state => {
     reject,
     time,
     msg,
-    close
+    close,
   };
 };
 const mapDispatchToProps = {
@@ -2069,7 +2071,7 @@ const mapDispatchToProps = {
   closeTicket,
   closeChat,
   timeExceed,
-  timeModal
+  timeModal,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(dashboard);
