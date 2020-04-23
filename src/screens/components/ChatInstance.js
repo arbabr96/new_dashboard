@@ -135,15 +135,15 @@ class ChatInstance extends React.Component {
       file_uri: "",
       file_type: "",
       uploading: false,
-      s_required: "",
-      d_required: "",
-      pd_required: "",
-      test_required: "",
-      m_required: "",
-      do_required: "",
-      r_required: "",
-      f_required: "",
-      du_required: "",
+      s_required: null,
+      d_required: null,
+      pd_required: null,
+      test_required: null,
+      m_required: null,
+      do_required: null,
+      r_required: null,
+      f_required: null,
+      du_required: null,
       s_valid: true,
       d_valid: true,
       pd_valid: true,
@@ -1513,13 +1513,13 @@ class ChatInstance extends React.Component {
             if (
               (s_valid || s_required === "") &&
               (d_valid || d_required === "") &&
-              pd_valid &&
-              test_valid &&
-              m_valid &&
-              do_valid &&
-              r_valid &&
-              f_valid &&
-              du_valid
+              (pd_valid || pd_required === "") &&
+              (test_valid || test_required === "") &&
+              (m_valid || m_required === "") &&
+              (do_valid || do_required === "") &&
+              (r_valid || r_required === "") &&
+              (f_valid || f_required === "") &&
+              (du_valid || du_required === "")
             ) {
               console.log("ALL VALUES FILLED");
               this.postData();
@@ -1638,6 +1638,11 @@ class ChatInstance extends React.Component {
                   } else {
                     console.log("All Values filled");
                     this.setState({
+                      m_required: "",
+                      do_required: "",
+                      r_required: "",
+                      f_required: "",
+                      du_required: "",
                       m_valid: true,
                       do_valid: true,
                       r_valid: true,
@@ -2443,7 +2448,6 @@ class ChatInstance extends React.Component {
                         required={true}
                         name="contact"
                         className="show_hide"
-                        valid={valid_contact}
                         id="contact"
                         placeholder="Contact"
                         style={{ fontSize: "12px" }}

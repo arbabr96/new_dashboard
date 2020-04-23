@@ -14,26 +14,46 @@ class Login extends React.Component {
     this.state = {
       Username: "",
       Password: "",
+      isDisconnected: false,
     };
   }
-  //   componentDidMount() {
-  //     setTimeout(() => {
-  //       axios
-  //         .post(window.API_URL + "/api/auth/login", {
-  //           Username: "admin",
-  //           Password: "admin123456"
-  //         })
-  //         .then(r => {
-  //           Store.dispatch(setAuth(r.data));
+  componentDidMount() {
+    this.handleConnectionChange();
+    window.addEventListener("online", this.handleConnectionChange);
+    window.addEventListener("offline", this.handleConnectionChange);
+  }
 
-  //           axios.defaults.headers.common["Authorization"] =
-  //             "Bearer " + r.data.token;
-  //         })
-  //         .catch(c => {
-  //           console.log("c", c);
-  //         });
-  //     }, 500);
-  //   }
+  componentWillUnmount() {
+    window.removeEventListener("online", this.handleConnectionChange);
+    window.removeEventListener("offline", this.handleConnectionChange);
+  }
+  handleConnectionChange = () => {
+    const key = "net";
+    const condition = navigator.onLine ? "online" : "offline";
+    if (condition === "online") {
+      const webPing = setInterval(() => {
+        fetch("//google.com", {
+          mode: "no-cors",
+        })
+          .then(() => {
+            this.setState({ isDisconnected: false }, () => {
+              console.log("Online");
+              return clearInterval(webPing);
+            });
+          })
+          .catch(() => this.setState({ isDisconnected: true }));
+      }, 2000);
+      return;
+    } else {
+      console.log("Offline");
+      message.error({
+        content: "No Internet",
+        key,
+        duration: 1000,
+      });
+      return this.setState({ isDisconnected: true });
+    }
+  };
 
   login = () => {
     const { Username, Password } = this.state;
@@ -68,6 +88,8 @@ class Login extends React.Component {
                   "Bearer " + r.data.token;
                 setTimeout(() => {
                   Store.dispatch(setAuth(r.data));
+                  console.log("LOGIN", this.props);
+                  window.HH = this.props.history;
                   this.props.history.push("/TakafulPanel/dashboard");
                 }, 600);
               }
@@ -86,10 +108,6 @@ class Login extends React.Component {
     } else {
       message.error({ content: "Please Enter Username", duration: 1 });
     }
-  };
-
-  handleClick = () => {
-    this.props.history.push("/sign-up");
   };
   signup = () => {
     this.props.history.push("/TakafulPanel/Signup");
@@ -151,13 +169,13 @@ class Login extends React.Component {
         >
           Login
         </button>
-        <button
+        {/* <button
           type="button"
           onClick={this.signup}
           className="btn btn-success btn-block"
         >
           Sign Up
-        </button>
+        </button> */}
         {/* <p className="forgot-password text-right">
           <a onClick={this.signup} href="#">
             Sign Up

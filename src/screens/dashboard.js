@@ -47,6 +47,7 @@ import { bounce, bounceInUp } from "react-animations";
 import Ripples, { createRipples } from "react-ripples";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
+import Logout from "./components/Logout";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
 import {
   Tabs,
@@ -128,6 +129,7 @@ class dashboard extends React.Component {
       selected_id: 0,
       select_ticket: "",
       show_video: false,
+      logout_show: false,
     };
     this.url =
       "https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/mp3/iphone-6-original-ringtone-24163.mp3";
@@ -1774,6 +1776,59 @@ class dashboard extends React.Component {
       );
     }
   };
+  _logout = () => {
+    this.setState({
+      logout_show: true,
+    });
+  };
+  logoutModal = () => {
+    if (this.state.logout_show) {
+      return (
+        <Modal
+          fade={true}
+          centered={true}
+          backdrop={true}
+          show={this.state.logout_show}
+          className={"modal"}
+          backdropClassName={"backdrop"}
+        >
+          <Modal.Header>Confirmation</Modal.Header>
+          <Modal.Body>Do you want to Logout?</Modal.Body>
+          <Modal.Footer>
+            <Button
+              color="primary"
+              onClick={() => {
+                this.setState(
+                  {
+                    logout_show: false,
+                  },
+                  () => {
+                    window.HH.push("./Login");
+                    setTimeout(() => {
+                      Store.dispatch(setAuth(""));
+                    }, 100);
+                    console.log("LOGOUT", window.HH);
+                  }
+                );
+              }}
+            >
+              Yes
+            </Button>
+            <Button
+              color="danger"
+              onClick={() =>
+                this.setState({
+                  logout_show: false,
+                })
+              }
+            >
+              No
+            </Button>
+          </Modal.Footer>
+        </Modal>
+      );
+    }
+  };
   render() {
     const { isOpen, availability } = this.state;
 
@@ -1784,6 +1839,7 @@ class dashboard extends React.Component {
               this.openNotification(val.key)
             )
           : null}
+        {this.logoutModal()}
         {this.closeChatModal()}
         <div className="logout_container">
           <div className="logout_sub">
@@ -1798,7 +1854,9 @@ class dashboard extends React.Component {
                   }}
                 />
               </div>{" "}
-              <div className="col logout_Text">Logout</div>
+              <div className="col logout_Text" onClick={this._logout}>
+                Logout
+              </div>
             </div>
           </div>
         </div>

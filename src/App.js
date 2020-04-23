@@ -60,6 +60,7 @@ class App extends React.Component {
             <div className={this.props.auth ? null : "auth-inner"}>
               <Switch>
                 <Route
+                  history={this.props.history}
                   path="/TakafulPanel/dashboard"
                   render={() => {
                     return this.props.auth ? (
@@ -75,17 +76,6 @@ class App extends React.Component {
                 />
                 <Route
                   path="/TakafulPanel/Login"
-                  // render={() => {
-                  //   return this.props.auth ? (
-                  //     <Redirect
-                  //       to={{
-                  //         pathname: "/dashboard"
-                  //       }}
-                  //     />
-                  //   ) : (
-                  //     <Login />
-                  //   );
-                  // }}
                   render={() => {
                     return <Login />;
                   }}
