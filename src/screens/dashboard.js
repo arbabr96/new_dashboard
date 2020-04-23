@@ -18,7 +18,7 @@ import {
   newCallMsg,
   ermModal,
 } from "../store/actions/livechat";
-import add from "../assets/add.png";
+import logout from "../assets/logout.png";
 import ChatInstance from "./components/ChatInstance";
 import Store from "../store/store";
 import TabBar from "./components/TabBar";
@@ -48,7 +48,16 @@ import Ripples, { createRipples } from "react-ripples";
 import Divider from "@material-ui/core/Divider";
 import Button from "@material-ui/core/Button";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
-import { Tabs, Layout, Upload, Icon, notification, Col, Row } from "antd";
+import {
+  Tabs,
+  Layout,
+  Upload,
+  Icon,
+  notification,
+  Col,
+  Row,
+  message,
+} from "antd";
 // import { Button } from "reactstrap";
 import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
@@ -147,6 +156,13 @@ class dashboard extends React.Component {
   }
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
   connectWithLiveChatHub = () => {
+    const key = "conn";
+
+    message.loading({
+      content: "Establishing Connection with Server ...",
+      key,
+      duration: 1000,
+    });
     let connection = new signalR.HubConnectionBuilder()
       .withUrl(window.API_URL + "livechat", {
         accessTokenFactory: () => {
@@ -230,7 +246,7 @@ class dashboard extends React.Component {
       );
       console.log("NEW WINDOWS ", event);
       var tickets = [...this.props.tickets, event];
-      console.log("TIckets === ", tickets);
+      // console.log("TIckets === ", tickets);
       this.props.updateTickets(tickets);
       this.send_TO_CI();
       this.forceUpdate();
@@ -243,10 +259,25 @@ class dashboard extends React.Component {
       this.props.closeTicket(false);
     });
 
-    connection.start().then(() => {
-      console.log("Connection Established");
-      this.props.onConnect(connection);
-    });
+    connection
+      .start()
+      .then(() => {
+        console.log("Connection Established");
+        message.success({
+          content: "Connection Established!",
+          key,
+          duration: 1,
+        });
+        this.props.onConnect(connection);
+      })
+      .catch((err) => {
+        console.log("Error Establishing Connection");
+        message.error({
+          content: "Error Establishing Connection",
+          key,
+          duration: 1,
+        });
+      });
   };
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
   addNewMessageToTicket = (message) => {
@@ -1754,6 +1785,23 @@ class dashboard extends React.Component {
             )
           : null}
         {this.closeChatModal()}
+        <div className="logout_container">
+          <div className="logout_sub">
+            <div className="row">
+              <div className="col">
+                <img
+                  src={logout}
+                  alt=""
+                  style={{
+                    width: "40px",
+                    height: "40px",
+                  }}
+                />
+              </div>{" "}
+              <div className="col logout_Text">Logout</div>
+            </div>
+          </div>
+        </div>
         {/* /////////////////////// NavBar ///////////////////// */}
         {/* <Navbar color="dark" dark expand="sm">
           <NavbarBrand href="/">Takaful Pakistan</NavbarBrand>

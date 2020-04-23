@@ -9,18 +9,50 @@ import {
 import Dashboard from "./screens/dashboard";
 import Login from "./screens/Login";
 import { connect } from "react-redux";
+import logo from "./assets/logo.png";
 import SignUp from "./screens/SignUp";
+import { Spinner } from "react-bootstrap";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-
+    this.state = {
+      loader: true,
+    };
     // window.API_URL = "http://192.168.21.212:5000/";
     // window.API_URL = "http://54.36.109.50/TakafulAPI";
-    window.API_URL = "https://iteck.pk/Takaful/";
+    window.API_URL = "https://iteck.pk/TakafulAPI/";
     window.Tak_API = "https://iteck.pk/TakafulAPI/";
   }
+  componentDidMount() {
+    setTimeout(() => {
+      this.setState({
+        loader: false,
+      });
+    }, 3000);
+  }
   render() {
+    if (this.state.loader) {
+      return (
+        <div class="page-load">
+          <img
+            src={logo}
+            // alt="Takaful"
+            style={{ width: "300px", height: "300px" }}
+          />
+          <div class="loader">
+            {/* <Spinner animation="grow" />
+            <Spinner animation="grow" />
+            <Spinner animation="grow" /> */}
+            <div class="spinner">
+              <div class="bounce1"></div>
+              <div class="bounce2"></div>
+              <div class="bounce3"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <Router>
         <div className={this.props.auth ? "All" : "App"}>
@@ -35,14 +67,14 @@ class App extends React.Component {
                     ) : (
                       <Redirect
                         to={{
-                          pathname: "/TakafulPanel/signIn",
+                          pathname: "/TakafulPanel/Login",
                         }}
                       />
                     );
                   }}
                 />
                 <Route
-                  path="/TakafulPanel/signIn"
+                  path="/TakafulPanel/Login"
                   // render={() => {
                   //   return this.props.auth ? (
                   //     <Redirect
@@ -59,7 +91,7 @@ class App extends React.Component {
                   }}
                 />
                 <Route
-                  path="/TakafulPanel/signUP"
+                  path="/TakafulPanel/Signup"
                   render={() => {
                     return <SignUp />;
                   }}

@@ -144,6 +144,19 @@ class ChatInstance extends React.Component {
       r_required: "",
       f_required: "",
       du_required: "",
+      s_valid: true,
+      d_valid: true,
+      pd_valid: true,
+      test_valid: true,
+      m_valid: true,
+      do_valid: true,
+      r_valid: true,
+      f_valid: true,
+      du_valid: true,
+      cs_NE: true,
+      pd_NE: true,
+      pr_NE: true,
+      lt_NE: true,
     };
     // this.url = "http://streaming.tdiradio.com:8000/house.mp3";
     this.url =
@@ -1078,9 +1091,12 @@ class ChatInstance extends React.Component {
         },
       ],
     }));
+    this.setState({
+      s_valid: false,
+      d_valid: false,
+    });
   };
   delete_complaints = (event) => {
-    console.log("DELETE complaints_symptoms INDEX ", event);
     this.setState(
       {
         complaints_symptoms: this.state.complaints_symptoms.filter(
@@ -1090,7 +1106,16 @@ class ChatInstance extends React.Component {
         ),
       },
       () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.complaints_symptoms);
+        if (this.state.complaints_symptoms.length === 0) {
+          this.setState(
+            {
+              s_valid: true,
+              d_valid: true,
+            },
+            () =>
+              console.log("Lenggth 0", this.state.s_valid, this.state.d_valid)
+          );
+        }
       }
     );
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
@@ -1135,6 +1160,9 @@ class ChatInstance extends React.Component {
         { Value: "", Type: 1 },
       ],
     }));
+    this.setState({
+      pd_valid: false,
+    });
   };
   deletePD = (event) => {
     console.log("DELETE Disease INDEX ", event);
@@ -1147,7 +1175,14 @@ class ChatInstance extends React.Component {
         ),
       },
       () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.provisional_diagnosis);
+        if (this.state.complaints_symptoms.length === 0) {
+          this.setState(
+            {
+              pd_valid: true,
+            },
+            () => console.log("Lenggth 0", this.state.pd_valid)
+          );
+        }
       }
     );
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
@@ -1181,6 +1216,9 @@ class ChatInstance extends React.Component {
         },
       ],
     }));
+    this.setState({
+      test_valid: false,
+    });
   };
   delete_lab_test = (event) => {
     console.log("DELETE lab_tests INDEX ", event);
@@ -1191,7 +1229,14 @@ class ChatInstance extends React.Component {
         }),
       },
       () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.lab_tests);
+        if (this.state.complaints_symptoms.length === 0) {
+          this.setState(
+            {
+              test_valid: true,
+            },
+            () => console.log("Lenggth 0", this.state.test_valid)
+          );
+        }
       }
     );
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
@@ -1227,23 +1272,22 @@ class ChatInstance extends React.Component {
         },
       ],
     }));
+    this.setState({
+      m_valid: false,
+      do_valid: false,
+      r_valid: false,
+      f_valid: false,
+      du_valid: false,
+    });
   };
   add_description = (event, key) => {
     this.state.add_Prescription[key].Medicine = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_description == ",
-              this.state.add_Prescription
-            );
-          }
-        );
+        this.setState({
+          add_Prescription: temp,
+        });
       }
     });
   };
@@ -1253,17 +1297,9 @@ class ChatInstance extends React.Component {
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_dosage == ",
-              this.state.add_Prescription
-            );
-          }
-        );
+        this.setState({
+          add_Prescription: temp,
+        });
       }
     });
   };
@@ -1273,17 +1309,9 @@ class ChatInstance extends React.Component {
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_period == ",
-              this.state.add_Prescription
-            );
-          }
-        );
+        this.setState({
+          add_Prescription: temp,
+        });
       }
     });
   };
@@ -1293,17 +1321,9 @@ class ChatInstance extends React.Component {
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_dosageForm == ",
-              this.state.add_Prescription
-            );
-          }
-        );
+        this.setState({
+          add_Prescription: temp,
+        });
       }
     });
   };
@@ -1313,17 +1333,9 @@ class ChatInstance extends React.Component {
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
       if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_comment == ",
-              this.state.add_Prescription
-            );
-          }
-        );
+        this.setState({
+          add_Prescription: temp,
+        });
       }
     });
   };
@@ -1335,10 +1347,18 @@ class ChatInstance extends React.Component {
         delete_Prescription_key: index,
       },
       () => {
-        console.log(
-          "Delete Prescription KEY ======== ",
-          this.state.delete_Prescription_key
-        );
+        if (this.state.complaints_symptoms.length === 0) {
+          this.setState(
+            {
+              m_valid: true,
+              do_valid: true,
+              r_valid: true,
+              f_valid: true,
+              du_valid: true,
+            },
+            () => console.log("Lenggth 0", this.state.test_valid)
+          );
+        }
       }
     );
   };
@@ -1350,10 +1370,18 @@ class ChatInstance extends React.Component {
         }),
       },
       () => {
-        console.log(
-          "delete_Prescription_Row ARRAY +_++++ ",
-          this.state.add_Prescription
-        );
+        if (this.state.complaints_symptoms.length === 0) {
+          this.setState(
+            {
+              m_valid: true,
+              do_valid: true,
+              r_valid: true,
+              f_valid: true,
+              du_valid: true,
+            },
+            () => console.log("Lenggth 0", this.state.test_valid)
+          );
+        }
       }
     );
   };
@@ -1448,6 +1476,28 @@ class ChatInstance extends React.Component {
       provisional_diagnosis,
       add_Prescription,
       lab_tests,
+      s_required,
+      d_required,
+      pd_required,
+      test_required,
+      m_required,
+      do_required,
+      r_required,
+      f_required,
+      du_required,
+      s_valid,
+      d_valid,
+      pd_valid,
+      test_valid,
+      m_valid,
+      do_valid,
+      r_valid,
+      f_valid,
+      du_valid,
+      cs_NE,
+      pd_NE,
+      pr_NE,
+      lt_NE,
     } = this.state;
     if (patientName != "") {
       if (email != "") {
@@ -1460,72 +1510,161 @@ class ChatInstance extends React.Component {
               error_gender: false,
               error_pname: false,
             });
-            if (complaints_symptoms.length > 0) {
-              for (let i = 0; i < complaints_symptoms.length; ++i) {
-                if (complaints_symptoms[i].Symptoms === "") {
-                  this.setState({
-                    s_required: i,
-                  });
-                  this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                }
-                if (complaints_symptoms[i].Duration === "") {
-                  this.setState({
-                    d_required: i,
-                  });
-                  this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-                }
-              }
-            }
-            if (provisional_diagnosis.length > 0) {
-              for (let i = 0; i < provisional_diagnosis.length; ++i) {
-                if (provisional_diagnosis[i].Value === "") {
-                  this.setState({
-                    pd_required: i,
-                  });
-                  this.form.scrollTo({ top: 200, left: 0, behavior: "smooth" });
-                }
-              }
-            }
-            if (add_Prescription.length > 0) {
-              for (let i = 0; i < add_Prescription.length; ++i) {
-                if (add_Prescription[i].Medicine === "") {
-                  this.setState({
-                    m_required: i,
-                  });
-                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
-                }
-                if (add_Prescription[i].Dosage === "") {
-                  this.setState({
-                    do_required: i,
-                  });
-                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
-                }
-                if (add_Prescription[i].Route === "") {
-                  this.setState({
-                    r_required: i,
-                  });
-                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
-                }
-                if (add_Prescription[i].Frequency === "") {
-                  this.setState({
-                    f_required: i,
-                  });
-                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
-                }
-                if (add_Prescription[i].Duration === "") {
-                  this.setState({
-                    du_required: i,
-                  });
-                  this.form.scrollTo({ top: 400, left: 0, behavior: "smooth" });
+            if (
+              (s_valid || s_required === "") &&
+              (d_valid || d_required === "") &&
+              pd_valid &&
+              test_valid &&
+              m_valid &&
+              do_valid &&
+              r_valid &&
+              f_valid &&
+              du_valid
+            ) {
+              console.log("ALL VALUES FILLED");
+              this.postData();
+            } else {
+              console.log(
+                "ALL VALUES Not FILLED",
+                s_valid,
+                d_valid,
+                pd_valid,
+                test_valid,
+                m_valid,
+                do_valid,
+                r_valid,
+                f_valid,
+                du_valid
+              );
+              if (complaints_symptoms.length > 0) {
+                for (let i = 0; i < complaints_symptoms.length; ++i) {
+                  if (complaints_symptoms[i].Symptoms === "") {
+                    this.setState({
+                      s_required: i,
+                      s_valid: false,
+                    });
+                    this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                  } else if (complaints_symptoms[i].Duration === "") {
+                    this.setState({
+                      d_required: i,
+                      d_valid: false,
+                    });
+                    this.form.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+                  } else {
+                    this.setState(
+                      {
+                        d_required: "",
+                        s_valid: true,
+                        d_valid: true,
+                      },
+                      () =>
+                        console.log("CS NOT NUll", d_required, s_valid, d_valid)
+                    );
+                  }
                 }
               }
-            }
-            if (lab_tests.length > 0) {
-              for (let i = 0; i < lab_tests.length; ++i) {
-                if (lab_tests[i].Value === "") {
-                  this.setState({
-                    test_required: i,
-                  });
+              if (provisional_diagnosis.length > 0) {
+                for (let i = 0; i < provisional_diagnosis.length; ++i) {
+                  if (provisional_diagnosis[i].Value === "") {
+                    this.setState({
+                      pd_required: i,
+                      pd_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 200,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else {
+                    this.setState({
+                      pd_required: "",
+                      pd_valid: true,
+                    });
+                  }
+                }
+              }
+              if (add_Prescription.length > 0) {
+                for (let i = 0; i < add_Prescription.length; ++i) {
+                  if (add_Prescription[i].Medicine === "") {
+                    this.setState({
+                      m_required: i,
+                      m_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 400,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else if (add_Prescription[i].Dosage === "") {
+                    this.setState({
+                      do_required: i,
+                      do_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 400,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else if (add_Prescription[i].Route === "") {
+                    this.setState({
+                      r_required: i,
+                      r_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 400,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else if (add_Prescription[i].Frequency === "") {
+                    this.setState({
+                      f_required: i,
+                      f_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 400,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else if (add_Prescription[i].Duration === "") {
+                    this.setState({
+                      du_required: i,
+                      du_valid: false,
+                    });
+                    this.form.scrollTo({
+                      top: 400,
+                      left: 0,
+                      behavior: "smooth",
+                    });
+                  } else {
+                    console.log("All Values filled");
+                    this.setState({
+                      m_valid: true,
+                      do_valid: true,
+                      r_valid: true,
+                      f_valid: true,
+                      du_valid: true,
+                    });
+                    // if (
+                    //   add_Prescription[i].Medicine != "" &&
+                    //   add_Prescription[i].Dosage != "" &&
+                    //   add_Prescription[i].Route != "" &&
+                    //   add_Prescription[i].Frequency != "" &&
+                    //   add_Prescription[i].Duration != ""
+                    // )
+                  }
+                }
+              }
+              if (lab_tests.length > 0) {
+                for (let i = 0; i < lab_tests.length; ++i) {
+                  if (lab_tests[i].Value === "") {
+                    this.setState({
+                      test_required: i,
+                    });
+                  } else {
+                    this.setState({
+                      test_required: "",
+                    });
+                  }
                 }
               }
             }
@@ -1599,6 +1738,12 @@ class ChatInstance extends React.Component {
     }
   };
   postData = () => {
+    const key = "upload";
+    message.loading({
+      content: "Uploading EHR ...",
+      key,
+      duration: 1000,
+    });
     const {
       h_id,
       patientName,
@@ -1614,7 +1759,7 @@ class ChatInstance extends React.Component {
     var data = {
       Name: patientName,
       Contact: contact,
-      HealthID: h_id,
+      HealthID: this.props.ticket.healthID,
       Gender: gender,
       Email: email,
       Followup: follow_up,
@@ -1629,9 +1774,25 @@ class ChatInstance extends React.Component {
       axios
         .post(window.Tak_API + "api/EHR", data)
         .then((r) => {
-          // if (r.status === 200) {
-          console.log("Response --- ", r);
-          // }
+          if (r.status === 200) {
+            message.success({
+              content: "Upload Successfully!",
+              key,
+              duration: 1,
+            });
+            this.setState({
+              patientName: "",
+              gender: "Gender",
+              contact: "",
+              email: "",
+              follow_up: "",
+              complaints_symptoms: [],
+              provisional_diagnosis: [],
+              add_Prescription: [],
+              lab_tests: [],
+            });
+            console.log("Response --- ", r);
+          }
         })
         .catch((c) => {
           console.log("EHR error", c);
@@ -2196,6 +2357,7 @@ class ChatInstance extends React.Component {
                         className="show_hide"
                         id="health_id"
                         disabled={true}
+                        value={this.props.ticket.healthID}
                         placeholder="Health ID #"
                         style={{ fontSize: "12px" }}
                         invalid={this.state.error_hid}
@@ -2227,6 +2389,7 @@ class ChatInstance extends React.Component {
                         style={{ fontSize: "12px" }}
                         invalid={this.state.error_pname}
                         onChange={(e) => this.handlePatientName(e)}
+                        value={this.state.patientName}
                       />
                     </div>
                     <div className="col">
@@ -2241,6 +2404,7 @@ class ChatInstance extends React.Component {
                         style={{ fontSize: "12px" }}
                         invalid={this.state.error_email}
                         onChange={(e) => this.handleEmail(e)}
+                        value={this.state.email}
                       />
                     </div>
                   </div>
@@ -2265,6 +2429,7 @@ class ChatInstance extends React.Component {
                         style={{ fontSize: "12px" }}
                         valid={valid_gender}
                         invalid={this.state.error_gender}
+                        value={this.state.gender}
                         onChange={(e) => this.handleGender(e)}
                       >
                         <option>Gender</option>
@@ -2285,6 +2450,7 @@ class ChatInstance extends React.Component {
                         valid={valid_contact}
                         invalid={this.state.error_contact}
                         onChange={(e) => this.handleContact(e)}
+                        value={this.state.contact}
                       />
                     </div>
                     <div className="col"> </div>
@@ -2642,6 +2808,7 @@ class ChatInstance extends React.Component {
                                       type="text"
                                       name="description"
                                       id="description"
+                                      invalid={false}
                                       className="show_hide"
                                       style={{ fontSize: "10px" }}
                                       value={
@@ -2682,6 +2849,7 @@ class ChatInstance extends React.Component {
                                       type="text"
                                       name="dosage"
                                       id="dosage"
+                                      invalid={false}
                                       className="show_hide"
                                       style={{ fontSize: "10px" }}
                                       value={
@@ -2721,6 +2889,7 @@ class ChatInstance extends React.Component {
                                       type="text"
                                       name="route"
                                       id="route"
+                                      invalid={false}
                                       className="show_hide"
                                       style={{ fontSize: "10px" }}
                                       value={
@@ -2760,6 +2929,7 @@ class ChatInstance extends React.Component {
                                       type="text"
                                       name="frequency"
                                       id="frequency"
+                                      invalid={false}
                                       className="show_hide"
                                       style={{ fontSize: "10px" }}
                                       value={
@@ -2801,6 +2971,7 @@ class ChatInstance extends React.Component {
                                       name="duration"
                                       className="show_hide"
                                       id="duration"
+                                      valid={true}
                                       style={{ fontSize: "10px" }}
                                       value={
                                         this.state.add_Prescription[index]

@@ -1,7 +1,7 @@
 import React from "react";
 import "../index.css";
 // import "antd/dist/antd.css";
-import { Input } from "antd";
+import { Input, message } from "antd";
 import { setAuth } from "../store/actions/auth";
 import Store from "../store/store";
 import { withRouter } from "react-router-dom";
@@ -41,34 +41,50 @@ class Login extends React.Component {
       Username: Username,
       Password: Password,
     };
+    const key = "login";
+
     // console.log("USERNAME __ ", Username, Password);
     if (Username !== "") {
       if (Password !== "") {
+        const hide = message.loading({
+          content: "Please wait ...",
+          key,
+          duration: 1000,
+        });
+
         try {
           axios
             .post(window.API_URL + "api/auth/login", data)
             .then((r) => {
               if (r.status === 200) {
                 console.log("Response --- ", r);
-                Store.dispatch(setAuth(r.data));
-                this.props.history.push("/TakafulPanel/dashboard");
+                message.success({
+                  content: "Login Successfully!",
+                  key,
+                  duration: 0.5,
+                });
+
                 axios.defaults.headers.common["Authorization"] =
                   "Bearer " + r.data.token;
+                setTimeout(() => {
+                  Store.dispatch(setAuth(r.data));
+                  this.props.history.push("/TakafulPanel/dashboard");
+                }, 600);
               }
             })
             .catch((c) => {
-              alert("Check Credentials");
+              message.error({ content: "Check Credentials", duration: 1 });
               console.log("Api Error --- ", c);
             });
         } catch (error) {
-          alert("Check Credentials");
+          message.error({ content: "Check Credentials", duration: 1 });
           console.log("Catch Error -- ", error);
         }
       } else {
-        alert("Please Enter Password");
+        message.error({ content: "Please Enter Password", duration: 1 });
       }
     } else {
-      alert("Please Enter Username");
+      message.error({ content: "Please Enter Username", duration: 1 });
     }
   };
 
@@ -76,13 +92,13 @@ class Login extends React.Component {
     this.props.history.push("/sign-up");
   };
   signup = () => {
-    this.props.history.push("/TakafulPanel/signUP");
+    this.props.history.push("/TakafulPanel/Signup");
   };
 
   render() {
     return (
       <form>
-        <h3>Sign In</h3>
+        <h3>Takaful Login</h3>
         <div className="form-group">
           <label>Username</label>
           {/* <input
@@ -105,7 +121,7 @@ class Login extends React.Component {
             placeholder="Enter password"
           /> */}
           <Input.Password
-            visibilityToggle={false}
+            visibilityToggle={true}
             placeholder="Password"
             onChange={(text) => this.setState({ Password: text.target.value })}
             onKeyUp={(text) => {
@@ -135,20 +151,18 @@ class Login extends React.Component {
         >
           Login
         </button>
-        {/* <Link to="/TakafulPanel/Signup">
-          <button
-            type="button"
-            onClick={this.handleClick}
-            className="btn btn-success btn-block"
-          >
-            Sign Up
+        <button
+          type="button"
+          onClick={this.signup}
+          className="btn btn-success btn-block"
+        >
+          Sign Up
         </button>
-        </Link> */}
-        <p className="forgot-password text-right">
+        {/* <p className="forgot-password text-right">
           <a onClick={this.signup} href="#">
             Sign Up
           </a>
-        </p>
+        </p> */}
       </form>
     );
   }
