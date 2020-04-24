@@ -25,11 +25,6 @@ class App extends React.Component {
     window.Tak_API = "https://iteck.pk/TakafulAPI/";
   }
   componentDidMount() {
-    const token = localStorage.getItem("token");
-    console.log("Token", token);
-    this.setState({
-      token,
-    });
     setTimeout(() => {
       this.setState({
         loader: false,

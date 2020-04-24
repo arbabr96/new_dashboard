@@ -1063,7 +1063,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
   add_complaints = (event) => {
     // this.Form_scrollToBottom();
-    console.log("add_complaints _____", this.state.complaints_symptoms.length);
+    // console.log("add_complaints _____", this.state.complaints_symptoms.length);
     this.setState((prevState) => ({
       complaints_symptoms: [
         ...prevState.complaints_symptoms,
@@ -1103,10 +1103,10 @@ class ChatInstance extends React.Component {
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
   };
   complaints_add_array = (event, key) => {
-    console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
+    // console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
     this.state.complaints_symptoms[key].Symptoms = event;
     var temp = this.state.complaints_symptoms;
-    console.log("complaints_symptoms 1 ", temp);
+    // console.log("complaints_symptoms 1 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
         this.setState((prevState) => ({
@@ -1116,10 +1116,10 @@ class ChatInstance extends React.Component {
     });
   };
   complaints_add_array1 = (event, key) => {
-    console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
+    // console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
     this.state.complaints_symptoms[key].Duration = event;
     var temp = this.state.complaints_symptoms;
-    console.log("complaints_symptoms 2 ", temp);
+    // console.log("complaints_symptoms 2 ", temp);
     this.state.complaints_symptoms.filter((item, index) => {
       if (index === key) {
         this.setState((prevState) => ({
@@ -1135,7 +1135,7 @@ class ChatInstance extends React.Component {
 
   addPD = (event) => {
     // this.Form_scrollToBottom();
-    console.log("ADD_____", this.state.treatment_arr.length);
+    // console.log("ADD_____", this.state.treatment_arr.length);
     this.setState((prevState) => ({
       provisional_diagnosis: [
         ...prevState.provisional_diagnosis,
@@ -1147,7 +1147,7 @@ class ChatInstance extends React.Component {
     });
   };
   deletePD = (event) => {
-    console.log("DELETE Disease INDEX ", event);
+    // console.log("DELETE Disease INDEX ", event);
     this.setState(
       {
         provisional_diagnosis: this.state.provisional_diagnosis.filter(
@@ -1170,10 +1170,10 @@ class ChatInstance extends React.Component {
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
   };
   PD_arr = (event, key) => {
-    console.log("Treatment_arr Name ---- ", event, " at Index ", key);
+    // console.log("Treatment_arr Name ---- ", event, " at Index ", key);
     this.state.provisional_diagnosis[key].Value = event;
     var temp = this.state.provisional_diagnosis;
-    console.log("Treatment_arr  ", temp);
+    // console.log("Treatment_arr  ", temp);
     this.state.provisional_diagnosis.filter((item, index) => {
       if (index === key) {
         this.setState((prevState) => ({
@@ -1188,7 +1188,7 @@ class ChatInstance extends React.Component {
   ////////////////////////// Lab Tests /////////////////////////////////////////
   add_lab_test = (event) => {
     // this.Form_scrollToBottom();
-    console.log("add_complaints _____", this.state.lab_tests.length);
+    // console.log("add_complaints _____", this.state.lab_tests.length);
     this.setState((prevState) => ({
       lab_tests: [
         ...prevState.lab_tests,
@@ -1203,7 +1203,7 @@ class ChatInstance extends React.Component {
     });
   };
   delete_lab_test = (event) => {
-    console.log("DELETE lab_tests INDEX ", event);
+    // console.log("DELETE lab_tests INDEX ", event);
     this.setState(
       {
         lab_tests: this.state.lab_tests.filter((item, index) => {
@@ -1224,10 +1224,10 @@ class ChatInstance extends React.Component {
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
   };
   tests_add_array = (event, key) => {
-    console.log("lab_tests Name ---- ", event, " at Index ", key);
+    // console.log("lab_tests Name ---- ", event, " at Index ", key);
     this.state.lab_tests[key].Value = event;
     var temp = this.state.lab_tests;
-    console.log("lab_tests  ", temp);
+    // console.log("lab_tests  ", temp);
     this.state.lab_tests.filter((item, index) => {
       if (index === key) {
         this.setState((prevState) => ({

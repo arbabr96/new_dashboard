@@ -8,7 +8,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Store from "./store/store";
 import HttpsRedirect from "react-https-redirect";
 import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
 
 ReactDOM.render(
   <HttpsRedirect>

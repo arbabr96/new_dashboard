@@ -10,7 +10,8 @@ import {
   timeExceed,
   timeModal,
 } from "../store/actions/livechat";
-import { setAuth, rmAuth } from "../store/actions/auth";
+import "antd/dist/antd.css";
+import { rmAuth } from "../store/actions/auth";
 import Store from "../store/store";
 import logout from "../assets/logout.png";
 import ChatInstance from "./components/ChatInstance";
@@ -34,7 +35,6 @@ import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import AddCircleRoundedIcon from "@material-ui/icons/AddCircleRounded";
-import Tooltip from "@material-ui/core/Tooltip";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import TextField from "@material-ui/core/TextField";
 import SendIcon from "@material-ui/icons/Send";
@@ -89,6 +89,7 @@ class dashboard extends React.Component {
       select_ticket: "",
       show_video: false,
       logout_show: false,
+      token: "",
     };
     this.url =
       "https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/mp3/iphone-6-original-ringtone-24163.mp3";
@@ -100,6 +101,14 @@ class dashboard extends React.Component {
   };
   componentDidMount() {
     this.connectWithLiveChatHub();
+    try {
+      const token = localStorage.getItem("token");
+      if (token === null) {
+        console.log("Session Out");
+      }
+    } catch (e) {
+      console.log("Local Storage Catch", e);
+    }
     // axios
     //   .post(window.API_URL + "api/auth/login", {
     //     Username: "admin",
@@ -117,9 +126,6 @@ class dashboard extends React.Component {
     //   .catch(c => {
     //     console.log("c", c);
     //   });
-  }
-  componentWillUnmount() {
-    console.log("Refresh Dashboard", this.props.auth);
   }
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
   connectWithLiveChatHub = () => {
@@ -465,7 +471,6 @@ class dashboard extends React.Component {
           <Modal.Footer>
             <Button
               color="primary"
-              on
               onClick={() => {
                 this.props.closeChat(false);
                 this.props.closeTicket(true);
@@ -473,7 +478,10 @@ class dashboard extends React.Component {
             >
               Yes
             </Button>
-            <Button color="danger" onClick={() => this.props.closeChat(false)}>
+            <Button
+              color="secondary"
+              onClick={() => this.props.closeChat(false)}
+            >
               No
             </Button>
           </Modal.Footer>
@@ -538,28 +546,25 @@ class dashboard extends React.Component {
                             )
                           }
                         />
-                        <Tooltip title="Start Video Call">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <VideocamIcon style={{ color: "#7a7a7a" }} />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Close Chat">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <CloseIcon
-                              style={{
-                                color: "red",
-                              }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <VideocamIcon style={{ color: "#7a7a7a" }} />
+                        </IconButton>
+
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <CloseIcon
+                            style={{
+                              color: "red",
+                            }}
+                          />
+                        </IconButton>
                       </div>
                     </div>
                   </div>
@@ -616,32 +621,28 @@ class dashboard extends React.Component {
                     />
                   </div>
                   <div className="col-3">
-                    <Tooltip arrow title="Upload File/Image">
-                      <IconButton
-                        disabled
-                        color="secondary"
-                        aria-label="add an alarm"
-                      >
-                        <AttachFileIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton
+                      disabled
+                      color="secondary"
+                      aria-label="add an alarm"
+                    >
+                      <AttachFileIcon />
+                    </IconButton>
 
-                    <Tooltip arrow title="Send Message">
-                      <IconButton
-                        disabled
+                    <IconButton
+                      disabled
+                      style={{
+                        borderWidth: "0px",
+                      }}
+                      color="primary"
+                      aria-label="add an alarm"
+                    >
+                      <SendIcon
                         style={{
-                          borderWidth: "0px",
+                          color: "#0d74bc",
                         }}
-                        color="primary"
-                        aria-label="add an alarm"
-                      >
-                        <SendIcon
-                          style={{
-                            color: "#0d74bc",
-                          }}
-                        />
-                      </IconButton>
-                    </Tooltip>
+                      />
+                    </IconButton>
                   </div>
                 </div>
               </div>
@@ -796,17 +797,13 @@ class dashboard extends React.Component {
                     <div className="col">
                       <div className="add_btn">
                         {" "}
-                        <Tooltip title="Add Complaints & Symptoms">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <AddCircleRoundedIcon
-                              style={{ color: "#0b9444" }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
+                        </IconButton>
                       </div>
                     </div>
                   </div>
@@ -840,18 +837,16 @@ class dashboard extends React.Component {
                             style={{ fontSize: "12px" }}
                           />
                           <InputGroupAddon addonType="append">
-                            <Tooltip title="Remove Complaints & Symptoms">
-                              <IconButton
-                                disabled
-                                size="small"
-                                color="secondary"
-                                aria-label="add an alarm"
-                              >
-                                <RemoveCircleOutlineIcon
-                                  style={{ color: "red" }}
-                                />
-                              </IconButton>
-                            </Tooltip>
+                            <IconButton
+                              disabled={true}
+                              size="small"
+                              color="secondary"
+                              aria-label="add an alarm"
+                            >
+                              <RemoveCircleOutlineIcon
+                                style={{ color: "red" }}
+                              />
+                            </IconButton>
                           </InputGroupAddon>
                         </InputGroup>
                       </FormGroup>
@@ -870,17 +865,13 @@ class dashboard extends React.Component {
                     <div className="col">
                       <div className="add_btn">
                         {" "}
-                        <Tooltip title="Add Provisional Diagnosis">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <AddCircleRoundedIcon
-                              style={{ color: "#0b9444" }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
+                        </IconButton>
                       </div>
                     </div>
                   </div>
@@ -905,18 +896,16 @@ class dashboard extends React.Component {
                             style={{ fontSize: "12px" }}
                           />
                           <InputGroupAddon addonType="append">
-                            <Tooltip title="Remove Provisional Diagnosis">
-                              <IconButton
-                                disabled
-                                size="small"
-                                color="secondary"
-                                aria-label="add an alarm"
-                              >
-                                <RemoveCircleOutlineIcon
-                                  style={{ color: "red" }}
-                                />
-                              </IconButton>
-                            </Tooltip>
+                            <IconButton
+                              disabled={true}
+                              size="small"
+                              color="secondary"
+                              aria-label="add an alarm"
+                            >
+                              <RemoveCircleOutlineIcon
+                                style={{ color: "red" }}
+                              />
+                            </IconButton>
                           </InputGroupAddon>
                         </InputGroup>
                       </FormGroup>
@@ -935,17 +924,13 @@ class dashboard extends React.Component {
                     <div className="col">
                       <div className="add_btn">
                         {" "}
-                        <Tooltip title="Add New Prescription Row">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <AddCircleRoundedIcon
-                              style={{ color: "#0b9444" }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
+                        </IconButton>
                       </div>
                     </div>
                   </div>
@@ -1002,19 +987,17 @@ class dashboard extends React.Component {
                       <tbody>
                         <tr>
                           <th scope="select">
-                            <Tooltip title="Delete Provisional Diagnosis">
-                              <IconButton
-                                disabled
-                                style={{ marginTop: "-10px", width: "10px" }}
-                                size="small"
-                                color="secondary"
-                                aria-label="add an alarm"
-                              >
-                                <RemoveCircleOutlineIcon
-                                  style={{ color: "red" }}
-                                />
-                              </IconButton>
-                            </Tooltip>
+                            <IconButton
+                              disabled={true}
+                              style={{ marginTop: "-10px", width: "10px" }}
+                              size="small"
+                              color="secondary"
+                              aria-label="add an alarm"
+                            >
+                              <RemoveCircleOutlineIcon
+                                style={{ color: "red" }}
+                              />
+                            </IconButton>
                           </th>
                           <th
                             className="show_hide"
@@ -1094,17 +1077,13 @@ class dashboard extends React.Component {
                     <div className="col">
                       <div className="add_btn">
                         {" "}
-                        <Tooltip title="Add Lab Tests">
-                          <IconButton
-                            disabled
-                            color="secondary"
-                            aria-label="add an alarm"
-                          >
-                            <AddCircleRoundedIcon
-                              style={{ color: "#0b9444" }}
-                            />
-                          </IconButton>
-                        </Tooltip>
+                        <IconButton
+                          disabled={true}
+                          color="secondary"
+                          aria-label="add an alarm"
+                        >
+                          <AddCircleRoundedIcon style={{ color: "#0b9444" }} />
+                        </IconButton>
                       </div>
                     </div>
                   </div>
@@ -1129,18 +1108,16 @@ class dashboard extends React.Component {
                             style={{ width: "250px", fontSize: "12px" }}
                           />
                           <InputGroupAddon addonType="append">
-                            <Tooltip title="Remove Lab Test">
-                              <IconButton
-                                disabled
-                                size="small"
-                                color="secondary"
-                                aria-label="add an alarm"
-                              >
-                                <RemoveCircleOutlineIcon
-                                  style={{ color: "red" }}
-                                />
-                              </IconButton>
-                            </Tooltip>
+                            <IconButton
+                              disabled={true}
+                              size="small"
+                              color="secondary"
+                              aria-label="add an alarm"
+                            >
+                              <RemoveCircleOutlineIcon
+                                style={{ color: "red" }}
+                              />
+                            </IconButton>
                           </InputGroupAddon>
                         </InputGroup>
                       </FormGroup>
@@ -1241,10 +1218,10 @@ class dashboard extends React.Component {
     });
   };
   logoutModal = () => {
+    const key = "conn";
     if (this.state.logout_show) {
       return (
         <Modal
-          fade={true}
           centered={true}
           backdrop={true}
           show={this.state.logout_show}
@@ -1256,13 +1233,20 @@ class dashboard extends React.Component {
           <Modal.Footer>
             <Button
               color="primary"
+              variant="contained"
               onClick={() => {
                 this.setState(
                   {
                     logout_show: false,
                   },
                   () => {
+                    message.loading({
+                      content: "Logging Out",
+                      key,
+                      duration: 0.3,
+                    });
                     setTimeout(() => {
+                      localStorage.clear();
                       Store.dispatch(rmAuth(""));
                     }, 100);
                     // this.props.history.push("/TakafulPanel/Login");
@@ -1273,8 +1257,10 @@ class dashboard extends React.Component {
             >
               Yes
             </Button>
+            <div style={{ marginRight: "10px" }} />
             <Button
-              color="danger"
+              color="secondary"
+              variant="contained"
               onClick={() =>
                 this.setState({
                   logout_show: false,

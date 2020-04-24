@@ -1,10 +1,12 @@
 import React from "react";
 import "../index.css";
-// import "antd/dist/antd.css";
+import "antd/dist/antd.css";
+import "antd/es/message/style/css";
 import { Input, message } from "antd";
 import { setAuth } from "../store/actions/auth";
 import Store from "../store/store";
 import { withRouter } from "react-router-dom";
+import Grow from "@material-ui/core/Grow";
 
 const axios = require("axios");
 
@@ -15,14 +17,26 @@ class Login extends React.Component {
       Username: "",
       Password: "",
       isDisconnected: false,
+      checked: false,
     };
   }
-  getState = (state) => {
-    return state;
-  };
   componentDidMount() {
-    var state_auth = this.getState(Store.getState());
-    // console.log("State AUth", state_auth);
+    this.setState({
+      checked: true,
+    });
+    try {
+      const token = localStorage.getItem("token");
+      if (token === null) {
+        console.log("Session out");
+      } else {
+        // console.log("Local Storage Value APP JS", token);
+        Store.dispatch(setAuth(JSON.parse(token)));
+        this.props.history.push("/TakafulPanel/dashboard");
+      }
+    } catch (e) {
+      console.log("Local Storage Catch Error", e);
+    }
+
     this.handleConnectionChange();
     window.addEventListener("online", this.handleConnectionChange);
     window.addEventListener("offline", this.handleConnectionChange);
@@ -33,7 +47,7 @@ class Login extends React.Component {
     window.removeEventListener("offline", this.handleConnectionChange);
   }
   handleConnectionChange = () => {
-    const key = "net";
+    const key = "login";
     const condition = navigator.onLine ? "online" : "offline";
     if (condition === "online") {
       const webPing = setInterval(() => {
@@ -42,7 +56,7 @@ class Login extends React.Component {
         })
           .then(() => {
             this.setState({ isDisconnected: false }, () => {
-              console.log("Online");
+              // console.log("Online");
               return clearInterval(webPing);
             });
           })
@@ -50,11 +64,11 @@ class Login extends React.Component {
       }, 2000);
       return;
     } else {
-      console.log("Offline");
+      // console.log("Offline");
       message.error({
-        content: "No Internet",
+        content: "Internet Disconnected",
         key,
-        duration: 1000,
+        duration: 1,
       });
       return this.setState({ isDisconnected: true });
     }
@@ -93,24 +107,24 @@ class Login extends React.Component {
                   "Bearer " + r.data.token;
                 setTimeout(() => {
                   Store.dispatch(setAuth(r.data));
-                  localStorage.setItem("token", r.data.token);
+                  localStorage.setItem("token", JSON.stringify(r.data));
                   this.props.history.push("/TakafulPanel/dashboard");
                 }, 600);
               }
             })
             .catch((c) => {
-              message.error({ content: "Check Credentials", duration: 1 });
-              console.log("Api Error --- ", c);
+              message.error({ content: `${c.message}`, key, duration: 1 });
+              // console.log("Api Error --- ", c);
             });
         } catch (error) {
-          message.error({ content: "Check Credentials", duration: 1 });
-          console.log("Catch Error -- ", error);
+          message.error({ content: `${error.message}`, key, duration: 1 });
+          // console.log("Catch Error -- ", error);
         }
       } else {
-        message.error({ content: "Please Enter Password", duration: 1 });
+        message.error({ content: "Please Enter Password", key, duration: 1 });
       }
     } else {
-      message.error({ content: "Please Enter Username", duration: 1 });
+      message.error({ content: "Please Enter Username", key, duration: 1 });
     }
   };
   signup = () => {
@@ -118,45 +132,55 @@ class Login extends React.Component {
   };
 
   render() {
+    const { checked } = this.state;
     return (
-      <form>
-        <h3>Takaful Login</h3>
-        <div className="form-group">
-          <label>Username</label>
-          {/* <input
+      <Grow
+        in={checked}
+        style={{ transformOrigin: "0 0 0 0" }}
+        {...(checked ? { timeout: 400 } : {})}
+      >
+        <form>
+          <h3>Takaful Login</h3>
+          <div className="form-group">
+            <label>Username</label>
+            {/* <input
             type="email"
             className="form-control"
             placeholder="Enter email"
             onChange
           /> */}
-          <Input
-            placeholder="Username"
-            onChange={(text) => this.setState({ Username: text.target.value })}
-            // value={this.state.Username}
-          />
-        </div>
-        <div className="form-group">
-          <label>Password</label>
-          {/* <input
+            <Input
+              placeholder="Username"
+              onChange={(text) =>
+                this.setState({ Username: text.target.value })
+              }
+              // value={this.state.Username}
+            />
+          </div>
+          <div className="form-group">
+            <label>Password</label>
+            {/* <input
             type="password"
             className="form-control"
             placeholder="Enter password"
           /> */}
-          <Input.Password
-            visibilityToggle={true}
-            placeholder="Password"
-            onChange={(text) => this.setState({ Password: text.target.value })}
-            onKeyUp={(text) => {
-              if (text.keyCode === 13 && text.target.value !== "") {
-                this.login();
+            <Input.Password
+              visibilityToggle={true}
+              placeholder="Password"
+              onChange={(text) =>
+                this.setState({ Password: text.target.value })
               }
-            }}
-            // value={this.state.Password}
-          />
-        </div>
-        <div className="form-group">
-          <div className="custom-control custom-checkbox">
-            {/* <input
+              onKeyUp={(text) => {
+                if (text.keyCode === 13 && text.target.value !== "") {
+                  this.login();
+                }
+              }}
+              // value={this.state.Password}
+            />
+          </div>
+          <div className="form-group">
+            <div className="custom-control custom-checkbox">
+              {/* <input
                 type="checkbox"
                 className="custom-control-input"
                 id="customCheck1"
@@ -164,28 +188,29 @@ class Login extends React.Component {
               <label className="custom-control-label" htmlFor="customCheck1">
                 Remember me
               </label> */}
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={this.login}
-          className="btn btn-primary btn-block"
-        >
-          Login
-        </button>
-        {/* <button
+          <button
+            type="button"
+            onClick={this.login}
+            className="btn btn-primary btn-block"
+          >
+            Login
+          </button>
+          {/* <button
           type="button"
           onClick={this.signup}
           className="btn btn-success btn-block"
         >
           Sign Up
         </button> */}
-        {/* <p className="forgot-password text-right">
+          {/* <p className="forgot-password text-right">
           <a onClick={this.signup} href="#">
             Sign Up
           </a>
         </p> */}
-      </form>
+        </form>
+      </Grow>
     );
   }
 }
