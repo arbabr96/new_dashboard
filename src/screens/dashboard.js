@@ -109,6 +109,9 @@ class dashboard extends React.Component {
     } catch (e) {
       console.log("Local Storage Catch", e);
     }
+    this.handleConnectionChange();
+    window.addEventListener("online", this.handleConnectionChange);
+    window.addEventListener("offline", this.handleConnectionChange);
     // axios
     //   .post(window.API_URL + "api/auth/login", {
     //     Username: "admin",
@@ -127,6 +130,37 @@ class dashboard extends React.Component {
     //     console.log("c", c);
     //   });
   }
+  componentWillUnmount() {
+    window.removeEventListener("online", this.handleConnectionChange);
+    window.removeEventListener("offline", this.handleConnectionChange);
+  }
+  handleConnectionChange = () => {
+    const key = "login";
+    const condition = navigator.onLine ? "online" : "offline";
+    if (condition === "online") {
+      const webPing = setInterval(() => {
+        fetch("//google.com", {
+          mode: "no-cors",
+        })
+          .then(() => {
+            this.setState({ isDisconnected: false }, () => {
+              // console.log("Online");
+              return clearInterval(webPing);
+            });
+          })
+          .catch(() => this.setState({ isDisconnected: true }));
+      }, 2000);
+      return;
+    } else {
+      // console.log("Offline");
+      message.error({
+        content: "Internet Disconnected",
+        key,
+        duration: 1,
+      });
+      return this.setState({ isDisconnected: true });
+    }
+  };
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
   connectWithLiveChatHub = () => {
     const key = "conn";
