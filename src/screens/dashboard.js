@@ -184,53 +184,59 @@ class dashboard extends React.Component {
 
     connection.on("NewRequest", (event) => {
       console.log("NewRequest ==== ", event);
-      this.setState({
-        newRequest_check: true,
-      });
-      this.setState(
-        (prevState) => ({
-          newRequest_array: [...prevState.newRequest_array, { key: event }],
-        }),
-        () => {
-          console.log("newRequest_array ======= ", this.state.newRequest_array);
-        }
+      /////////////////////////////////////////////////////////////////////
+      const close = () => {
+        this.props.connection.invoke("OnReject", event).then((response) => {
+          notification.close(event);
+          this.setState({
+            newRequest_check: false,
+          });
+
+          if (this.props.modal) {
+            this.props.modalShow(false);
+          }
+        });
+      };
+
+      const btn = (
+        <Button
+          variant="contained"
+          size="small"
+          color="primary"
+          startIcon={<DoneIcon />}
+          onClick={() => {
+            console.log("ON ACCEPT", key);
+            this.props.connection.invoke("OnAccept", event).then(() => {
+              notification.close(event);
+              this.setState({
+                newRequest_check: false,
+              });
+              if (this.props.modal) {
+                this.props.modalShow(false);
+              }
+            });
+          }}
+        >
+          Accept
+        </Button>
       );
+
+      notification.open({
+        message: <div style={{ fontWeight: "bold" }}>Message Request</div>,
+        description: `New Message Request From Patient ID - ${event}`,
+        btn,
+        key,
+        onClose: close,
+        duration: 60,
+      });
+      ///////////////////////////////////////////////////////////////////////
     });
     connection.on("AcceptedBySomeDoctor", (event) => {
       console.log("AcceptedBySomeDoctor --- ", event);
-
-      this.setState(
-        {
-          newRequest_array: this.state.newRequest_array.filter(
-            (item, index) => {
-              return item.key !== JSON.stringify(event);
-            }
-          ),
-        },
-        () => {
-          console.log(
-            "AcceptedBySomeDoctor AcceptedBySomeDoctor +_++++ ",
-            this.state.newRequest_array
-          );
-        }
-      );
     });
+
     connection.on("OnTimeExceed", (event) => {
       console.log("OnTimeExceed ------ ----- ", JSON.stringify(event));
-      // notification.close(event);
-      this.setState({
-        newRequest_array: this.state.newRequest_array.filter((item, index) => {
-          return item.key !== JSON.stringify(event);
-        }),
-      });
-      this.setState(
-        (prevState) => ({
-          timeExceed_array: [...prevState.timeExceed_array, { key: event }],
-        }),
-        () => {
-          console.log("timeExceed_array ======= ", this.state.timeExceed_array);
-        }
-      );
     });
     connection.on("newWindow", (event) => {
       this.setState({
@@ -1313,11 +1319,11 @@ class dashboard extends React.Component {
 
     return (
       <div>
-        {this.state.newRequest_check
+        {/* {this.state.newRequest_check
           ? this.state.newRequest_array.map((val) =>
               this.openNotification(val.key)
             )
-          : null}
+          : null} */}
         {this.logoutModal()}
         {this.closeChatModal()}
         <div className="logout_container">

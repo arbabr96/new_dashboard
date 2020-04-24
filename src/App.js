@@ -1,11 +1,6 @@
 import React from "react";
 import "./App.css";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect,
-} from "react-router-dom";
+import { HashRouter, Switch, Route, Redirect } from "react-router-dom";
 import Dashboard from "./screens/dashboard";
 import Login from "./screens/Login";
 import { connect } from "react-redux";
@@ -31,6 +26,7 @@ class App extends React.Component {
       });
     }, 3000);
   }
+
   render() {
     if (this.state.loader) {
       return (
@@ -50,28 +46,29 @@ class App extends React.Component {
       );
     }
     return (
-      <Router>
+      <HashRouter>
         <div className={this.props.auth !== "" ? "All" : "App"}>
           <div className={this.props.auth !== "" ? null : "auth-wrapper"}>
             <div className={this.props.auth !== "" ? null : "auth-inner"}>
               <Switch>
                 <Route
                   history={this.props.history}
-                  path="/TakafulPanel/dashboard"
+                  path="/TakafulPanel/Dashboard"
                   render={() => {
                     return this.props.auth !== "" ? (
                       <Dashboard />
                     ) : (
                       <Redirect
                         to={{
-                          pathname: "/TakafulPanel/Login",
+                          pathname: "/TakafulPanel",
                         }}
                       />
                     );
                   }}
                 />
                 <Route
-                  path="/TakafulPanel/Login"
+                  exact
+                  path="/TakafulPanel"
                   render={() => {
                     return <Login />;
                   }}
@@ -86,7 +83,7 @@ class App extends React.Component {
             </div>
           </div>
         </div>
-      </Router>
+      </HashRouter>
     );
   }
 }

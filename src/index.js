@@ -8,6 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import Store from "./store/store";
 import HttpsRedirect from "react-https-redirect";
 import { Provider } from "react-redux";
+import { HashRouter } from "react-router-dom";
 
 ReactDOM.render(
   <HttpsRedirect>

@@ -18,7 +18,7 @@
       "sizes": "512x512"
     }
   ],
-  "start_url": ".",
+  "start_url": "https://iteck.pk/TakafulPanel/Login",
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#ffffff"

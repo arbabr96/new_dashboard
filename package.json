@@ -1,6 +1,6 @@
 {
   "name": "takafuldashboard",
-  "homepage": "https://iteck.pk/TakafulPanel/Login",
+  "homepage": "https://iteck.pk/TakafulPanel",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -13,6 +13,7 @@
     "antd": "^3.26.15",
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
+    "immutability-helper": "^3.0.2",
     "jwt-decode": "^2.2.0",
     "mdbreact": "^4.25.4",
     "qs": "^6.9.1",

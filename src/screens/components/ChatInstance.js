@@ -1046,17 +1046,17 @@ class ChatInstance extends React.Component {
     // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
   };
   Treatment_arr = (event, key) => {
-    console.log("Treatment_arr Name ---- ", event, " at Index ", key);
-    this.state.treatment_arr[key].treatment = event;
-    var temp = this.state.treatment_arr;
-    console.log("Treatment_arr  ", temp);
-    this.state.treatment_arr.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          treatment_arr: temp,
-        }));
-      }
-    });
+    // console.log("Treatment_arr Name ---- ", event, " at Index ", key);
+    // this.state.treatment_arr[key].treatment = event;
+    // var temp = this.state.treatment_arr;
+    // console.log("Treatment_arr  ", temp);
+    // this.state.treatment_arr.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState((prevState) => ({
+    //       treatment_arr: temp,
+    //     }));
+    //   }
+    // });
   };
   ////////////////////////////////////// Disease //////////////////////////////////////////
 
@@ -1104,29 +1104,44 @@ class ChatInstance extends React.Component {
   };
   complaints_add_array = (event, key) => {
     // console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].Symptoms = event;
-    var temp = this.state.complaints_symptoms;
-    // console.log("complaints_symptoms 1 ", temp);
-    this.state.complaints_symptoms.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          complaints_symptoms: temp,
-        }));
-      }
-    });
+    // this.state.complaints_symptoms[key].Symptoms = event;
+    // var temp = this.state.complaints_symptoms;
+    // this.state.complaints_symptoms.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState((prevState) => ({
+    //       complaints_symptoms: temp,
+    //     }));
+    //   }
+    // });
+    var cs = this.state.complaints_symptoms;
+    cs[key].Symptoms = event;
+    this.setState(
+      {
+        complaints_symptoms: cs,
+      },
+      () => console.log("CS", this.state.complaints_symptoms)
+    );
   };
   complaints_add_array1 = (event, key) => {
     // console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].Duration = event;
-    var temp = this.state.complaints_symptoms;
-    // console.log("complaints_symptoms 2 ", temp);
-    this.state.complaints_symptoms.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          complaints_symptoms: temp,
-        }));
-      }
-    });
+    // this.state.complaints_symptoms[key].Duration = event;
+    // var temp = this.state.complaints_symptoms;
+    // // console.log("complaints_symptoms 2 ", temp);
+    // this.state.complaints_symptoms.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState((prevState) => ({
+    //       complaints_symptoms: temp,
+    //     }));
+    //   }
+    // });
+    var cs = this.state.complaints_symptoms;
+    cs[key].Duration = event;
+    this.setState(
+      {
+        complaints_symptoms: cs,
+      },
+      () => console.log("CS", this.state.complaints_symptoms)
+    );
   };
 
   ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
@@ -1167,20 +1182,27 @@ class ChatInstance extends React.Component {
         }
       }
     );
-    // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
   };
   PD_arr = (event, key) => {
     // console.log("Treatment_arr Name ---- ", event, " at Index ", key);
-    this.state.provisional_diagnosis[key].Value = event;
-    var temp = this.state.provisional_diagnosis;
-    // console.log("Treatment_arr  ", temp);
-    this.state.provisional_diagnosis.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          provisional_diagnosis: temp,
-        }));
-      }
-    });
+    // this.state.provisional_diagnosis[key].Value = event;
+    // var temp = this.state.provisional_diagnosis;
+    // // console.log("Treatment_arr  ", temp);
+    // this.state.provisional_diagnosis.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState((prevState) => ({
+    //       provisional_diagnosis: temp,
+    //     }));
+    //   }
+    // });
+    var pd = this.state.provisional_diagnosis;
+    pd[key].Value = event;
+    this.setState(
+      {
+        provisional_diagnosis: pd,
+      },
+      () => console.log("pd", this.state.provisional_diagnosis)
+    );
   };
 
   ////////////////////////// Provisional Diagnosis /////////////////////////////////////////
@@ -1225,16 +1247,24 @@ class ChatInstance extends React.Component {
   };
   tests_add_array = (event, key) => {
     // console.log("lab_tests Name ---- ", event, " at Index ", key);
-    this.state.lab_tests[key].Value = event;
-    var temp = this.state.lab_tests;
-    // console.log("lab_tests  ", temp);
-    this.state.lab_tests.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          lab_tests: temp,
-        }));
-      }
-    });
+    // this.state.lab_tests[key].Value = event;
+    // var temp = this.state.lab_tests;
+    // // console.log("lab_tests  ", temp);
+    // this.state.lab_tests.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState((prevState) => ({
+    //       lab_tests: temp,
+    //     }));
+    //   }
+    // });
+    var tst = this.state.lab_tests;
+    tst[key].Value = event;
+    this.setState(
+      {
+        lab_tests: tst,
+      },
+      () => console.log("tst", this.state.lab_tests)
+    );
   };
 
   ////////////////////////// Lab Tests /////////////////////////////////////////
@@ -1263,63 +1293,103 @@ class ChatInstance extends React.Component {
     });
   };
   add_description = (event, key) => {
-    this.state.add_Prescription[key].Medicine = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState({
-          add_Prescription: temp,
-        });
-      }
-    });
+    // this.state.add_Prescription[key].Medicine = event;
+    // var temp = this.state.add_Prescription;
+    // this.state.add_Prescription.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState({
+    //       add_Prescription: temp,
+    //     });
+    //   }
+    // });
+    var pr = this.state.add_Prescription;
+    pr[key].Medicine = event;
+    this.setState(
+      {
+        add_Prescription: pr,
+      },
+      () => console.log("pr", this.state.add_Prescription)
+    );
   };
   add_dosage = (event, key) => {
     // console.log("add_dosage ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].Dosage = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState({
-          add_Prescription: temp,
-        });
-      }
-    });
+    // this.state.add_Prescription[key].Dosage = event;
+    // var temp = this.state.add_Prescription;
+    // this.state.add_Prescription.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState({
+    //       add_Prescription: temp,
+    //     });
+    //   }
+    // });
+    var pr = this.state.add_Prescription;
+    pr[key].Dosage = event;
+    this.setState(
+      {
+        add_Prescription: pr,
+      },
+      () => console.log("pr", this.state.add_Prescription)
+    );
   };
   add_period = (event, key) => {
     // console.log("add_period ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].Route = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState({
-          add_Prescription: temp,
-        });
-      }
-    });
+    // this.state.add_Prescription[key].Route = event;
+    // var temp = this.state.add_Prescription;
+    // this.state.add_Prescription.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState({
+    //       add_Prescription: temp,
+    //     });
+    //   }
+    // });
+    var pr = this.state.add_Prescription;
+    pr[key].Route = event;
+    this.setState(
+      {
+        add_Prescription: pr,
+      },
+      () => console.log("pr", this.state.add_Prescription)
+    );
   };
   add_dosageForm = (event, key) => {
     // console.log("add_dosageForm ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].Frequency = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState({
-          add_Prescription: temp,
-        });
-      }
-    });
+    // this.state.add_Prescription[key].Frequency = event;
+    // var temp = this.state.add_Prescription;
+    // this.state.add_Prescription.filter((item, index) => {
+    //   if (index === key) {
+    //     this.setState({
+    //       add_Prescription: temp,
+    //     });
+    //   }
+    // });
+    var pr = this.state.add_Prescription;
+    pr[key].Frequency = event;
+    this.setState(
+      {
+        add_Prescription: pr,
+      },
+      () => console.log("pr", this.state.add_Prescription)
+    );
   };
   add_comment(event, key) {
     // console.log("add_comment ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].Duration = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      return index === key
-        ? this.setState({
-            add_Prescription: temp,
-          })
-        : null;
-    });
+    // this.state.add_Prescription[key].Duration = event;
+    // var temp = this.state.add_Prescription;
+    // this.state.add_Prescription.filter((item, index) => {
+    //   return index === key
+    //     ? this.setState({
+    //         add_Prescription: temp,
+    //       })
+    //     : null;
+    // });
+    var pr = this.state.add_Prescription;
+    pr[key].Duration = event;
+    this.setState(
+      {
+        add_Prescription: pr,
+      },
+      () => console.log("pr", this.state.add_Prescription)
+    );
   }
 
   delete_Prescription = (index) => {
@@ -1371,54 +1441,6 @@ class ChatInstance extends React.Component {
     value: 1,
   };
 
-  onConsultationChange = (e) => {
-    if (this.state.consultation === e) {
-      this.setState({
-        consultation: "",
-      });
-    } else {
-      console.log("consultation checked", e.target.value);
-      this.setState({
-        consultation: e.target.value,
-      });
-    }
-  };
-  onLaboratoryChange = (e) => {
-    if (this.state.laboratory === e) {
-      this.setState({
-        laboratory: "",
-      });
-    } else {
-      console.log("laboratory checked", e.target.value);
-      this.setState({
-        laboratory: e.target.value,
-      });
-    }
-  };
-  onMastersChange = (e) => {
-    if (this.state.masters === e) {
-      this.setState({
-        masters: "",
-      });
-    } else {
-      console.log("laboratory checked", e.target.value);
-      this.setState({
-        masters: e.target.value,
-      });
-    }
-  };
-  onSettingsChange = (e) => {
-    if (this.state.settings === e) {
-      this.setState({
-        settings: "",
-      });
-    } else {
-      console.log("settings checked", e.target.value);
-      this.setState({
-        settings: e.target.value,
-      });
-    }
-  };
   addItem = () => {
     this.setState({
       data: [

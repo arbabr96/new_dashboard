@@ -31,7 +31,7 @@ class Login extends React.Component {
       } else {
         // console.log("Local Storage Value APP JS", token);
         Store.dispatch(setAuth(JSON.parse(token)));
-        this.props.history.push("/TakafulPanel/dashboard");
+        this.props.history.push("/TakafulPanel/Dashboard");
       }
     } catch (e) {
       console.log("Local Storage Catch Error", e);
@@ -108,7 +108,7 @@ class Login extends React.Component {
                 setTimeout(() => {
                   Store.dispatch(setAuth(r.data));
                   localStorage.setItem("token", JSON.stringify(r.data));
-                  this.props.history.push("/TakafulPanel/dashboard");
+                  this.props.history.push("/TakafulPanel/Dashboard");
                 }, 600);
               }
             })
