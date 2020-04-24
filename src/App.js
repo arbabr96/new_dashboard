@@ -11,13 +11,13 @@ import Login from "./screens/Login";
 import { connect } from "react-redux";
 import logo from "./assets/logo.png";
 import SignUp from "./screens/SignUp";
-import { Spinner } from "react-bootstrap";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       loader: true,
+      token: "",
     };
     // window.API_URL = "http://192.168.21.212:5000/";
     // window.API_URL = "http://54.36.109.50/TakafulAPI";
@@ -25,6 +25,11 @@ class App extends React.Component {
     window.Tak_API = "https://iteck.pk/TakafulAPI/";
   }
   componentDidMount() {
+    const token = localStorage.getItem("token");
+    console.log("Token", token);
+    this.setState({
+      token,
+    });
     setTimeout(() => {
       this.setState({
         loader: false,
@@ -34,20 +39,16 @@ class App extends React.Component {
   render() {
     if (this.state.loader) {
       return (
-        <div class="page-load">
-          <img
-            src={logo}
-            // alt="Takaful"
-            style={{ width: "300px", height: "300px" }}
-          />
-          <div class="loader">
+        <div className="page-load">
+          <img src={logo} alt="" style={{ width: "300px", height: "300px" }} />
+          <div className="loader">
             {/* <Spinner animation="grow" />
             <Spinner animation="grow" />
             <Spinner animation="grow" /> */}
-            <div class="spinner">
-              <div class="bounce1"></div>
-              <div class="bounce2"></div>
-              <div class="bounce3"></div>
+            <div className="spinner">
+              <div className="bounce1"></div>
+              <div className="bounce2"></div>
+              <div className="bounce3"></div>
             </div>
           </div>
         </div>
@@ -55,15 +56,15 @@ class App extends React.Component {
     }
     return (
       <Router>
-        <div className={this.props.auth ? "All" : "App"}>
-          <div className={this.props.auth ? null : "auth-wrapper"}>
-            <div className={this.props.auth ? null : "auth-inner"}>
+        <div className={this.props.auth !== "" ? "All" : "App"}>
+          <div className={this.props.auth !== "" ? null : "auth-wrapper"}>
+            <div className={this.props.auth !== "" ? null : "auth-inner"}>
               <Switch>
                 <Route
                   history={this.props.history}
                   path="/TakafulPanel/dashboard"
                   render={() => {
-                    return this.props.auth ? (
+                    return this.props.auth !== "" ? (
                       <Dashboard />
                     ) : (
                       <Redirect

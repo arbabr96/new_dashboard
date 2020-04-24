@@ -1,6 +1,4 @@
 import React from "react";
-
-import { setAuth } from "../store/actions/auth";
 import {
   onConnect,
   updateTickets,
@@ -11,84 +9,45 @@ import {
   closeChat,
   timeExceed,
   timeModal,
-  newMessage,
-  ticketID,
-  callAlert,
-  newCallNotification,
-  newCallMsg,
-  ermModal,
 } from "../store/actions/livechat";
+import { setAuth, rmAuth } from "../store/actions/auth";
+import Store from "../store/store";
 import logout from "../assets/logout.png";
 import ChatInstance from "./components/ChatInstance";
-import Store from "../store/store";
-import TabBar from "./components/TabBar";
 import {
-  Collapse,
-  Navbar,
-  NavbarToggler,
-  NavbarBrand,
-  Nav,
-  NavItem,
-  NavLink,
-  UncontrolledDropdown,
-  NavbarText,
   Form,
   FormGroup,
-  Label,
   Input,
-  FormText,
   Table,
   InputGroup,
-  InputGroupText,
   InputGroupAddon,
 } from "reactstrap";
 import Radium, { StyleRoot } from "radium";
-import { bounce, bounceInUp } from "react-animations";
-import Ripples, { createRipples } from "react-ripples";
-import Divider from "@material-ui/core/Divider";
+import { bounceInUp } from "react-animations";
+import Ripples from "react-ripples";
 import Button from "@material-ui/core/Button";
-import Logout from "./components/Logout";
+import { withRouter } from "react-router";
 import QueryBuilderIcon from "@material-ui/icons/QueryBuilder";
-import {
-  Tabs,
-  Layout,
-  Upload,
-  Icon,
-  notification,
-  Col,
-  Row,
-  message,
-} from "antd";
-// import { Button } from "reactstrap";
-import { makeStyles } from "@material-ui/core/styles";
+import { Tabs, Icon, notification, message } from "antd";
 import IconButton from "@material-ui/core/IconButton";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
-import AddRoundedIcon from "@material-ui/icons/AddRounded";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import AddCircleRoundedIcon from "@material-ui/icons/AddCircleRounded";
-import CancelIcon from "@material-ui/icons/Cancel";
 import Tooltip from "@material-ui/core/Tooltip";
 import VideocamIcon from "@material-ui/icons/Videocam";
 import TextField from "@material-ui/core/TextField";
 import SendIcon from "@material-ui/icons/Send";
 import Chip from "@material-ui/core/Chip";
 import CloseIcon from "@material-ui/icons/Close";
-import VideocamOffRoundedIcon from "@material-ui/icons/VideocamOffRounded";
-import SpeakerNotesOffIcon from "@material-ui/icons/SpeakerNotesOff";
 import { connect } from "react-redux";
-import { Card, Dropdown, Container, Modal } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
 import Switch from "@material-ui/core/Switch";
-import Paper from "@material-ui/core/Paper";
-import Zoom from "@material-ui/core/Zoom";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { MDBCol, MDBContainer, MDBRow, MDBFooter } from "mdbreact";
 import FiberManualRecordIcon from "@material-ui/icons/FiberManualRecord";
 import DoneIcon from "@material-ui/icons/Done";
 import logo from "../assets/logo.png";
-import axios from "axios";
 const signalR = require("@aspnet/signalr");
-const { TextArea } = Input;
 const { TabPane } = Tabs;
 
 const styles = {
@@ -136,6 +95,9 @@ class dashboard extends React.Component {
     this.audio = new Audio(this.url);
     this.msgAudio = new Audio(this.state.msgURL);
   }
+  getState = (state) => {
+    return state;
+  };
   componentDidMount() {
     this.connectWithLiveChatHub();
     // axios
@@ -155,6 +117,9 @@ class dashboard extends React.Component {
     //   .catch(c => {
     //     console.log("c", c);
     //   });
+  }
+  componentWillUnmount() {
+    console.log("Refresh Dashboard", this.props.auth);
   }
   //////////////////////////////////////// CONNECTION WITH HUB //////////////////////////////////////////////////
   connectWithLiveChatHub = () => {
@@ -346,512 +311,6 @@ class dashboard extends React.Component {
     //   availability: "Away"
     // });
   };
-  handlePatientName = (event) => {
-    if (event.target.value !== "") {
-      this.setState(
-        {
-          patientName: event.target.value,
-          error_PatientName: "",
-        },
-        () => {
-          console.log("Patient Name === ", this.state.patientName);
-        }
-      );
-    } else {
-      this.setState({
-        error_PatientName: "Enter Patient Name",
-      });
-    }
-  };
-
-  handleAge = (event) => {
-    console.log("EVENT AGE ==", event.target.value);
-    if (event.target.value > 0 && event.target.value < 99) {
-      console.log("Age -- ", event.target.value);
-      this.setState({
-        Age: event.target.value,
-        errorAge: "",
-      });
-    } else {
-      // document.getElementById("age").style.borderColor = "red";
-      this.setState({
-        Age: "",
-        errorAge: "Age Must be Greater Than 0 and Less than 99",
-      });
-    }
-  };
-  ///////////////////////////// Disease ///////////////////////////////////////////
-  addTreatment = (event) => {
-    console.log("ADD_____", this.state.treatment_arr.length);
-    this.setState((prevState) => ({
-      treatment_arr: [
-        ...prevState.treatment_arr,
-        { treatment: "", key: this.state.treatment_arr.length },
-      ],
-    }));
-  };
-  deleteTreatment = (event) => {
-    console.log("DELETE Disease INDEX ", event);
-    this.setState(
-      {
-        treatment_arr: this.state.treatment_arr.filter((item, index) => {
-          return index !== event;
-        }),
-      },
-      () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.treatment_arr);
-      }
-    );
-    // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
-  };
-  Treatment_arr = (event, key) => {
-    console.log("Treatment_arr Name ---- ", event, " at Index ", key);
-    this.state.treatment_arr[key].treatment = event;
-    var temp = this.state.treatment_arr;
-    console.log("Treatment_arr  ", temp);
-    this.state.treatment_arr.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          treatment_arr: temp,
-        }));
-      }
-    });
-  };
-  ////////////////////////////////////// Disease //////////////////////////////////////////
-
-  ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
-  add_complaints = (event) => {
-    console.log("add_complaints _____", this.state.complaints_symptoms.length);
-    this.setState((prevState) => ({
-      complaints_symptoms: [
-        ...prevState.complaints_symptoms,
-        {
-          symptoms: "",
-          duration: "",
-          key: this.state.complaints_symptoms.length,
-        },
-      ],
-    }));
-  };
-  delete_complaints = (event) => {
-    console.log("DELETE complaints_symptoms INDEX ", event);
-    this.setState(
-      {
-        complaints_symptoms: this.state.complaints_symptoms.filter(
-          (item, index) => {
-            return index !== event;
-          }
-        ),
-      },
-      () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.complaints_symptoms);
-      }
-    );
-    // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
-  };
-  complaints_add_array = (event, key) => {
-    console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].symptoms = event;
-    var temp = this.state.complaints_symptoms;
-    console.log("complaints_symptoms 1 ", temp);
-    this.state.complaints_symptoms.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          complaints_symptoms: temp,
-        }));
-      }
-    });
-  };
-  complaints_add_array1 = (event, key) => {
-    console.log("complaints_symptoms Name ---- ", event, " at Index ", key);
-    this.state.complaints_symptoms[key].duration = event;
-    var temp = this.state.complaints_symptoms;
-    console.log("complaints_symptoms 2 ", temp);
-    this.state.complaints_symptoms.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          complaints_symptoms: temp,
-        }));
-      }
-    });
-  };
-
-  ////////////////////////// Complaints & Symptoms /////////////////////////////////////////
-
-  ////////////////////////// Lab Tests /////////////////////////////////////////
-  add_lab_test = (event) => {
-    console.log("add_complaints _____", this.state.lab_tests.length);
-    this.setState((prevState) => ({
-      lab_tests: [
-        ...prevState.lab_tests,
-        {
-          test: "",
-          key: this.state.lab_tests.length,
-        },
-      ],
-    }));
-  };
-  delete_lab_test = (event) => {
-    console.log("DELETE lab_tests INDEX ", event);
-    this.setState(
-      {
-        lab_tests: this.state.lab_tests.filter((item, index) => {
-          return index !== event;
-        }),
-      },
-      () => {
-        console.log("DISEASE ARRAY +_++++ ", this.state.lab_tests);
-      }
-    );
-    // this.state.treatment_arr.splice(this.state.treatment_arr.length, 0);
-  };
-  tests_add_array = (event, key) => {
-    console.log("lab_tests Name ---- ", event, " at Index ", key);
-    this.state.lab_tests[key].test = event;
-    var temp = this.state.lab_tests;
-    console.log("lab_tests  ", temp);
-    this.state.lab_tests.filter((item, index) => {
-      if (index === key) {
-        this.setState((prevState) => ({
-          lab_tests: temp,
-        }));
-      }
-    });
-  };
-
-  ////////////////////////// Lab Tests /////////////////////////////////////////
-
-  addPrescriptionRow = () => {
-    console.log("addPrescriptionRow === ", this.state.add_Prescription.length);
-    this.setState((prevState) => ({
-      add_Prescription: [
-        ...prevState.add_Prescription,
-        {
-          sr: this.state.add_Prescription.length,
-          description: "",
-          dosage: "",
-          period: "",
-          dosageForm: "",
-          comment: "",
-          interval: "",
-          intervalUOM: "",
-        },
-      ],
-    }));
-  };
-  add_description = (event, key) => {
-    console.log("add_description ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].description = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_description == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_dosage = (event, key) => {
-    console.log("add_dosage ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].dosage = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_dosage == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_period = (event, key) => {
-    console.log("add_period ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].period = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_period == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_dosageForm = (event, key) => {
-    console.log("add_dosageForm ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].dosageForm = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_dosageForm == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_comment = (event, key) => {
-    console.log("add_comment ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].comment = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_comment == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_interval = (event, key) => {
-    console.log("add_interval ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].interval = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_interval == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  add_intervalUOM = (event, key) => {
-    console.log("add_intervalUOM ---- ", event, " at Index ", key);
-    this.state.add_Prescription[key].intervalUOM = event;
-    var temp = this.state.add_Prescription;
-    this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState(
-          {
-            add_Prescription: temp,
-          },
-          () => {
-            console.log(
-              "Add Prescription After add_intervalUOM == ",
-              this.state.add_Prescription
-            );
-          }
-        );
-      }
-    });
-  };
-  delete_Prescription = (index) => {
-    console.log("Delete Prescription Index ==== ", index);
-    this.setState(
-      {
-        delete_Prescription_key: index,
-      },
-      () => {
-        console.log(
-          "Delete Prescription KEY ======== ",
-          this.state.delete_Prescription_key
-        );
-      }
-    );
-  };
-  delete_Prescription_Row = () => {
-    this.setState(
-      {
-        add_Prescription: this.state.add_Prescription.filter((item, index) => {
-          return index !== this.state.delete_Prescription_key;
-        }),
-      },
-      () => {
-        console.log(
-          "delete_Prescription_Row ARRAY +_++++ ",
-          this.state.add_Prescription
-        );
-      }
-    );
-  };
-  handleform1next = () => {
-    if (this.state.form1) {
-      this.setState({
-        form1: false,
-        form2: true,
-      });
-    }
-  };
-  handleform2back = () => {
-    if (this.state.form2) {
-      this.setState({
-        form2: false,
-        form1: true,
-      });
-    }
-  };
-  handleform2next = () => {
-    if (this.state.form2) {
-      this.setState({
-        form2: false,
-        form3: true,
-      });
-    }
-  };
-  handleform3back = () => {
-    if (this.state.form3) {
-      this.setState({
-        form3: false,
-        form2: true,
-      });
-    }
-  };
-  handleform3next = () => {
-    if (this.state.form2) {
-      this.setState({
-        form2: false,
-        form3: true,
-      });
-    }
-  };
-  state = {
-    value: 1,
-  };
-
-  onConsultationChange = (e) => {
-    if (this.state.consultation === e) {
-      this.setState({
-        consultation: "",
-      });
-    } else {
-      console.log("consultation checked", e.target.value);
-      this.setState({
-        consultation: e.target.value,
-      });
-    }
-  };
-  onLaboratoryChange = (e) => {
-    if (this.state.laboratory === e) {
-      this.setState({
-        laboratory: "",
-      });
-    } else {
-      console.log("laboratory checked", e.target.value);
-      this.setState({
-        laboratory: e.target.value,
-      });
-    }
-  };
-  onMastersChange = (e) => {
-    if (this.state.masters === e) {
-      this.setState({
-        masters: "",
-      });
-    } else {
-      console.log("laboratory checked", e.target.value);
-      this.setState({
-        masters: e.target.value,
-      });
-    }
-  };
-  onSettingsChange = (e) => {
-    if (this.state.settings === e) {
-      this.setState({
-        settings: "",
-      });
-    } else {
-      console.log("settings checked", e.target.value);
-      this.setState({
-        settings: e.target.value,
-      });
-    }
-  };
-  // DrawChats = () => {
-  //   if (this.props.tickets.length > 0) {
-  //     return (
-  //       <div className="row">
-  //         <div className="col-3">
-  //           <div
-  //             id="style-1"
-  //             className="chatBox"
-  //             style={{
-  //               width: "300px",
-  //               backgroundColor: "#fafafa",
-  //               paddingTop: "10px",
-  //               paddingBottom: "10px"
-  //             }}
-  //           >
-  //             {/* ////////////////////// Header ///////////////////////// */}
-  //             <div className="row">
-  //               <div className="col-6">
-  //                 <span className="leftText" style={{ paddingLeft: "10px" }}>
-  //                   Chats
-  //                 </span>
-  //               </div>
-  //             </div>
-  //             <div className="bottom_Width" />
-  //             {/* ////////////////////// Header ///////////////////////// */}
-
-  //             <Ripples color="#0d74bc" during={1500}>
-  //               <div
-  //                 className="chat_Tabs"
-  //                 onClick={() =>
-  //                   this.setState(
-  //                     {
-  //                       selected_id: ticket.id
-  //                     },
-  //                     () => {
-  //                       console.log("Tickets id --- ", this.state.selected_id);
-  //                     }
-  //                   )
-  //                 }
-  //               >
-  //                 {ticket.patient.username} - {ticket.id}
-  //               </div>
-  //             </Ripples>
-  //             <Divider light={true} />
-  //           </div>
-  //         </div>
-  //       </div>
-  //     );
-  //   }
-  // };
-
-  //////////////////////////////////////// DRAW DYNAMIC CHAT TABS //////////////////////////////////////////////////
   drawChatTabs = () => {
     if (this.props.tickets.length > 0) {
       return (
@@ -1546,7 +1005,7 @@ class dashboard extends React.Component {
                             <Tooltip title="Delete Provisional Diagnosis">
                               <IconButton
                                 disabled
-                                style={{ marginTop: -"10px", width: "10px" }}
+                                style={{ marginTop: "-10px", width: "10px" }}
                                 size="small"
                                 color="secondary"
                                 aria-label="add an alarm"
@@ -1803,11 +1262,11 @@ class dashboard extends React.Component {
                     logout_show: false,
                   },
                   () => {
-                    window.HH.push("./Login");
                     setTimeout(() => {
-                      Store.dispatch(setAuth(""));
+                      Store.dispatch(rmAuth(""));
                     }, 100);
-                    console.log("LOGOUT", window.HH);
+                    // this.props.history.push("/TakafulPanel/Login");
+                    console.log("LOGOUT", this.props);
                   }
                 );
               }}
@@ -1830,7 +1289,7 @@ class dashboard extends React.Component {
     }
   };
   render() {
-    const { isOpen, availability } = this.state;
+    const { availability } = this.state;
 
     return (
       <div>
@@ -2129,7 +1588,7 @@ class dashboard extends React.Component {
           <a
             className="logo_name"
             // style={{ color: "red", fontWeight: "bold", fontFamily: "Segoe UI" }}
-            href="#"
+            href="https://avolox.com/"
           >
             {" "}
             Avolox{" "}
@@ -2180,4 +1639,5 @@ const mapDispatchToProps = {
   timeModal,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(dashboard);
+const Dash = connect(mapStateToProps, mapDispatchToProps)(dashboard);
+export default withRouter(Dash);

@@ -8,6 +8,7 @@
   /* Center and scale the image nicely */
   background-color: #f6f6f8;
   width: auto;
+  height: 100vh;
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;

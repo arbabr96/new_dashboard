@@ -1,34 +1,24 @@
 import React from "react";
 import { Row, Col, Alert } from "antd";
 import { connect } from "react-redux";
-import { Layout, Upload, message } from "antd";
+import { Upload, message } from "antd";
 import {
-  Collapse,
   Form,
   FormGroup,
-  Label,
   Input,
-  FormText,
   Table,
   InputGroup,
-  InputGroupText,
   InputGroupAddon,
 } from "reactstrap";
 import "../../index.css";
-// import { Button } from "reactstrap";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import Ripples, { createRipples } from "react-ripples";
 import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
-import AddRoundedIcon from "@material-ui/icons/AddRounded";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import AddCircleRoundedIcon from "@material-ui/icons/AddCircleRounded";
-import CancelIcon from "@material-ui/icons/Cancel";
 import Tooltip from "@material-ui/core/Tooltip";
 import VideocamIcon from "@material-ui/icons/Videocam";
-import Divider from "@material-ui/core/Divider";
 import TextField from "@material-ui/core/TextField";
 import SendIcon from "@material-ui/icons/Send";
 import Chip from "@material-ui/core/Chip";
@@ -38,7 +28,6 @@ import SpeakerNotesOffIcon from "@material-ui/icons/SpeakerNotesOff";
 import ClearIcon from "@material-ui/icons/Clear";
 import DoneIcon from "@material-ui/icons/Done";
 import Switch from "@material-ui/core/Switch";
-import Paper from "@material-ui/core/Paper";
 import Zoom from "@material-ui/core/Zoom";
 import { Spinner } from "reactstrap";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -59,9 +48,6 @@ import {
   closeTicket,
   ermModal,
 } from "../../store/actions/livechat";
-import { CloseButton } from "react-bootstrap";
-const { TextArea } = Input;
-const { Icon } = Layout;
 
 function getBase64(img, callback) {
   const reader = new FileReader();
@@ -69,17 +55,17 @@ function getBase64(img, callback) {
   reader.readAsDataURL(img);
 }
 
-function beforeUpload(file) {
-  const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
-  if (!isJpgOrPng) {
-    message.error("You can only upload JPG/PNG file!");
-  }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error("Image must smaller than 2MB!");
-  }
-  return isJpgOrPng && isLt2M;
-}
+// function beforeUpload(file) {
+//   const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+//   if (!isJpgOrPng) {
+//     message.error("You can only upload JPG/PNG file!");
+//   }
+//   const isLt2M = file.size / 1024 / 1024 < 2;
+//   if (!isLt2M) {
+//     message.error("Image must smaller than 2MB!");
+//   }
+//   return isJpgOrPng && isLt2M;
+// }
 
 class ChatInstance extends React.Component {
   localStream;
@@ -128,7 +114,6 @@ class ChatInstance extends React.Component {
       error_contact: false,
       valid_email: false,
       error_email: false,
-      valid_pname: false,
       error_fup: false,
       data: [],
       show_video: false,
@@ -909,9 +894,6 @@ class ChatInstance extends React.Component {
       }
     );
   };
-  onChange = (e) => {
-    let files = e.target.files;
-  };
   // fileList,
   customRequest = () => {
     console.log("File Request ", this.state.file);
@@ -993,10 +975,10 @@ class ChatInstance extends React.Component {
       });
     } else {
       alert("Empty message cannot send");
-      if (!(this.state.textMessage == "\n" || this.state.textMessage == "\r")) {
-        console.log("Message has enter");
-        var someText = this.state.textMessage.replace(/(\r\n|\n|\r)/gm, "");
-        console.log("REMOVE ENTER ", someText);
+      if (
+        !(this.state.textMessage === "\n" || this.state.textMessage === "\r")
+      ) {
+        var someText = this.state.textMessage.replace(/(\r\n|\n|\r)/g, "");
         this.setState({
           textMessage: someText,
         });
@@ -1327,18 +1309,18 @@ class ChatInstance extends React.Component {
       }
     });
   };
-  add_comment = (event, key) => {
+  add_comment(event, key) {
     // console.log("add_comment ---- ", event, " at Index ", key);
     this.state.add_Prescription[key].Duration = event;
     var temp = this.state.add_Prescription;
     this.state.add_Prescription.filter((item, index) => {
-      if (index === key) {
-        this.setState({
-          add_Prescription: temp,
-        });
-      }
+      return index === key
+        ? this.setState({
+            add_Prescription: temp,
+          })
+        : null;
     });
-  };
+  }
 
   delete_Prescription = (index) => {
     console.log("Delete Prescription Index ==== ", index);
@@ -1466,12 +1448,10 @@ class ChatInstance extends React.Component {
   };
   submit_form = () => {
     const {
-      h_id,
       patientName,
       gender,
       contact,
       email,
-      follow_up,
       complaints_symptoms,
       provisional_diagnosis,
       add_Prescription,
@@ -1494,15 +1474,11 @@ class ChatInstance extends React.Component {
       r_valid,
       f_valid,
       du_valid,
-      cs_NE,
-      pd_NE,
-      pr_NE,
-      lt_NE,
     } = this.state;
-    if (patientName != "") {
-      if (email != "") {
-        if (gender != "Gender" || gender != "") {
-          if (contact != "") {
+    if (patientName !== "") {
+      if (email !== "") {
+        if (gender !== "Gender" || gender !== "") {
+          if (contact !== "") {
             this.setState({
               error_email: false,
               error_contact: false,
@@ -1750,7 +1726,6 @@ class ChatInstance extends React.Component {
       duration: 1000,
     });
     const {
-      h_id,
       patientName,
       gender,
       contact,
@@ -1977,7 +1952,7 @@ class ChatInstance extends React.Component {
                 <div className="col">
                   <div
                     className={
-                      this.state.file_uri != "" ? "with_img" : "middle"
+                      this.state.file_uri !== "" ? "with_img" : "middle"
                     }
                     id="style-1"
                   >
@@ -1990,7 +1965,7 @@ class ChatInstance extends React.Component {
                         overflowX: "hidden",
                         overflowY: "auto",
                         maxHeight:
-                          this.state.file_uri != "" ? "320px" : "420px",
+                          this.state.file_uri !== "" ? "320px" : "420px",
                       }}
                     >
                       {this.props.close_Ticket ? this.removeTicket() : null}
@@ -2061,9 +2036,9 @@ class ChatInstance extends React.Component {
                             <Col>
                               {isSenderPatient ? (
                                 <div className={"message_right"}>
-                                  {message.file == null ? message.text : null}
+                                  {message.file === null ? message.text : null}
 
-                                  {message.file != null &&
+                                  {message.file !== null &&
                                   message.file.fileType === 0 ? (
                                     <img
                                       alt=""
@@ -2080,7 +2055,7 @@ class ChatInstance extends React.Component {
                                   ) : (
                                     ""
                                   )}
-                                  {message.file != null &&
+                                  {message.file !== null &&
                                   message.file.fileType === 1 ? (
                                     <a
                                       style={{ color: "#fff" }}
@@ -2099,8 +2074,8 @@ class ChatInstance extends React.Component {
                                 </div>
                               ) : (
                                 <div className={"message_left"}>
-                                  {message.file == null ? message.text : null}
-                                  {message.file != null &&
+                                  {message.file === null ? message.text : null}
+                                  {message.file !== null &&
                                   message.file.fileType === 0 ? (
                                     <img
                                       alt=""
@@ -2117,7 +2092,7 @@ class ChatInstance extends React.Component {
                                   ) : (
                                     ""
                                   )}
-                                  {message.file != null &&
+                                  {message.file !== null &&
                                   message.file.fileType === 1 ? (
                                     <a
                                       style={{ color: "#fff" }}
@@ -2179,7 +2154,7 @@ class ChatInstance extends React.Component {
                   </div>
                 </div>*/}
               </div>
-              {this.state.file_uri != "" ? (
+              {this.state.file_uri !== "" ? (
                 <div className="preview_img">
                   <div className="close_btn">
                     <img
@@ -2205,7 +2180,7 @@ class ChatInstance extends React.Component {
                   {this.state.file_type === "image/png" ||
                   this.state.file_type === "image/jpg" ||
                   (this.state.file_type === "image/jpeg" &&
-                    this.state.file_type != "") ? (
+                    this.state.file_type !== "") ? (
                     <img
                       alt=""
                       style={{
@@ -2494,7 +2469,7 @@ class ChatInstance extends React.Component {
                 <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row">
-                  {this.state.complaints_symptoms.length == 0
+                  {this.state.complaints_symptoms.length === 0
                     ? null
                     : this.state.complaints_symptoms.map((val, index) => {
                         return (
@@ -2637,7 +2612,7 @@ class ChatInstance extends React.Component {
                 <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row" style={{ marginBottom: "16px" }}>
-                  {this.state.provisional_diagnosis.length == 0
+                  {this.state.provisional_diagnosis.length === 0
                     ? null
                     : this.state.provisional_diagnosis.map((val, index) => {
                         return (
@@ -3025,7 +3000,7 @@ class ChatInstance extends React.Component {
                 <div className="block-example border-bottom border-primary"></div>
                 <div style={{ marginTop: "16px" }}></div>
                 <div className="row">
-                  {this.state.lab_tests.length == 0
+                  {this.state.lab_tests.length === 0
                     ? null
                     : this.state.lab_tests.map((val, index) => {
                         return (

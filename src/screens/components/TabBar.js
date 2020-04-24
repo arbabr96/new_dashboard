@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Ripples, { createRipples } from "react-ripples";
+import Ripples from "react-ripples";
 import Divider from "@material-ui/core/Divider";
 import "../../index.css";
 class TabBar extends Component {
@@ -14,7 +14,7 @@ class TabBar extends Component {
               width: "300px",
               backgroundColor: "#fafafa",
               paddingTop: "10px",
-              paddingBottom: "10px"
+              paddingBottom: "10px",
             }}
           >
             {/* ////////////////////// Header ///////////////////////// */}

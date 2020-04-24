@@ -17,7 +17,12 @@ class Login extends React.Component {
       isDisconnected: false,
     };
   }
+  getState = (state) => {
+    return state;
+  };
   componentDidMount() {
+    var state_auth = this.getState(Store.getState());
+    // console.log("State AUth", state_auth);
     this.handleConnectionChange();
     window.addEventListener("online", this.handleConnectionChange);
     window.addEventListener("offline", this.handleConnectionChange);
@@ -66,7 +71,7 @@ class Login extends React.Component {
     // console.log("USERNAME __ ", Username, Password);
     if (Username !== "") {
       if (Password !== "") {
-        const hide = message.loading({
+        message.loading({
           content: "Please wait ...",
           key,
           duration: 1000,
@@ -88,8 +93,7 @@ class Login extends React.Component {
                   "Bearer " + r.data.token;
                 setTimeout(() => {
                   Store.dispatch(setAuth(r.data));
-                  console.log("LOGIN", this.props);
-                  window.HH = this.props.history;
+                  localStorage.setItem("token", r.data.token);
                   this.props.history.push("/TakafulPanel/dashboard");
                 }, 600);
               }

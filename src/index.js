@@ -6,9 +6,9 @@ import * as serviceWorker from "./serviceWorker";
 import "antd/dist/antd.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Store from "./store/store";
-import { BrowserRouter } from "react-router-dom";
 import HttpsRedirect from "react-https-redirect";
 import { Provider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 
 ReactDOM.render(
   <HttpsRedirect>
