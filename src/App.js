@@ -6,6 +6,8 @@ import Login from "./screens/Login";
 import { connect } from "react-redux";
 import logo from "./assets/logo.png";
 import SignUp from "./screens/SignUp";
+import Store from "./store/store";
+import { setAuth } from "./store/actions/auth";
 
 class App extends React.Component {
   constructor(props) {
@@ -17,7 +19,6 @@ class App extends React.Component {
     // window.API_URL = "http://192.168.21.212:5000/";
     // window.API_URL = "http://54.36.109.50/TakafulAPI";
     window.API_URL = "https://iteck.pk/TakafulAPI/";
-    window.Tak_API = "https://iteck.pk/TakafulAPI/";
   }
   componentDidMount() {
     setTimeout(() => {
@@ -46,27 +47,21 @@ class App extends React.Component {
       );
     }
     return (
-      <HashRouter>
-        <div className={this.props.auth !== "" ? "All" : "App"}>
-          <div className={this.props.auth !== "" ? null : "auth-wrapper"}>
-            <div className={this.props.auth !== "" ? null : "auth-inner"}>
-              <Switch>
-                <Route
-                  history={this.props.history}
-                  path="/TakafulPanel/Dashboard"
-                  render={() => {
-                    return this.props.auth !== "" ? (
-                      <Dashboard />
-                    ) : (
-                      <Redirect
-                        to={{
-                          pathname: "/TakafulPanel",
-                        }}
-                      />
-                    );
-                  }}
-                />
-                <Route
+      <HashRouter basename="/">
+        {/* <div className={this.props.auth !== "" ? "All" : "App"}> */}
+        {/* <div className={this.props.auth !== "" ? null : "auth-wrapper"}>
+            <div className={this.props.auth !== "" ? null : "auth-inner"}> */}
+        {this.props.auth === "" ? (
+          <Route path="/" render={() => <Login />} />
+        ) : (
+          <Switch>
+            {/* <Route exact path="/">
+              <Login />
+            </Route> */}
+            <Route exact path="/Dashboard">
+              <Dashboard />
+            </Route>
+            {/*  <Route
                   exact
                   path="/TakafulPanel"
                   render={() => {
@@ -78,11 +73,12 @@ class App extends React.Component {
                   render={() => {
                     return <SignUp />;
                   }}
-                />
-              </Switch>
-            </div>
+                /> */}
+          </Switch>
+        )}
+        {/* </div>
           </div>
-        </div>
+        </div> */}
       </HashRouter>
     );
   }

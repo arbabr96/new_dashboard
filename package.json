@@ -1,6 +1,6 @@
 {
   "name": "takafuldashboard",
-  "homepage": "https://iteck.pk/TakafulPanel",
+  "homepage": ".",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

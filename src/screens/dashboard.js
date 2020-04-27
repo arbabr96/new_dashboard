@@ -1289,7 +1289,7 @@ class dashboard extends React.Component {
                       localStorage.clear();
                       Store.dispatch(rmAuth(""));
                     }, 100);
-                    // this.props.history.push("/TakafulPanel/Login");
+                    this.props.history.push("/");
                     console.log("LOGOUT", this.props);
                   }
                 );
@@ -1318,7 +1318,7 @@ class dashboard extends React.Component {
     const { availability } = this.state;
 
     return (
-      <div>
+      <div className="All">
         {/* {this.state.newRequest_check
           ? this.state.newRequest_array.map((val) =>
               this.openNotification(val.key)

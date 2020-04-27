@@ -1774,7 +1774,7 @@ class ChatInstance extends React.Component {
     console.log("Data === ", data);
     try {
       axios
-        .post(window.Tak_API + "api/EHR", data)
+        .post(window.API_URL + "api/EHR", data)
         .then((r) => {
           if (r.status === 200) {
             message.success({

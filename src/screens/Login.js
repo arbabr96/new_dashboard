@@ -3,7 +3,7 @@ import "../index.css";
 import "antd/dist/antd.css";
 import "antd/es/message/style/css";
 import { Input, message } from "antd";
-import { setAuth } from "../store/actions/auth";
+import { setAuth, rmAuth } from "../store/actions/auth";
 import Store from "../store/store";
 import { withRouter } from "react-router-dom";
 import Grow from "@material-ui/core/Grow";
@@ -26,12 +26,14 @@ class Login extends React.Component {
     });
     try {
       const token = localStorage.getItem("token");
-      if (token === null) {
-        console.log("Session out");
+      if (token === null || token === "") {
+        console.log("Session out Login");
+        Store.dispatch(rmAuth(""));
+        this.props.history.push("/");
       } else {
         // console.log("Local Storage Value APP JS", token);
         Store.dispatch(setAuth(JSON.parse(token)));
-        this.props.history.push("/TakafulPanel/Dashboard");
+        this.props.history.push("/Dashboard");
       }
     } catch (e) {
       console.log("Local Storage Catch Error", e);
@@ -108,7 +110,7 @@ class Login extends React.Component {
                 setTimeout(() => {
                   Store.dispatch(setAuth(r.data));
                   localStorage.setItem("token", JSON.stringify(r.data));
-                  this.props.history.push("/TakafulPanel/Dashboard");
+                  this.props.history.push("/Dashboard");
                 }, 600);
               }
             })
@@ -134,53 +136,56 @@ class Login extends React.Component {
   render() {
     const { checked } = this.state;
     return (
-      <Grow
-        in={checked}
-        style={{ transformOrigin: "0 0 0 0" }}
-        {...(checked ? { timeout: 400 } : {})}
-      >
-        <form>
-          <h3>Takaful Login</h3>
-          <div className="form-group">
-            <label>Username</label>
-            {/* <input
+      <div className={"App"}>
+        <div className={"auth-wrapper"}>
+          <div className={"auth-inner"}>
+            <Grow
+              in={checked}
+              style={{ transformOrigin: "0 0 0 0" }}
+              {...(checked ? { timeout: 400 } : {})}
+            >
+              <form>
+                <h3>Takaful Login</h3>
+                <div className="form-group">
+                  <label>Username</label>
+                  {/* <input
             type="email"
             className="form-control"
             placeholder="Enter email"
             onChange
           /> */}
-            <Input
-              placeholder="Username"
-              onChange={(text) =>
-                this.setState({ Username: text.target.value })
-              }
-              // value={this.state.Username}
-            />
-          </div>
-          <div className="form-group">
-            <label>Password</label>
-            {/* <input
+                  <Input
+                    placeholder="Username"
+                    onChange={(text) =>
+                      this.setState({ Username: text.target.value })
+                    }
+                    // value={this.state.Username}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Password</label>
+                  {/* <input
             type="password"
             className="form-control"
             placeholder="Enter password"
           /> */}
-            <Input.Password
-              visibilityToggle={true}
-              placeholder="Password"
-              onChange={(text) =>
-                this.setState({ Password: text.target.value })
-              }
-              onKeyUp={(text) => {
-                if (text.keyCode === 13 && text.target.value !== "") {
-                  this.login();
-                }
-              }}
-              // value={this.state.Password}
-            />
-          </div>
-          <div className="form-group">
-            <div className="custom-control custom-checkbox">
-              {/* <input
+                  <Input.Password
+                    visibilityToggle={true}
+                    placeholder="Password"
+                    onChange={(text) =>
+                      this.setState({ Password: text.target.value })
+                    }
+                    onKeyUp={(text) => {
+                      if (text.keyCode === 13 && text.target.value !== "") {
+                        this.login();
+                      }
+                    }}
+                    // value={this.state.Password}
+                  />
+                </div>
+                <div className="form-group">
+                  <div className="custom-control custom-checkbox">
+                    {/* <input
                 type="checkbox"
                 className="custom-control-input"
                 id="customCheck1"
@@ -188,29 +193,32 @@ class Login extends React.Component {
               <label className="custom-control-label" htmlFor="customCheck1">
                 Remember me
               </label> */}
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={this.login}
-            className="btn btn-primary btn-block"
-          >
-            Login
-          </button>
-          {/* <button
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={this.login}
+                  className="btn btn-primary btn-block"
+                >
+                  Login
+                </button>
+                {/* <button
           type="button"
           onClick={this.signup}
           className="btn btn-success btn-block"
         >
           Sign Up
         </button> */}
-          {/* <p className="forgot-password text-right">
+                {/* <p className="forgot-password text-right">
           <a onClick={this.signup} href="#">
             Sign Up
           </a>
         </p> */}
-        </form>
-      </Grow>
+              </form>
+            </Grow>
+          </div>
+        </div>
+      </div>
     );
   }
 }
