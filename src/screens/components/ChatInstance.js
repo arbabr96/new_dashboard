@@ -578,7 +578,7 @@ class ChatInstance extends React.Component {
         { url: "stun:stun3.l.google.com:19302" },
         { url: "stun:stun4.l.google.com:19302" },
         {
-          urls: "turn:110.93.216.20:3478?transport=tcp",
+          urls: "turn:54.36.109.50:3479?transport=tcp",
           username: "test",
           lifetime: 600,
           credential: "test",
@@ -839,26 +839,26 @@ class ChatInstance extends React.Component {
       { audio: true, video: true },
       (stream) => {
         this.localStream = stream;
-        const mediaRecorder = new MediaRecorder(stream);
-        mediaRecorder.start();
+        // const mediaRecorder = new MediaRecorder(stream);
+        // mediaRecorder.start();
 
         const audioChunks = [];
-        mediaRecorder.addEventListener("dataavailable", (event) => {
-          audioChunks.push(event.data);
-        });
+        // mediaRecorder.addEventListener("dataavailable", (event) => {
+        //   audioChunks.push(event.data);
+        // });
 
-        mediaRecorder.addEventListener("stop", () => {
-          const audioBlob = new Blob(audioChunks);
-          const audioUrl = window.URL.createObjectURL(audioBlob);
-          console.log("AUDIO URL === ", audioUrl);
-          this.setState({
-            recordURL: audioUrl,
-          });
-        });
+        // mediaRecorder.addEventListener("stop", () => {
+        //   const audioBlob = new Blob(audioChunks);
+        //   const audioUrl = window.URL.createObjectURL(audioBlob);
+        //   console.log("AUDIO URL === ", audioUrl);
+        //   this.setState({
+        //     recordURL: audioUrl,
+        //   });
+        // });
 
-        setTimeout(() => {
-          mediaRecorder.stop();
-        }, 10000);
+        // setTimeout(() => {
+        //   mediaRecorder.stop();
+        // }, 10000);
         console.log("local stream without video", this.localStream);
         this.localVideo.current.srcObject = stream;
       },

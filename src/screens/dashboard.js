@@ -90,6 +90,7 @@ class dashboard extends React.Component {
       show_video: false,
       logout_show: false,
       token: "",
+      connection: "",
     };
     this.url =
       "https://nf1f8200-a.akamaihd.net/downloads/ringtones/files/mp3/iphone-6-original-ringtone-24163.mp3";
@@ -177,7 +178,9 @@ class dashboard extends React.Component {
         },
       })
       .build();
-
+    this.setState({
+      connection,
+    });
     connection.on("exception", (exception) => {
       console.log("connectWithLiveChatHub exception", exception);
     });
@@ -207,7 +210,7 @@ class dashboard extends React.Component {
           onClick={() => {
             console.log("ON ACCEPT", key);
             this.props.connection.invoke("OnAccept", event).then(() => {
-              notification.close(event);
+              notification.close();
               this.setState({
                 newRequest_check: false,
               });
@@ -227,7 +230,7 @@ class dashboard extends React.Component {
         btn,
         key,
         onClose: close,
-        duration: 60,
+        duration: 4,
       });
       ///////////////////////////////////////////////////////////////////////
     });
@@ -238,6 +241,7 @@ class dashboard extends React.Component {
     connection.on("OnTimeExceed", (event) => {
       console.log("OnTimeExceed ------ ----- ", JSON.stringify(event));
     });
+
     connection.on("newWindow", (event) => {
       this.setState({
         newRequest_check: false,
@@ -275,6 +279,17 @@ class dashboard extends React.Component {
     connection
       .start()
       .then(() => {
+        connection
+          .invoke("SetAvailability", true)
+          .then((r) => {
+            this.setState({
+              availability: "Available",
+            });
+            console.log("Available", r);
+          })
+          .catch((e) => {
+            console.log("Available ERR", e);
+          });
         console.log("Connection Established");
         message.success({
           content: "Connection Established!",
@@ -323,22 +338,34 @@ class dashboard extends React.Component {
     if (this.state.availability === "Away") {
       if (this.props.connection) {
         this.props.connection
-          .invoke("setAvailability", "Available")
+          .invoke("SetAvailability", true)
           .then((r) => {
-            console.log("r", r);
+            this.setState({
+              availability: "Available",
+            });
+            console.log("Available", r);
           })
           .catch((e) => {
-            console.log("e", e);
+            console.log("Available ERR", e);
           });
       }
-      this.setState({
-        availability: "Available",
-      });
+
       console.log("Value is Available");
     } else {
-      this.setState({
-        availability: "Away",
-      });
+      if (this.props.connection) {
+        this.props.connection
+          .invoke("SetAvailability", false)
+          .then((r) => {
+            this.setState({
+              availability: "Away",
+            });
+            console.log("Away", r);
+          })
+          .catch((e) => {
+            console.log("Away ERR", e);
+          });
+      }
+      console.log("Value is Away");
     }
     // if (val === "Available") {
     //   if (this.props.connection) {
@@ -346,6 +373,7 @@ class dashboard extends React.Component {
     //       .invoke("setAvailability", val)
     //       .then(r => {
     //         console.log("r", r);
+
     //       })
     //       .catch(e => {
     //         console.log("e", e);
@@ -1280,6 +1308,12 @@ class dashboard extends React.Component {
                     logout_show: false,
                   },
                   () => {
+                    if (
+                      this.state.connection.state ===
+                      signalR.HubConnectionState.Connected
+                    ) {
+                      this.state.connection.stop();
+                    }
                     message.loading({
                       content: "Logging Out",
                       key,
