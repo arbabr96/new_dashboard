@@ -156,17 +156,18 @@ class ChatInstance extends React.Component {
     } else {
       this.listening_connection(connection, ticket);
     }
-    console.log(
-      "UNSAFE_componentWillReceiveProps (Connection) ",
-      connection,
-      "UNSAFE_componentWillReceiveProps (Ticket) ",
-      ticket
-    );
+    // console.log(
+    //   "UNSAFE_componentWillReceiveProps (Connection) ",
+    //   connection,
+    //   "UNSAFE_componentWillReceiveProps (Ticket) ",
+    //   ticket
+    // );
   }
   listening_connection = (connection, ticket) => {
     // let ticket = this.props.ticket;
     // let connection = this.props.connection;
     console.log("CHAT INSTANCE RE RENDER ---- ", ticket);
+    // if (connection.methods.message + `-${ticket.id}` === undefined) {
     connection.on("message-" + ticket.id, (message) => {
       this.props.newMessage("New Message");
       this.props.ticketID(message.ticketID);
@@ -181,6 +182,7 @@ class ChatInstance extends React.Component {
 
       this.forceUpdate();
     });
+    // }
 
     connection.on("requestAudio-" + ticket.id, (ticketId) => {
       //  console.log('')
@@ -577,8 +579,14 @@ class ChatInstance extends React.Component {
         { url: "stun:stun2.l.google.com:19302" },
         { url: "stun:stun3.l.google.com:19302" },
         { url: "stun:stun4.l.google.com:19302" },
+        // {
+        //   urls: "turn:54.36.109.50:3479?transport=tcp",
+        //   username: "test",
+        //   lifetime: 600,
+        //   credential: "test",
+        // },
         {
-          urls: "turn:54.36.109.50:3479?transport=tcp",
+          urls: "turn:110.93.216.20:3478?transport=tcp",
           username: "test",
           lifetime: 600,
           credential: "test",
@@ -663,7 +671,8 @@ class ChatInstance extends React.Component {
     return (
       <div className="call_request_view">
         <div className="heading_text show_hide">
-          Patient has requested for an audio call session
+          {this.props.ticket.patient.username} has requested for an audio call
+          session
         </div>
 
         <div className="row buttons_call">
@@ -900,6 +909,10 @@ class ChatInstance extends React.Component {
     this.setState({ uploading: true });
     var data = new FormData();
 
+    const token = localStorage.getItem("token");
+    var user = JSON.parse(token);
+    var uid = user.id;
+    console.log("UID", uid);
     // data.append("prescription", this.state.file);
     data.append("prescription", this.state.file);
     console.log("DATA APPENDED", data);
@@ -912,8 +925,8 @@ class ChatInstance extends React.Component {
     axios
       .post(
         window.API_URL +
-          "api/files/uploadprescription?ticketId=" +
-          this.props.ticket.id,
+          `api/files/uploadprescription?ticketId=
+          ${this.props.ticket.id}&id=${uid}`,
         data,
         config
       )

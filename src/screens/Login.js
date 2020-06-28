@@ -31,8 +31,10 @@ class Login extends React.Component {
         Store.dispatch(rmAuth(""));
         this.props.history.push("/");
       } else {
-        // console.log("Local Storage Value APP JS", token);
-        Store.dispatch(setAuth(JSON.parse(token)));
+        var data = JSON.parse(token);
+        console.log("Local Storage Value APP JS", data.token);
+        axios.defaults.headers.common["Authorization"] = "Bearer " + data.token;
+        Store.dispatch(setAuth(data));
         this.props.history.push("/Dashboard");
       }
     } catch (e) {

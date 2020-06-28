@@ -184,13 +184,16 @@ class dashboard extends React.Component {
     connection.on("exception", (exception) => {
       console.log("connectWithLiveChatHub exception", exception);
     });
+    // connection.on("isBusy", (ev) => {
+    //   console.log("Doctor is Busy on Another Call", ev);
+    // });
 
     connection.on("NewRequest", (event) => {
-      console.log("NewRequest ==== ", event);
+      console.log("NewRequest ==== ", this.state.connection);
       /////////////////////////////////////////////////////////////////////
       const close = () => {
+        notification.close(event);
         this.props.connection.invoke("OnReject", event).then((response) => {
-          notification.close(event);
           this.setState({
             newRequest_check: false,
           });
@@ -209,8 +212,8 @@ class dashboard extends React.Component {
           startIcon={<DoneIcon />}
           onClick={() => {
             console.log("ON ACCEPT", key);
+            notification.close(event);
             this.props.connection.invoke("OnAccept", event).then(() => {
-              notification.close();
               this.setState({
                 newRequest_check: false,
               });
@@ -230,12 +233,13 @@ class dashboard extends React.Component {
         btn,
         key,
         onClose: close,
-        duration: 4,
+        duration: 5,
       });
       ///////////////////////////////////////////////////////////////////////
     });
     connection.on("AcceptedBySomeDoctor", (event) => {
       console.log("AcceptedBySomeDoctor --- ", event);
+      notification.close(event);
     });
 
     connection.on("OnTimeExceed", (event) => {
@@ -1628,7 +1632,9 @@ class dashboard extends React.Component {
                               <div className="p_hid">
                                 Ticket Id : {ticket.id}
                               </div>
-                              <div className="p_policy">Policy # 1111221</div>
+                              <div className="p_policy">
+                                Policy # {ticket.policyNo}
+                              </div>
                             </div>
                           </div>
                         </Ripples>
